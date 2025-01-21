@@ -2,7 +2,7 @@
 
 当前前端项目是SpringVulnBoot靶场项目的前端工程，后端工程地址是：[https://github.com/bansh2eBreak/SpringVulnBoot-backend](https://github.com/bansh2eBreak/SpringVulnBoot-backend)
 
-![img_1.png](img_1.png)
+![alt text](image.png)
 
 本次更新（2025/01/21）：
 - 增加了登录认证，通过spring框架的Interceptor+WebMvcConfigurer配置类实现登录校验
