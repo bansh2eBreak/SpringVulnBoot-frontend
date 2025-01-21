@@ -53,7 +53,7 @@
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">漏洞代码 - 语句拼接(Statement) <div>
-                                <el-button type="danger" round size="mini" @click="handleButtonClick1">去测试</el-button>
+                                <!-- <el-button type="danger" round size="mini" @click="handleButtonClick1">去测试</el-button> -->
                                 <el-button type="text" @click="fetchDataAndFillTable1"
                                     style="color: green;">正常查询</el-button>
                                 <el-button type="text" @click="fetchDataAndFillTable2"
@@ -89,8 +89,10 @@ public Result getUserByUsername(String username) throws Exception {
                 </el-col>
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 恶意字符过滤 <el-button
-                                type="success" round size="mini" @click="handleButtonClick2">去测试</el-button></el-row>
+                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 恶意字符过滤 <div>
+                                <el-button type="text" @click="fetchDataAndFillTable3"
+                                    style="color: red;">注入查询</el-button>
+                            </div></el-row>
                         <pre v-highlightjs><code class="java">// 安全工具类
 public class Security {
     public static boolean checkSql(String content) {
@@ -119,6 +121,7 @@ public Result getUserByUsernameFilter(String username) throws Exception {
         Statement statement = conn.createStatement();
         ResultSet resultSet = statement.executeQuery(sql);
         //5.判断是否查询到数据，省略
+    }
 }
 </code></pre>
                     </div>
@@ -128,20 +131,24 @@ public Result getUserByUsernameFilter(String username) throws Exception {
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">漏洞代码 -
-                            语句拼接(PrepareStatement)<el-button type="danger" round size="mini"
-                                @click="handleButtonClick3">去测试</el-button></el-row>
-                        <pre v-highlightjs><code class="java">@GetMapping("/getUserByUsername")
-public Result getUserByUsername(String username) throws Exception {
+                            语句拼接(PrepareStatement)<div>
+                                <el-button type="text" @click="fetchDataAndFillTable4"
+                                    style="color: green;">正常查询</el-button>
+                                <el-button type="text" @click="fetchDataAndFillTable5"
+                                    style="color: red;">注入查询</el-button>
+                            </div></el-row>
+                        <pre v-highlightjs><code class="java">@GetMapping("/getUserSecByUsernameError")
+public Result getUserSecByUsernameError(String username) throws Exception {
     List&lt;User&gt; users = new ArrayList&lt;&gt;();
     //1、注册驱动
     Class.forName("com.mysql.cj.jdbc.Driver");
     //2.获取连接
     Connection conn = DriverManager.getConnection(db_url, db_user, db_pass);
     //3.定义sql语句
-    String sql = "select * from user where username = '" + username + "'";
+    String sql = "select id, username, name from user where username = '" + username + "'";
     //4.获取statement对象
-    Statement statement = conn.createStatement();
-    ResultSet resultSet = statement.executeQuery(sql);
+    PreparedStatement preparedStatement = conn.prepareStatement(sql);
+    ResultSet resultSet = preparedStatement.executeQuery();
     log.info("sql语句被执行: {}", sql);
     //5.判断是否查询到数据
     while (resultSet.next()) {
@@ -152,7 +159,7 @@ public Result getUserByUsername(String username) throws Exception {
         users.add(user);
     }
     resultSet.close();
-    statement.close();
+    preparedStatement.close();
     conn.close();
     return Result.success(users);
 }</code></pre>
@@ -160,8 +167,10 @@ public Result getUserByUsername(String username) throws Exception {
                 </el-col>
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 预编译 <el-button type="success"
-                                round size="mini" @click="handleButtonClick4">去测试</el-button></el-row>
+                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 预编译 <div>
+                                <el-button type="text" @click="fetchDataAndFillTable6"
+                                    style="color: red;">注入查询</el-button>
+                            </div></el-row>
                         <pre v-highlightjs><code class="java">@GetMapping("/getUserSecByUsername")
 public Result getUserSecByUsername(String username) throws Exception {
     List&lt;User&gt; users = new ArrayList&lt;&gt;();
@@ -212,6 +221,8 @@ public Result getUserSecByUsername(String username) throws Exception {
 
 <script>
 import axios from 'axios';
+import { getUserByUsername, getUserByUsernameFilter, getUserSecByUsernameError, getUserSecByUsername } from '@/api/sqli';
+
 export default {
     data() {
         return {
@@ -225,37 +236,67 @@ export default {
         handleClick(tab, event) {
             // console.log(tab, event);
         },
-        handleButtonClick1() {
-            window.open("http://127.0.0.1:8080/sqli/jdbc/getUserByUsername?username=zhangsan' or 'f'='f", "_blank");
-        },
-        handleButtonClick2() {
-            window.open("http://127.0.0.1:8080/sqli/jdbc/getUserSecByUsernameFilter?username=zhangsan'", "_blank");
-        },
-        handleButtonClick3() {
-            window.open("http://127.0.0.1:8080/sqli/jdbc/getUserSecByUsernameError?username=zhangsan' or 'f'='f", "_blank");
-        },
-        handleButtonClick4() {
-            window.open("http://127.0.0.1:8080/sqli/jdbc/getUserSecByUsername?username=zhangsan' or 'f'='f", "_blank");
-        },
         fetchDataAndFillTable1() {
-            axios.get("http://127.0.0.1:8080/sqli/jdbc/getUserByUsername?username=zhangsan")
+            getUserByUsername({ username: 'zhangsan' })
                 .then(response => {
-                    this.gridData = response.data.data;
-                    console.log(this.gridData);
+                    this.pocUrl = "http://127.0.0.1:8080/sqli/jdbc/getUserByUsername?username=zhangsan";
                     this.dialogTableVisible = true; // 显示对话框
-                    this.pocUrl = "http://127.0.0.1:8080/sqli/jdbc/getUserSecByUsername?username=zhangsan";
+                    this.gridData = response.data;
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                 });
         },
         fetchDataAndFillTable2() {
-            axios.get("http://127.0.0.1:8080/sqli/jdbc/getUserByUsername?username=zhangsan' or 'f'='f")
+            getUserByUsername({ username: "zhangsan' or 'f'= 'f" })
                 .then(response => {
-                    this.gridData = response.data.data;
-                    console.log(this.gridData);
+                    this.pocUrl = "http://127.0.0.1:8080/sqli/jdbc/getUserByUsername?username=zhangsan' or 'f'='f";
                     this.dialogTableVisible = true; // 显示对话框
+                    this.gridData = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        fetchDataAndFillTable3() {
+            getUserByUsernameFilter({ username: "zhangsan' or 'f'= 'f" })
+                .then(response => {
+                    this.pocUrl = "http://127.0.0.1:8080/sqli/jdbc/getUserSecByUsernameFilter?username=zhangsan' or 'f'='f";
+                    this.dialogTableVisible = true; // 显示对话框
+                    this.gridData = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        fetchDataAndFillTable4() {
+            getUserSecByUsernameError({ username: "zhangsan" })
+                .then(response => {
+                    this.pocUrl = "http://127.0.0.1:8080/sqli/jdbc/getUserSecByUsernameError?username=zhangsan";
+                    this.dialogTableVisible = true; // 显示对话框
+                    this.gridData = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        fetchDataAndFillTable5() {
+            getUserSecByUsernameError({ username: "zhangsan' or 'f'= 'f" })
+                .then(response => {
+                    this.pocUrl = "http://127.0.0.1:8080/sqli/jdbc/getUserSecByUsernameError?username=zhangsan' or 'f'='f";
+                    this.dialogTableVisible = true; // 显示对话框
+                    this.gridData = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        fetchDataAndFillTable6() {
+            getUserSecByUsername({ username: "zhangsan' or 'f'= 'f" })
+                .then(response => {
                     this.pocUrl = "http://127.0.0.1:8080/sqli/jdbc/getUserSecByUsername?username=zhangsan' or 'f'='f";
+                    this.dialogTableVisible = true; // 显示对话框
+                    this.gridData = response.data;
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);

@@ -46,20 +46,20 @@
             <el-row :gutter="20" class="grid-flex">
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">漏洞代码 - Runtime方式 <div>
-                                <el-button type="danger" round size="mini" @click="handleButtonClick1">去测试</el-button>
+                        <el-row type="flex" justify="space-between" align="middle">漏洞代码 - Runtime方式<div><el-button
+                                    type="danger" round size="mini" @click="fetchDataAndFillTable1">测试</el-button>
                             </div></el-row>
                         <pre v-highlightjs><code class="java">@RestController
 @Slf4j
 @RequestMapping("/rce")
 public class RCEController {
     /**
-     * @Poc：http://127.0.0.1:8080/rce/ping?ip=127.0.0.1 -c 1;whoami
+     * @Poc：http://127.0.0.1:8080/rce/vulnPing?ip=127.0.0.1 -c 1;whoami
      * @param ip IP地址
      * @return  返回命令执行结果
      */
-    @GetMapping("/ping")
-    public String vuln1(String ip) {
+    @GetMapping("/vulnPing")
+    public String vulnPing(String ip) {
         String line;    // 用于保存命令执行结果
         StringBuilder sb = new StringBuilder();
 
@@ -89,15 +89,16 @@ public class RCEController {
             e.printStackTrace();
         }
         //将命令执行结果或者错误结果输出
-        return sb.toString();
+        return Result.success(sb.toString());
     }
 }</code></pre>
                     </div>
                 </el-col>
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 自定义过滤 <el-button
-                                type="success" round size="mini" @click="handleButtonClick2">去测试</el-button></el-row>
+                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 自定义过滤<div><el-button
+                                    type="success" round size="mini" @click="fetchDataAndFillTable2">测试</el-button>
+                            </div></el-row>
                         <pre v-highlightjs><code class="java">/**
  * 命令执行恶意字符检测
  */
@@ -111,8 +112,8 @@ public static boolean checkCommand(String content) {
     return false;
 }
 
-@GetMapping("/secping")
-public String vuln2(String ip) {
+@GetMapping("/secPing")
+public String secPing(String ip) {
     if (Security.checkCommand(ip)) {
         log.warn("非法字符：{}", ip);
         return "检测到非法命令注入！";
@@ -134,9 +135,8 @@ public String vuln2(String ip) {
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">漏洞代码 - ProcessBuilder方式
-                            <div><el-button type="danger" round size="mini" @click="handleButtonClick3">去测试</el-button>
-                                <el-button type="text" @click="fetchDataAndFillTable1"
-                                    style="color: red;">页面查询</el-button>
+                            <div><el-button type="danger" round size="mini"
+                                    @click="fetchDataAndFillTable3">测试</el-button>
                             </div>
                         </el-row>
                         <pre v-highlightjs><code class="java">/**
@@ -177,16 +177,15 @@ public String vulnPing2(String ip) {
         e.printStackTrace();
     }
     //将命令执行结果或者错误结果输出
-    return sb.toString();
+    return Result.success(sb.toString());
 }</code></pre>
                     </div>
                 </el-col>
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - 合法IP地址检测
-                            <div><el-button type="success" round size="mini" @click="handleButtonClick4">去测试</el-button>
-                                <el-button type="text" @click="fetchDataAndFillTable2"
-                                    style="color: green;">页面查询</el-button>
+                            <div><el-button type="success" round size="mini"
+                                    @click="fetchDataAndFillTable4">测试</el-button>
                             </div>
                         </el-row>
                         <pre v-highlightjs><code class="java">// 合法IP地址检测
@@ -243,29 +242,55 @@ public String secPing2(String ip) {
             </el-row>
         </div>
         <!-- 打开嵌套表单的对话框1 -->
-        <el-dialog title="Ping测试" :visible.sync="dialogFormVisible" class="center-dialog">
-            <el-form :inline="true" :model="formInline" class="demo-form-inline">
+        <el-dialog title="Ping测试" :visible.sync="dialogFormVisible1" class="center-dialog">
+            <el-form :inline="true" class="demo-form-inline">
                 <el-form-item label="Ping">
-                    <el-input v-model="formInline.ipaddress"></el-input>
+                    <el-input v-model="ipaddress1"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="onSubmit">测试</el-button>
+                    <el-button type="primary" @click="onSubmit1">测试</el-button>
                 </el-form-item>
                 <br />
-                <pre>{{ pingResult }}</pre>
+                <pre>{{ pingResult1 }}</pre>
             </el-form>
         </el-dialog>
         <!-- 打开嵌套表单的对话框2 -->
         <el-dialog title="Ping测试" :visible.sync="dialogFormVisible2" class="center-dialog">
-            <el-form :inline="true" :model="formInline" class="demo-form-inline">
+            <el-form :inline="true" class="demo-form-inline">
                 <el-form-item label="Ping">
-                    <el-input v-model="formInline.ipaddress"></el-input>
+                    <el-input v-model="ipaddress2"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="onSubmit2">测试</el-button>
                 </el-form-item>
                 <br />
-                <pre>{{ pingResult }}</pre>
+                <pre>{{ pingResult2 }}</pre>
+            </el-form>
+        </el-dialog>
+        <!-- 打开嵌套表单的对话框3 -->
+        <el-dialog title="Ping测试" :visible.sync="dialogFormVisible3" class="center-dialog">
+            <el-form :inline="true" class="demo-form-inline">
+                <el-form-item label="Ping">
+                    <el-input v-model="ipaddress3"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit3">测试</el-button>
+                </el-form-item>
+                <br />
+                <pre>{{ pingResult3 }}</pre>
+            </el-form>
+        </el-dialog>
+        <!-- 打开嵌套表单的对话框4 -->
+        <el-dialog title="Ping测试" :visible.sync="dialogFormVisible4" class="center-dialog">
+            <el-form :inline="true" class="demo-form-inline">
+                <el-form-item label="Ping">
+                    <el-input v-model="ipaddress4"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit4">测试</el-button>
+                </el-form-item>
+                <br />
+                <pre>{{ pingResult4 }}</pre>
             </el-form>
         </el-dialog>
     </div>
@@ -273,74 +298,99 @@ public String secPing2(String ip) {
 
 <script>
 import axios from 'axios';
+import { vulnPing, secPing, vulnPing2, secPing2 } from '@/api/rce';
+
 export default {
     data() {
         return {
             activeName: 'first',
-            dialogFormVisible: false,
+            dialogFormVisible1: false,
             dialogFormVisible2: false,
-            formInline: {
-                ipaddress: ''
-            },
-            pingResult: ''
+            dialogFormVisible3: false,
+            dialogFormVisible4: false,
+            ipaddress1: '127.0.0.1 -c 1;whoami',
+            ipaddress2: '127.0.0.1 -c 1;whoami',
+            ipaddress3: '127.0.0.1 -c 1;whoami',
+            ipaddress4: '127.0.0.1 -c 1;whoami',
+            pingResult1: '',
+            pingResult2: '',
+            pingResult3: '',
+            pingResult4: '',
         };
     },
     methods: {
         handleClick(tab, event) {
             // console.log(tab, event);
         },
-        handleButtonClick1() {
-            window.open("http://127.0.0.1:8080/rce/vulnPing?ip=127.0.0.1 -c 1;whoami", "_blank");
-        },
-        handleButtonClick2() {
-            window.open("http://127.0.0.1:8080/rce/secPing?ip=127.0.0.1%20-c%201;whoami", "_blank");
-        },
-        handleButtonClick3() {
-            window.open("http://127.0.0.1:8080/rce/vulnPing2?ip=127.0.0.1 -c 1;whoami", "_blank");
-        },
-        handleButtonClick4() {
-            window.open("http://127.0.0.1:8080/rce/secPing2?ip=127.0.0.1 -c 1;whoami", "_blank");
-        },
         fetchDataAndFillTable1() {
-            this.dialogFormVisible = true; // 显示对话框
+            this.dialogFormVisible1 = true; // 显示对话框
         },
         fetchDataAndFillTable2() {
             this.dialogFormVisible2 = true; // 显示对话框
         },
-        onSubmit() {
-            if (!this.formInline.ipaddress) {
+        fetchDataAndFillTable3() {
+            this.dialogFormVisible3 = true; // 显示对话框
+        },
+        fetchDataAndFillTable4() {
+            this.dialogFormVisible4 = true; // 显示对话框
+        },
+        onSubmit1() {
+            if (!this.ipaddress1) {
                 // 如果提交内容为空，显示错误提示
                 this.$message.error('留言内容不能为空');
                 return;
             }
-            axios.get("http://127.0.0.1:8080/rce/vulnPing2", {
-                params: {
-                    ip: this.formInline.ipaddress
-                }
-            }).then(response => {
-                // 展示返回的数据
-                this.pingResult = response.data;
-            }).catch(error => {
-                // 处理异常
-            });
+            vulnPing({ ip: this.ipaddress1 })
+                .then(response => {
+                    // 展示返回的数据
+                    this.pingResult1 = response.data;
+                }).catch(error => {
+                    // 处理异常
+                });
         },
         onSubmit2() {
-            if (!this.formInline.ipaddress) {
+            if (!this.ipaddress2) {
                 // 如果提交内容为空，显示错误提示
                 this.$message.error('留言内容不能为空');
                 return;
             }
-            axios.get("http://127.0.0.1:8080/rce/secPing2", {
-                params: {
-                    ip: this.formInline.ipaddress
-                }
-            }).then(response => {
-                // 展示返回的数据
-                this.pingResult = response.data;
-            }).catch(error => {
-                // 处理异常
-            });
+            secPing({ ip: this.ipaddress2 })
+                .then(response => {
+                    // 展示返回的数据
+                    this.pingResult2 = response.data;
+                }).catch(error => {
+                    // 处理异常
+                });
+        },
+        onSubmit3() {
+            if (!this.ipaddress3) {
+                // 如果提交内容为空，显示错误提示
+                this.$message.error('留言内容不能为空');
+                return;
+            }
+            vulnPing2({ ip: this.ipaddress3 })
+                .then(response => {
+                    // 展示返回的数据
+                    this.pingResult3 = response.data;
+                }).catch(error => {
+                    // 处理异常
+                });
+        },
+        onSubmit4() {
+            if (!this.ipaddress4) {
+                // 如果提交内容为空，显示错误提示
+                this.$message.error('留言内容不能为空');
+                return;
+            }
+            secPing2({ ip: this.ipaddress4 })
+                .then(response => {
+                    // 展示返回的数据
+                    this.pingResult4 = response.data;
+                }).catch(error => {
+                    // 处理异常
+                });
         }
+
     }
 };
 </script>

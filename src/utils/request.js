@@ -5,7 +5,7 @@ import { getToken } from '@/utils/auth'
 
 // create an axios instance
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
+  baseURL: process.env.VUE_APP_BASE_API, // VUE_APP_BASE_API = 'http://127.0.0.1:8080/'
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })
@@ -19,7 +19,8 @@ service.interceptors.request.use(
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
-      config.headers['X-Token'] = getToken()
+      // config.headers['Authorization'] = getToken()
+      config.headers['Authorization'] = localStorage.getItem('Authorization')
     }
     return config
   },
@@ -42,37 +43,74 @@ service.interceptors.response.use(
    * Here is just an example
    * You can also judge the status by HTTP Status Code
    */
+  /** 
   response => {
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+    if (res.code !== 0) {
       Message({
-        message: res.message || 'Error',
+        message: res.data || 'Error',
         type: 'error',
         duration: 5 * 1000
       })
 
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-        // to re-login
-        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-          confirmButtonText: 'Re-Login',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload()
-          })
-        })
-      }
-      return Promise.reject(new Error(res.message || 'Error'))
+      // // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
+      // if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
+      //   // to re-login
+      //   MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
+      //     confirmButtonText: 'Re-Login',
+      //     cancelButtonText: 'Cancel',
+      //     type: 'warning'
+      //   }).then(() => {
+      //     store.dispatch('user/resetToken').then(() => {
+      //       location.reload()
+      //     })
+      //   }) 
+      // }
+      return Promise.reject(new Error(res.msg || 'Error'))
     } else {
       return res
     }
+  }, */
+  response => {
+    if (response.status === 200) {
+      // HTTP状态码为200，表示请求成功
+      try {
+        // const res = JSON.parse(response.data) //response.data.data 是 jwttoken
+        const res = response.data
+        if (res.code !== 0) {
+          Message({
+            message: res.data || 'Error', // 这行执行了，输出Error
+            type: 'error',
+            duration: 5 * 1000
+          })
+          return Promise.reject(new Error(res.msg || 'Error'))
+        } else {
+          return res
+        }
+      } catch (error) {
+        // 如果无法解析为JSON，则将响应文本作为消息内容处理
+        // response 内容不是标准的JSON格式
+        Message({
+          message: response.data || 'Error',
+          type: 'error',
+          duration: 5 * 1000
+        })
+        return Promise.reject(new Error('Error parsing response'))
+      }
+    } else {
+      // 处理HTTP状态码不是200的情况
+      // 在这里添加相应的处理逻辑
+      Message({
+        message: 'HTTP Error: ' + response.status,
+        type: 'error',
+        duration: 5 * 1000
+      })
+      return Promise.reject(new Error('HTTP Error'))
+    }
   },
   error => {
-    console.log('err' + error) // for debug
     Message({
       message: error.message,
       type: 'error',

@@ -153,6 +153,8 @@ void insertMessage(MessageBoard messageBoard);
 
 <script>
 import axios from 'axios';
+import { queryMessage, addMessage, addMessageSec } from '@/api/xss';
+
 export default {
     data() {
         return {
@@ -170,21 +172,19 @@ export default {
             // console.log(tab, event);
         },
         fetchDataAndFillTable1() {
-            axios.get("http://127.0.0.1:8080/xss/stored/queryMessage")
+            queryMessage({})
                 .then(response => {
-                    this.tableData = response.data.data;
-                    console.log(this.tableData[0].message);
                     this.dialogFormVisible = true; // 显示对话框
+                    this.tableData = response.data;
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                 });
         },
         fetchDataAndFillTable2() {
-            axios.get("http://127.0.0.1:8080/xss/stored/queryMessage")
+            queryMessage({})
                 .then(response => {
-                    this.tableData = response.data.data;
-                    console.log(this.tableData[0].message);
+                    this.tableData = response.data;
                     this.dialogFormVisible2 = true; // 显示对话框
                 })
                 .catch(error => {
@@ -197,7 +197,8 @@ export default {
                 this.$message.error('留言内容不能为空');
                 return;
             }
-            axios.post("http://127.0.0.1:8080/xss/stored/addMessage", {
+
+            addMessage({
                 "message": this.formInline.message
             }).then(response => {
                 this.fetchDataAndFillTable1();  // 重新查询数据
@@ -211,7 +212,7 @@ export default {
                 this.$message.error('留言内容不能为空');
                 return;
             }
-            axios.post("http://127.0.0.1:8080/xss/stored/addMessageSec", {
+            addMessageSec({
                 "message": this.formInline.message
             }).then(response => {
                 this.fetchDataAndFillTable2();  // 重新查询数据

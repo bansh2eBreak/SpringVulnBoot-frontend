@@ -68,7 +68,7 @@ handleButtonClick1() {
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - 白名单校验1（可绕过） <el-button
                                 type="success" round size="mini" @click="handleButtonClick2">去测试</el-button></el-row>
-                        <pre v-highlightjs><code class="java">// 后端校验逻辑：url.contains("google.com")
+                        <pre v-highlightjs><code class="java">// 后端校验逻辑（不严谨）：url.contains("google.com")
 // 绕过Poc：http://127.0.0.1:8080/openUrl/secRedirect1?url=https://www.baidu.com/s?wd=google.com
 @GetMapping("/secRedirect1")
 public void secRedirect1(String url, HttpServletResponse response) throws IOException {
@@ -112,7 +112,7 @@ public void redirect2(String url, HttpServletResponse response) throws IOExcepti
                             <div><el-button type="success" round size="mini" @click="handleButtonClick4">去测试</el-button>
                             </div>
                         </el-row>
-                        <pre v-highlightjs><code class="java">// 后端校验逻辑："https://www.google.com".equals(url)
+                        <pre v-highlightjs><code class="java">// 后端校验逻辑（严谨）："https://www.google.com".equals(url)
 @GetMapping("/secRedirect")
 public void secRedirect(String url, HttpServletResponse response) throws IOException {
     log.info("重定向到: " + url);
@@ -133,6 +133,8 @@ public void secRedirect(String url, HttpServletResponse response) throws IOExcep
 
 <script>
 import axios from 'axios';
+import { redirect, redirect2 } from '@/api/openUrl';
+
 export default {
     data() {
         return {
@@ -158,6 +160,25 @@ export default {
         },
         handleButtonClick4() {
             window.open("http://127.0.0.1:8080/openUrl/secRedirect2?url=https://www.baidu.com?k=google.com", "_blank");
+        },
+        fetchDataAndFillTable1() {
+            redirect({ url: 'https://www.baidu.com' })
+                .then(response => {
+                    console.log(response.data);
+                    window.open(response.data, "_blank");
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        fetchDataAndFillTable3() {
+            redirect2({ url: 'https://juejin.cn/' })
+                .then(response => {
+                    // 浏览器跨域问题导致浏览器302跳转会遇到CORS错误
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
         }
     }
 };

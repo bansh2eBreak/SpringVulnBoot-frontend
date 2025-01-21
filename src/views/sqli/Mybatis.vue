@@ -53,8 +53,12 @@
             <el-row :gutter="20" class="grid-flex">
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">漏洞代码 - ${} - 普通参数 <el-button
-                                type="danger" round size="mini" @click="handleButtonClick1">去测试</el-button></el-row>
+                        <el-row type="flex" justify="space-between" align="middle">漏洞代码 - ${} - 普通参数<div>
+                                <el-button type="text" @click="fetchDataAndFillTable1"
+                                    style="color: green;">正常查询</el-button>
+                                <el-button type="text" @click="fetchDataAndFillTable2"
+                                    style="color: red;">注入查询</el-button>
+                            </div></el-row>
                         <pre v-highlightjs><code class="java">/**
  * Controller接口代码
  */
@@ -80,8 +84,10 @@ List&lt;User&gt; selectUserById(String id);</code></pre>
                 </el-col>
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 恶意字符过滤 <el-button
-                                type="success" round size="mini" @click="handleButtonClick2">去测试</el-button></el-row>
+                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 恶意字符过滤<div>
+                                <el-button type="text" @click="fetchDataAndFillTable3"
+                                    style="color: red;">注入查询</el-button>
+                            </div></el-row>
                         <pre v-highlightjs><code class="java">// 安全工具类
 public class Security {
     public static boolean checkSql(String content) {
@@ -95,24 +101,25 @@ public class Security {
     }
 }
 // Controller层
-@GetMapping("/getUserSecByUsernameFilter")
-public Result getUserSecByUsernameFilter(String username) {
-    if (!Security.checkSql(username)) {
-        return Result.success(userService.selecctUserByUsername(username));
+@GetMapping("/getUserByIdSec")
+public Result getUserByIdSec(String id) {
+    if (!Security.checkSql(id)) {
+        return Result.success(userService.selectUserById(id));
     } else {
+        log.warn("检测到非法注入字符: {}", id);
         return Result.error("检测到非法注入");
     }
 }
 
 // Service层
 @Override
-public List&lt;User&gt; selecctUserByUsername(String username) {
-    return userMapper.selectUserByUsername(username);
-}
+    public List&lt;User&gt; selectUserById(String id) {
+        return userMapper.selectUserById(id);
+    }
 
 // Mapper接口层
-@Select("select id, username, name from user where username = '${username}'")
-List&lt;User&gt; selectUserByUsername(@Param("username") String username);
+@Select("select * from user where id = ${id}")
+List&lt;User&gt; selectUserById(String id);
 </code></pre>
                     </div>
                 </el-col>
@@ -121,15 +128,15 @@ List&lt;User&gt; selectUserByUsername(@Param("username") String username);
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">漏洞代码 -
-                            ${} - order by参数 <div><el-button type="danger" round size="mini"
-                                    @click="handleButtonClick3">去测试</el-button>
-                                <el-button type="text" @click="fetchDataAndFillTable1"
+                            ${} - order by参数 <div>
+                                <el-button type="text" @click="fetchDataAndFillTable4"
                                     style="color: green;">正常查询</el-button>
-                                <el-button type="text" @click="fetchDataAndFillTable2"
+                                <el-button type="text" @click="fetchDataAndFillTable5"
                                     style="color: red;">注入查询</el-button>
                             </div></el-row>
                         <pre
-                            v-highlightjs><code class="java">// Controller层
+                            v-highlightjs><code class="java">// 注意，order by 参数无法使用预编译
+// Controller层
 @GetMapping("/getUserByPage")
 public Result getUserByPage(@RequestParam(defaultValue = "id") String orderBy, @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "5") Integer pageSize) {
     log.info("分页查询，参数：{} {} {}", page, pageSize, orderBy);
@@ -163,8 +170,10 @@ List&lt;User&gt; pageOrderBy(@Param("orderBy") String orderBy, @Param("start") i
                 </el-col>
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">安全代码 - #{}预编译 <el-button
-                                type="success" round size="mini" @click="handleButtonClick4">去测试</el-button></el-row>
+                        <el-row type="flex" justify="space-between" align="middle">安全代码 - #{}预编译<div>
+                                <el-button type="text" @click="fetchDataAndFillTable6"
+                                    style="color: red;">注入查询</el-button>
+                            </div></el-row>
                         <pre v-highlightjs><code class="java">// Controller层
 /**
  * Mybatis：预编译
@@ -213,6 +222,8 @@ List&lt;User&gt; selectUserSecByUsername(@Param("username") String username);
 
 <script>
 import axios from 'axios';
+import { getUserByPage, getUserById, getUserByIdSec, getUserSecByUsername2 } from '@/api/sqli';
+
 export default {
     data() {
         return {
@@ -226,37 +237,90 @@ export default {
         handleClick(tab, event) {
             // console.log(tab, event);
         },
-        handleButtonClick1() {
-            window.open("http://127.0.0.1:8080/sqli/mybatis/getUserById?id=1 or 1=1", "_blank");
-        },
-        handleButtonClick2() {
-            window.open("http://127.0.0.1:8080/sqli/mybatis/getUserSecByUsernameFilter?username=zhangsan' and 'f'='f'", "_blank");
-        },
-        handleButtonClick3() {
-            window.open("http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=(CASE+WHEN+(select+substr((select+database()),1,1)='a')+THEN+username+ELSE+id+END)", "_blank");
-        },
-        handleButtonClick4() {
-            window.open("http://127.0.0.1:8080/sqli/mybatis/getUserSecByUsername?username=zhangsan' or 'f'='f'", "_blank");
-        },
         fetchDataAndFillTable1() {
-            axios.get("http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=username")
+            getUserById({ id: '1' })
                 .then(response => {
-                    this.gridData = response.data.data.rows;
-                    console.log(this.gridData);
+                    this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserById?id=1";
                     this.dialogTableVisible = true; // 显示对话框
-                    this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=username";
+                    this.gridData = response.data;
+                    console.log(this.gridData);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                 });
         },
         fetchDataAndFillTable2() {
-            axios.get("http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=(CASE+WHEN+(select+substr((select+database()),1,1)='a')+THEN+username+ELSE+id+END)")
+            getUserById({ id: '1 or 1=1' })
                 .then(response => {
-                    this.gridData = response.data.data.rows;
-                    console.log(this.gridData);
+                    this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserById?id=1 or 1=1";
                     this.dialogTableVisible = true; // 显示对话框
+                    this.gridData = response.data;
+                    console.log(this.gridData);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        fetchDataAndFillTable3() {
+            getUserByIdSec({ id: '1 or 1=1' })
+                .then(response => {
+                    this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserByIdSec?username=zhangsan' or 'f'='f";
+                    this.dialogTableVisible = true; // 显示对话框
+                    this.gridData = response.data;
+                    console.log(this.gridData);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        // fetchDataAndFillTable1() {
+        //     // 从localStorage获取token
+        //     const token = localStorage.getItem('token');
+
+        //     axios.get("http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=username")
+        //         .then(response => {
+        //             this.gridData = response.data.data.rows;
+        //             console.log(this.gridData);
+        //             this.dialogTableVisible = true; // 显示对话框
+        //             this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=username";
+        //         })
+        //         .catch(error => {
+        //             console.error('Error fetching data:', error);
+        //         });
+        // },
+        fetchDataAndFillTable4() {
+            // 从localStorage获取token
+            // const token = localStorage.getItem('token');
+            getUserByPage({ page: 1, pageSize: 5, orderBy: 'username' })
+                .then(response => {
+                    this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=username";
+                    this.dialogTableVisible = true; // 显示对话框
+                    this.gridData = response.data.rows;
+                    console.log(this.gridData);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        fetchDataAndFillTable5() {
+            getUserByPage({ page: 1, pageSize: 5, orderBy: "(CASE WHEN (select substr((select database()),1,1)='a') THEN username ELSE id END)" })
+                .then(response => {
                     this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=(CASE+WHEN+(select+substr((select+database()),1,1)='a')+THEN+username+ELSE+id+END)";
+                    this.dialogTableVisible = true; // 显示对话框
+                    this.gridData = response.data.rows;
+                    console.log(this.gridData);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        fetchDataAndFillTable6() {
+            getUserSecByUsername2({ username: "zhangsan' or 'f'='f" })
+                .then(response => {
+                    this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserSecByUsername2?username=zhangsan' or 'f'='f";
+                    this.dialogTableVisible = true; // 显示对话框
+                    this.gridData = response.data.rows;
+                    console.log(this.gridData);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);

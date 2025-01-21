@@ -34,8 +34,12 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        // commit('SET_TOKEN', data.token)
+        commit('SET_TOKEN', data)
+        // setToken(data.token)
+        // setToken(data) // 采用Cookie请取消注释这行
+        // 添加到localStorage
+        localStorage.setItem('Authorization', data)
         resolve()
       }).catch(error => {
         reject(error)
@@ -45,8 +49,10 @@ const actions = {
 
   // get user info
   getInfo({ commit, state }) {
+    console.log('444444') //流程走到这里
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
+        console.log("---------" +response.data.avatar)
         const { data } = response
 
         if (!data) {

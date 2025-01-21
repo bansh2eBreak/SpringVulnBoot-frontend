@@ -48,17 +48,41 @@
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">漏洞代码 - 直接拼接输入内容 <div>
-                                <el-button type="danger" round size="mini" @click="handleButtonClick1">去测试</el-button>
+                                <el-button type="danger" round size="mini"
+                                    @click="fetchDataAndFillTable1">去测试</el-button>
                             </div></el-row>
-                        <pre v-highlightjs><code class="java">@Slf4j
+                        <pre v-highlightjs><code class="java">
+// 前端代码
+&lt;template v-for="(text, index) in resp_text"&gt;
+    &lt;div :key="index" v-html="text"&gt;&lt;/div&gt;
+&lt;/template&gt;
+
+
+onSubmit() {
+    if (!this.search) {
+        // 如果提交内容为空，显示错误提示
+        this.$message.error('留言内容不能为空');
+        return;
+    }
+    vuln1({ name: this.search })
+        .then(response => {
+        this.resp_text.push(response.data);
+        })
+        .catch(error => {
+        console.error('Error fetching data:', error);
+        });
+},
+
+// 后端代码
+@Slf4j
 @RestController
 @RequestMapping("/xss/reflected")
 public class ReflectedController {
 
     @GetMapping("/vuln1")
-    public String vuln1(String name) {
-        // 在不经过任何安全过滤、校验的情况下，直接将前端输入字符串拼接后返回
-        return "Hello, " + name;
+        public Result Vuln1(String name) {
+        log.info("请求参数: {}", name);
+        return Result.success("Hello, " + name);
     }
 }</code></pre>
                     </div>
@@ -66,7 +90,8 @@ public class ReflectedController {
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - 自定义过滤 <el-button
-                                type="success" round size="mini" @click="handleButtonClick2">去测试</el-button></el-row>
+                                type="success" round size="mini"
+                                @click="fetchDataAndFillTable2">去测试</el-button></el-row>
                         <pre v-highlightjs><code class="java">// xss恶意字符过滤
 public static String xssFilter(String content) {
     content = StringUtils.replace(content, "&", "&amp;amp;");
@@ -80,10 +105,11 @@ public static String xssFilter(String content) {
 
 // Controller层
 @GetMapping("/sec1")
-public String Sec1(String name) {
-    String newName = Security.xssFilter(name);
-    return "Hello, " + newName;
-}
+    public Result Sec1(String name) {
+        log.info("请求参数: {}", name);
+        String newName = Security.xssFilter(name);
+        return Result.success("Hello, " + newName);
+    }
 </code></pre>
                     </div>
                 </el-col>
@@ -93,78 +119,209 @@ public String Sec1(String name) {
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 -
                             htmlEscape方法<el-button type="success" round size="mini"
-                                @click="handleButtonClick3">去测试</el-button></el-row>
+                                @click="fetchDataAndFillTable3">去测试</el-button></el-row>
                         <pre v-highlightjs><code class="java">// Controller层
 /**
- * 采用Spring自带的HtmlUtils方法防止xss脚本攻击
- */
+* 采用Spring自带的HtmlUtils方法防止xss脚本攻击
+*/
 @GetMapping("/sec2")
-public String Sec2(String name) {
+public Result Sec2(String name) {
     log.info("请求参数: {}", name);
     String newName = HtmlUtils.htmlEscape(name);
-    return "Hello, " + newName;
+    return Result.success("Hello, " + newName);
 }</code></pre>
                     </div>
                 </el-col>
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - OWASP Java Encoder库 <el-button
-                                type="success" round size="mini" @click="handleButtonClick4">去测试</el-button></el-row>
+                                type="success" round size="mini"
+                                @click="fetchDataAndFillTable4">去测试</el-button></el-row>
                         <pre v-highlightjs><code class="java">// pom.xml 导入org.owasp.encoder依赖
 &lt;dependency&gt;
-    &lt;groupId>org.owasp.encoder&lt;/groupId&gt;
-    &lt;artifactId>encoder&lt;/artifactId&gt;
-    &lt;version>1.2.3&lt;/version&gt;
+&lt;groupId>org.owasp.encoder&lt;/groupId&gt;
+&lt;artifactId>encoder&lt;/artifactId&gt;
+&lt;version>1.2.3&lt;/version&gt;
 &lt;/dependency&gt;
 
 // Controller层
 /**
- * 采用OWASP Java Encoder方法防止xss攻击
- */
+* 采用OWASP Java Encoder方法防止xss攻击
+*/
 @GetMapping("/sec3")
-public String Sec3(String name) {
+public Result Sec3(String name) {
     log.info("请求参数: {}", name);
     String newName = Encode.forHtml(name);
-    return "Hello, " + newName;
+    return Result.success("Hello, " + newName);
 }
 </code></pre>
                     </div>
                 </el-col>
             </el-row>
         </div>
+
+        <!-- 打开嵌套表格的对话框1 -->
+        <el-dialog title="搜索框" :visible.sync="dialogFormVisible1" class="center-dialog">
+            <el-form :inline="true" class="demo-form-inline">
+                <el-form-item label="搜索">
+                    <el-input v-model="search1"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit1">提交</el-button>
+                </el-form-item>
+            </el-form>
+            <div>
+                <template v-for="(text, index) in resp_text1">
+                    <div :key="index" v-html="text"></div>
+                </template>
+            </div>
+        </el-dialog>
+
+        <!-- 打开嵌套表格的对话框2 -->
+        <el-dialog title="搜索框" :visible.sync="dialogFormVisible2" class="center-dialog">
+            <el-form :inline="true" class="demo-form-inline">
+                <el-form-item label="搜索">
+                    <el-input v-model="search2"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit2">提交</el-button>
+                </el-form-item>
+            </el-form>
+            <div>
+                <template v-for="(text, index) in resp_text2">
+                    <div :key="index" v-html="text"></div>
+                </template>
+            </div>
+        </el-dialog>
+        <!-- 打开嵌套表格的对话框3 -->
+        <el-dialog title="搜索框" :visible.sync="dialogFormVisible3" class="center-dialog">
+            <el-form :inline="true" class="demo-form-inline">
+                <el-form-item label="搜索">
+                    <el-input v-model="search3"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit3">提交</el-button>
+                </el-form-item>
+            </el-form>
+            <div>
+                <template v-for="(text, index) in resp_text3">
+                    <div :key="index" v-html="text"></div>
+                </template>
+            </div>
+        </el-dialog>
+        <!-- 打开嵌套表格的对话框4 -->
+        <el-dialog title="搜索框" :visible.sync="dialogFormVisible4" class="center-dialog">
+            <el-form :inline="true" class="demo-form-inline">
+                <el-form-item label="搜索">
+                    <el-input v-model="search4"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit4">提交</el-button>
+                </el-form-item>
+            </el-form>
+            <div>
+                <template v-for="(text, index) in resp_text4">
+                    <div :key="index" v-html="text"></div>
+                </template>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
+import { vuln1, sec1, sec2, sec3 } from '@/api/xss';
+
 export default {
     data() {
         return {
             activeName: 'first',
-            pocUrl: '',
-            dialogFormVisible: false,
-            form: {
-                name: ''
-            },
-            formLabelWidth: '120px'
+            dialogFormVisible1: false,
+            dialogFormVisible2: false,
+            dialogFormVisible3: false,
+            dialogFormVisible4: false,
+            search1: '<img src=x onmouseover=alert(1)>',
+            search2: '<img src=x onmouseover=alert(1)>',
+            search3: '<img src=x onmouseover=alert(1)>',
+            search4: '<img src=x onmouseover=alert(1)>',
+            resp_text1: [],
+            resp_text2: [],
+            resp_text3: [],
+            resp_text4: [],
         };
     },
     methods: {
         handleClick(tab, event) {
             // console.log(tab, event);
         },
-        handleButtonClick1() {
-            window.open("http://localhost:8080/xss/reflected/vuln1?name=%3Cscript%3Ealert(1)%3C/script%3E", "_blank");
+        fetchDataAndFillTable1() {
+            this.dialogFormVisible1 = true; // 显示对话框
         },
-        handleButtonClick2() {
-            window.open("http://localhost:8080/xss/reflected/sec1?name=%3Cscript%3Ealert(1)%3C/script%3E", "_blank");
+        onSubmit1() {
+            if (!this.search1) {
+                // 如果提交内容为空，显示错误提示
+                this.$message.error('留言内容不能为空');
+                return;
+            }
+            vuln1({ name: this.search1 })
+                .then(response => {
+                    this.resp_text1.push(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
         },
-        handleButtonClick3() {
-            window.open("http://localhost:8080/xss/reflected/sec2?name=%3Cscript%3Ealert(1)%3C/script%3E", "_blank");
+        fetchDataAndFillTable2() {
+            this.dialogFormVisible2 = true; // 显示对话框
         },
-        handleButtonClick4() {
-            window.open("http://localhost:8080/xss/reflected/sec3?name=%3Cscript%3Ealert(1)%3C/script%3E", "_blank");
-        }
+        onSubmit2() {
+            if (!this.search2) {
+                // 如果提交内容为空，显示错误提示
+                this.$message.error('留言内容不能为空');
+                return;
+            }
+            sec1({ name: this.search2 })
+                .then(response => {
+                    this.resp_text2.push(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        fetchDataAndFillTable3() {
+            this.dialogFormVisible3 = true; // 显示对话框
+        },
+        onSubmit3() {
+            if (!this.search3) {
+                // 如果提交内容为空，显示错误提示
+                this.$message.error('留言内容不能为空');
+                return;
+            }
+            sec1({ name: this.search3 })
+                .then(response => {
+                    this.resp_text3.push(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        fetchDataAndFillTable4() {
+            this.dialogFormVisible4 = true; // 显示对话框
+        },
+        onSubmit4() {
+            if (!this.search4) {
+                // 如果提交内容为空，显示错误提示
+                this.$message.error('留言内容不能为空');
+                return;
+            }
+            sec1({ name: this.search4 })
+                .then(response => {
+                    this.resp_text4.push(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
     }
 };
 </script>
@@ -270,5 +427,14 @@ pre code {
 .row-bg {
     padding: 10px 0;
     background-color: #f9fafc;
+}
+
+.center-dialog {
+    text-align: center;
+    margin: 0 auto;
+}
+
+.center-dialog-table {
+    text-align: center;
 }
 </style>
