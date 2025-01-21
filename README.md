@@ -1,6 +1,6 @@
 # SpringVulnBoot Frontend
 
-当前前端项目是SpringVulnBoot靶场项目的前端工程，后端工程地址是：[https://github.com/bansh2eBreak/SpingVulnBoot-backend/tree/dev](https://github.com/bansh2eBreak/SpingVulnBoot-backend/tree/dev)
+当前前端项目是SpringVulnBoot靶场项目的前端工程，后端工程地址是：[https://github.com/bansh2eBreak/SpringVulnBoot-backend](https://github.com/bansh2eBreak/SpringVulnBoot-backend)
 
 Tips：对于不熟悉前端框架的人来说，这个简直就是福音，基于 vue-admin-template 进行简单的改改改就可以形成好看的前端页面。下面是 vue-admin-template 官网和简介。
 
