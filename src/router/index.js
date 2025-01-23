@@ -126,6 +126,28 @@ export const constantRoutes = [
   },
 
   {
+    path: '/authentication',
+    component: Layout,
+    redirect: '/authentication/passwordBased',
+    name: 'authentication',
+    meta: { title: '身份认证漏洞', icon: 'el-icon-s-help' },
+    children: [
+      {
+        path: 'passwordBased',
+        name: 'password-based authentication',
+        component: () => import('@/views/authentication/passwordBased'),
+        meta: { title: '密码登录漏洞', icon: 'table' }
+      },
+      {
+        path: '2faBased',
+        name: 'multi-factor authentication',
+        component: () => import('@/views/authentication/2faBased'),
+        meta: { title: '2fa登录漏洞', icon: 'tree' }
+      }
+    ]
+  },
+
+  {
     path: '/form',
     component: Layout,
     children: [
