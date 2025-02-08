@@ -3,10 +3,9 @@
 SpringBoot靶场后端工程：SpringVulnBoot-frontend
 
 通过Springboot打造的java安全靶场，尽可能编写出各种常见的漏洞，供大家学习和测试。<br>
-前端是基于流行的vue-admin-template基础模板进行改改改，前端不擅长，代码写的很冗余。
 后端是基于springboot开发的，参考：https://github.com/bansh2eBreak/SpringVulnBoot-backend
 
-![img_1.png](img_1.png)
+![alt text](image-1.png)
 
 本次更新（2025/02/08）：
 - 增加身份认证漏洞-密码登录暴力破解漏洞，包括普通的账号密码登录、HTTP Basic认证登录、带图形验证码登录几种场景。
