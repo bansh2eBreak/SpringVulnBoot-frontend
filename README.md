@@ -10,6 +10,8 @@ SpringBoot靶场后端工程：SpringVulnBoot-backend
 
 ## 效果图
 ![alt text](image-2.png)
+![alt text](image-3.png)
+![alt text](image-4.png)
 
 本次更新（2025/02/08）：
 - 增加身份认证漏洞-密码登录暴力破解漏洞，包括普通的账号密码登录、HTTP Basic认证登录、带图形验证码登录几种场景。
