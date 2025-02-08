@@ -1,23 +1,23 @@
 # SpringVulnBoot Frontend
 
-当前前端项目是SpringVulnBoot靶场项目的前端工程，后端工程地址是：[https://github.com/bansh2eBreak/SpringVulnBoot-backend](https://github.com/bansh2eBreak/SpringVulnBoot-backend)
+SpringBoot靶场后端工程：SpringVulnBoot-frontend
 
-![alt text](image.png)
+通过Springboot打造的java安全靶场，尽可能编写出各种常见的漏洞，供大家学习和测试。<br>
+前端是基于流行的vue-admin-template基础模板进行改改改，前端不擅长，代码写的很冗余。
+后端是基于springboot开发的，参考：https://github.com/bansh2eBreak/SpringVulnBoot-backend
 
-本次更新（2025/01/21）：
-- 增加了登录认证，通过spring框架的Interceptor+WebMvcConfigurer配置类实现登录校验
-- 实现了管理员登录Jwt会话的生成和验证逻辑
-- 抛弃原始前端框架的Cookie技术，改为从LocalStorage中读写
-- 完成前端登录后的头像获取
-- 增加了任意命令执行和任意URL跳转漏洞
+![img_1.png](img_1.png)
+
+本次更新（2025/02/08）：
+- 增加身份认证漏洞-密码登录暴力破解漏洞，包括普通的账号密码登录、HTTP Basic认证登录、带图形验证码登录几种场景。
 
 靶场已编写的漏洞有：
 - SQLi注入
 - XSS跨站脚本
 - 任意命令执行
 - 任意URL跳转
-- 身份认证漏洞
-  - 密码登录-暴力破解
+- 身份认证漏洞 
+  - 密码登录-暴力破解（包含图形验证码的漏洞）
 
 未完待续：
 - 文件上传漏洞
@@ -28,7 +28,7 @@
 - ...
 
 
-Tips：对于不熟悉前端框架的人来说，这个简直就是福音，基于 vue-admin-template 进行简单的改改改就可以形成好看的前端页面。下面是 vue-admin-template 官网和简介。
+说明：对于不熟悉前端框架的人来说，基于 vue-admin-template 进行简单的改改改就可以形成好看的前端页面。下面是 vue-admin-template 官网和简介。
 
 # vue-admin-template
 
