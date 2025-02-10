@@ -141,8 +141,67 @@ export const constantRoutes = [
       {
         path: '2faBased',
         name: 'multi-factor authentication',
-        component: () => import('@/views/authentication/2faBased'),
-        meta: { title: '2fa登录漏洞', icon: 'tree' }
+        component: () => import('@/views/authentication/mfaBased'),
+        meta: { title: 'mfa登录漏洞', icon: 'tree' }
+      }
+    ]
+  },
+
+  {
+    path: '/components',
+    component: Layout,
+    redirect: '/components/fastjson',
+    name: 'components',
+    meta: {
+      title: '组件漏洞',
+      icon: 'nested'
+    },
+    children: [
+      {
+        path: 'fastjson',
+        component: () => import('@/views/components/fastjson/index'),
+        name: 'fastjson',
+        meta: { title: 'fastjson漏洞' }
+      },
+      {
+        path: 'menu1',
+        component: () => import('@/views/nested/menu1/index'), // Parent router-view
+        name: 'Menu1',
+        meta: { title: 'Menu1' },
+        children: [
+          {
+            path: 'menu1-1',
+            component: () => import('@/views/nested/menu1/menu1-1'),
+            name: 'Menu1-1',
+            meta: { title: 'Menu1-1' }
+          },
+          {
+            path: 'menu1-2',
+            component: () => import('@/views/nested/menu1/menu1-2'),
+            name: 'Menu1-2',
+            meta: { title: 'Menu1-2' },
+            children: [
+              {
+                path: 'menu1-2-1',
+                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
+                name: 'Menu1-2-1',
+                meta: { title: 'Menu1-2-1' }
+              },
+              {
+                path: 'menu1-2-2',
+                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
+                name: 'Menu1-2-2',
+                meta: { title: 'Menu1-2-2' }
+              }
+            ]
+          },
+          {
+            path: 'menu1-3',
+            component: () => import('@/views/nested/menu1/menu1-3'),
+            name: 'Menu1-3',
+            meta: { title: 'Menu1-3' }
+          }
+        ]
       }
     ]
   },
