@@ -12,6 +12,7 @@ SpringBoot靶场后端工程：SpringVulnBoot-backend
 ![alt text](image-2.png)
 ![alt text](image-3.png)
 ![alt text](image-4.png)
+![alt text](image-5.png)
 
 ## 更新日志
 本次更新（2025/02/10）：
