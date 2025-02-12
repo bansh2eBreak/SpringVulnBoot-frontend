@@ -95,17 +95,17 @@ public class Log4j2Controller {
 &lt;dependency&gt;
     &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;
     &lt;artifactId&gt;log4j-core&lt;/artifactId&gt;
-    &lt;version&gt;${log4j2.version}&lt;/version&gt;
+    &lt;version&gt;${最新版}&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
     &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;
     &lt;artifactId&gt;log4j-api&lt;/artifactId&gt;
-    &lt;version&gt;${log4j2.version}&lt;/version&gt;
+    &lt;version&gt;${最新版}&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
     &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;
     &lt;artifactId&gt;log4j-slf4j-impl&lt;/artifactId&gt;
-    &lt;version&gt;${log4j2.version}&lt;/version&gt;
+    &lt;version&gt;${最新版}&lt;/version&gt;
 &lt;/dependency&gt;
 
 方案二、临时缓解（选其一）
