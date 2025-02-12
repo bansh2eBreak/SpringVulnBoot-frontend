@@ -21,6 +21,7 @@ service.interceptors.request.use(
       // please modify it according to the actual situation
       // config.headers['Authorization'] = getToken()
       config.headers['Authorization'] = localStorage.getItem('Authorization')
+      Credential: 'include'
     }
     return config
   },

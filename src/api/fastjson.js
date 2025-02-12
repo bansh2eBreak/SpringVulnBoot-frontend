@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function fastjsonVuln1(data) {
   return request({
-    url: '/components/fastjsonVuln1',
+    url: '/components/fastjson/vuln1',
     method: 'post',
     data: data
   })
@@ -10,7 +10,7 @@ export function fastjsonVuln1(data) {
 
 export function fastjsonSec1(data) {
   return request({
-    url: '/components/fastjsonSec1',
+    url: '/components/fastjson/sec1',
     method: 'post',
     data: data
   })

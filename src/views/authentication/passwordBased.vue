@@ -604,23 +604,7 @@ export default {
                 "password1", "password2", "password3", "password4", "password5",
                 "password6", "password7", "password8", "password9", "password10",
                 "password11", "password12", "password13", "password14", "password15",
-                "password16", "password17", "password18", "password19", "password20",
-                "password21", "password22", "password23", "password24", "password25",
-                "password26", "password27", "password28", "password29", "password30",
-                "password31", "password32", "password33", "password34", "password35",
-                "password36", "password37", "password38", "password39", "password40",
-                "password41", "password42", "password43", "password44", "password45",
-                "password46", "password47", "password48", "password49", "password50",
-                "password51", "password52", "password53", "password54", "password55",
-                "password56", "password57", "password58", "password59", "password60",
-                "password61", "password62", "password63", "password64", "password65",
-                "password66", "password67", "password68", "password69", "password70",
-                "password71", "password72", "password73", "password74", "password75",
-                "password76", "password77", "password78", "password79", "password80",
-                "password81", "password82", "password83", "password84", "password85",
-                "password86", "password87", "password88", "password89", "password90",
-                "password91", "password92", "password93", "password94", "password95",
-                "password96", "password97", "password98", "password99", "password100", "123"
+                "password16", "password17", "password18", "password19", "password20", "123"
             ];
 
             // 使用 for 循环遍历密码列表
@@ -820,9 +804,9 @@ export default {
             });
         },
         async onSubmit51() {
-            if (!this.username1 || !this.password1) {
+            if (!this.username1 || !this.password1 || !this.captcha) {
                 // 如果提交内容为空，显示错误提示
-                this.$message.error('账号密码不能为空');
+                this.$message.error('账号密码或验证码不能为空');
                 return;
             }
 
@@ -874,9 +858,9 @@ export default {
 
         },
         async onSubmit61() {
-            if (!this.username1 || !this.password1) {
+            if (!this.username1 || !this.password1 || !this.captcha) {
                 // 如果提交内容为空，显示错误提示
-                this.$message.error('账号密码不能为空');
+                this.$message.error('账号密码或验证码不能为空');
                 return;
             }
 

@@ -161,7 +161,13 @@ export const constantRoutes = [
         path: 'fastjson',
         component: () => import('@/views/components/fastjson/index'),
         name: 'fastjson',
-        meta: { title: 'fastjson漏洞' }
+        meta: { title: 'Fastjson漏洞' }
+      },
+      {
+        path: 'log4j2',
+        component: () => import('@/views/components/log4j2/index'),
+        name: 'log4j2',
+        meta: { title: 'Log4j2漏洞' }
       },
       {
         path: 'menu1',
