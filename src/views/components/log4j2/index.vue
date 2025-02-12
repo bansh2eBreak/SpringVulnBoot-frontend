@@ -7,7 +7,7 @@
                     <el-tab-pane label="漏洞描述" name="first">
                         <div class="vuln-detail">
                             Apache Log4j2是一款优秀的Java日志框架。此次漏洞是由 Log4j2
-                            提供的lookup功能造成的，该功能允许开发者通过一些协议去读取相应环境中的配置。但在处理数据时，并未对输入（如${jndi）进行严格的判断，从而造成JNDI注入。
+                            提供的lookup功能造成的，该功能允许开发者通过一些协议去读取相应环境中的配置。但在处理数据时，并未对输入（如${jndi}）进行严格的判断，从而造成JNDI注入。
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="漏洞危害" name="second">
