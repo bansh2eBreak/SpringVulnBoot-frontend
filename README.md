@@ -14,6 +14,7 @@ SpringBoot靶场后端工程：SpringVulnBoot-backend ,环境是基于JDK11 + Sp
 ![image-4.png](images/image-4.png)
 ![image-5.png](images/image-5.png)
 ![img_5.png](images/img_5.png)
+![img_6.png](images/img_6.png)
 
 ## 更新日志
 2025/02/21（最新更新）：
