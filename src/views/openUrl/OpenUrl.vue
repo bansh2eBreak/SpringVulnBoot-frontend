@@ -67,7 +67,7 @@ handleButtonClick1() {
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - 白名单校验1（可绕过） <el-button
-                                type="success" round size="mini" @click="handleButtonClick2">去测试</el-button></el-row>
+                                type="danger" round size="mini" @click="handleButtonClick2">去测试</el-button></el-row>
                         <pre v-highlightjs><code class="java">// 后端校验逻辑（不严谨）：url.contains("google.com")
 // 绕过Poc：http://127.0.0.1:8080/openUrl/secRedirect1?url=https://www.baidu.com/s?wd=google.com
 @GetMapping("/secRedirect1")
@@ -108,7 +108,7 @@ public void redirect2(String url, HttpServletResponse response) throws IOExcepti
                 </el-col>
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 白名单地址校验2
+                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 白名单校验2
                             <div><el-button type="success" round size="mini" @click="handleButtonClick4">去测试</el-button>
                             </div>
                         </el-row>

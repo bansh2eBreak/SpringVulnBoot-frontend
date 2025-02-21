@@ -148,6 +148,19 @@ export const constantRoutes = [
   },
 
   {
+    path: '/pathtraversal',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'pathtraversal',
+        component: () => import('@/views/pathtraversal/index'),
+        meta: { title: '路径穿越漏洞', icon: 'el-icon-s-help' }
+      }
+    ]
+  },
+
+  {
     path: '/components',
     component: Layout,
     redirect: '/components/fastjson',

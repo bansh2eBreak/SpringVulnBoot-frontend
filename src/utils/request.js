@@ -80,15 +80,20 @@ service.interceptors.response.use(
       try {
         // const res = JSON.parse(response.data) //response.data.data 是 jwttoken
         const res = response.data
-        if (res.code !== 0) {
-          Message({
-            message: res.data || 'Error', // 这行执行了，输出Error
-            type: 'error',
-            duration: 5 * 1000
-          })
-          return Promise.reject(new Error(res.msg || 'Error'))
+        // 优化，当返回的数据不是标准的json格式时，直接返回响应文本
+        if (res.code !== undefined && res.code !== null) {
+          if (res.code !== 0) {
+            Message({
+              message: res.data || 'Error',
+              type: 'error',
+              duration: 5 * 1000
+            });
+            return Promise.reject(new Error(res.msg || 'Error'));
+          } else {
+            return res;
+          }
         } else {
-          return res
+          return res;
         }
       } catch (error) {
         // 如果无法解析为JSON，则将响应文本作为消息内容处理

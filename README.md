@@ -9,14 +9,17 @@ SpringBoot靶场后端工程：SpringVulnBoot-backend ,环境是基于JDK11 + Sp
 2. 后端是基于springboot开发的，[后端工程](https://github.com/bansh2eBreak/SpringVulnBoot-backend)
 
 ## 效果图
-![alt text](image-2.png)
-![alt text](image-3.png)
-![alt text](image-4.png)
-![alt text](image-5.png)
-![alt text](img_5.png)
+![image-2.png](images/image-2.png)
+![image-3.png](images/image-3.png)
+![image-4.png](images/image-4.png)
+![image-5.png](images/image-5.png)
+![img_5.png](images/img_5.png)
 
 ## 更新日志
-2025/02/10（最新更新）：
+2025/02/21（最新更新）：
+- 增加路径穿越漏洞，并可以前端直接复现
+
+2025/02/10：
 - 增加组件漏洞-Fastjson漏洞，并可以前端直接复现
 
 2025/02/08：
@@ -33,6 +36,7 @@ SpringBoot靶场后端工程：SpringVulnBoot-backend ,环境是基于JDK11 + Sp
   - Runtime方式
   - ProcessBuilder方式
 - 任意URL跳转
+- 路径穿越漏洞
 - 身份认证漏洞 
   - 密码登录暴力破解
     - 普通的账号密码登录暴力破解
