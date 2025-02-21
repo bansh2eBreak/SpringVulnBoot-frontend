@@ -1,12 +1,13 @@
 # SpringVulnBoot Frontend
 
 ## 项目介绍
+
 SpringBoot靶场后端工程：SpringVulnBoot-backend ,环境是基于JDK11 + SpringBoot 2.7.14构建。
 
-通过Springboot打造的java安全靶场，尽可能编写出各种常见的漏洞，供大家学习和测试。<br>
+通过SpringBoot打造的java安全靶场，尽可能编写出各种常见的漏洞，供大家学习和测试。<br>
 
 1. 前端是基于流行的vue-admin-template基础模板进行改改改，[前端工程](https://github.com/bansh2eBreak/SpringVulnBoot-frontend)
-2. 后端是基于springboot开发的，[后端工程](https://github.com/bansh2eBreak/SpringVulnBoot-backend)
+2. 后端是基于springBoot开发的，[后端工程](https://github.com/bansh2eBreak/SpringVulnBoot-backend)
 
 ## 效果图
 ![image-2.png](images/image-2.png)
@@ -17,13 +18,17 @@ SpringBoot靶场后端工程：SpringVulnBoot-backend ,环境是基于JDK11 + Sp
 ![img_6.png](images/img_6.png)
 
 ## 更新日志
+
 2025/02/21（最新更新）：
+
 - 增加路径穿越漏洞，并可以前端直接复现
 
 2025/02/10：
+
 - 增加组件漏洞-Fastjson漏洞，并可以前端直接复现
 
 2025/02/08：
+
 - 增加身份认证漏洞-密码登录暴力破解漏洞，包括普通的账号密码登录、HTTP Basic认证登录、带图形验证码登录几种场景。
 
 ## 靶场已编写的漏洞
