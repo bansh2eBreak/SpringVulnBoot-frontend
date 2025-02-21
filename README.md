@@ -27,6 +27,7 @@ SpringBoot靶场后端工程：SpringVulnBoot-backend ,环境是基于JDK11 + Sp
 - 增加身份认证漏洞-密码登录暴力破解漏洞，包括普通的账号密码登录、HTTP Basic认证登录、带图形验证码登录几种场景。
 
 ## 靶场已编写的漏洞
+
 - SQLi注入
   - 基于Jdbc的SQLi注入
   - 基于Mybatis的SQLi注入
@@ -38,24 +39,24 @@ SpringBoot靶场后端工程：SpringVulnBoot-backend ,环境是基于JDK11 + Sp
   - ProcessBuilder方式
 - 任意URL跳转
 - 路径穿越漏洞
-- 身份认证漏洞 
-  - 密码登录暴力破解
-    - 普通的账号密码登录暴力破解
-    - 绕过单IP限制暴力破解
-    - HTTP Basic认证登录暴力破解
-    - 图形验证码登录暴力破解
+- 身份认证漏洞
+- 密码登录暴力破解
+  - 普通的账号密码登录暴力破解
+  - 绕过单IP限制暴力破解
+  - HTTP Basic认证登录暴力破解
+  - 图形验证码登录暴力破解
 - 组件漏洞
   - Fastjson漏洞
   - Log4j2漏洞
 
 ## 未完待续
+
 - 文件上传漏洞
 - SSRF漏洞
 - CSRF漏洞
 - 逻辑漏洞
 - 业务漏洞
 - ...
-
 
 说明：对于不熟悉前端框架的人来说，基于 vue-admin-template 进行简单的改改改就可以形成好看的前端页面。下面是 vue-admin-template 官网和简介。
 
