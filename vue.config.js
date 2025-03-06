@@ -32,6 +32,7 @@ module.exports = {
   productionSourceMap: false,
   devServer: {
     host: '127.0.0.1',
+    // host: '10.225.13.70',  //如果需要通过burpsuite抓包，可以切换为这一行
     port: port,
     open: true,
     overlay: {

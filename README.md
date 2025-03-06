@@ -8,16 +8,22 @@
 2. 后端是基于springBoot开发的，[后端工程](https://github.com/bansh2eBreak/SpringVulnBoot-backend)
 
 ## 效果图
-![image-2.png](images/image-2.png)
-![image-3.png](images/image-3.png)
-![image-4.png](images/image-4.png)
-![image-5.png](images/image-5.png)
+![img_1.png](images/img_1.png)
+![img_2.png](images/img_2.png)
+![img_3.png](images/img_3.png)
+![img_4.png](images/img_4.png)
 ![img_5.png](images/img_5.png)
 ![img_6.png](images/img_6.png)
+![img_7.png](images/img_7.png)
+![img_8.png](images/img_8.png)
 
 ## 更新日志
 
-2025/02/21（最新更新）：
+2025/03/06（最新更新）：
+
+- 增加文件上传漏洞
+  
+2025/02/21：
 
 - 增加路径穿越漏洞，并可以前端直接复现
 
@@ -42,6 +48,7 @@
   - ProcessBuilder方式
 - 任意URL跳转
 - 路径穿越漏洞
+- 文件上传漏洞
 - 身份认证漏洞
   - 密码登录暴力破解
     - 普通的账号密码登录暴力破解
@@ -54,7 +61,6 @@
 
 ## 未完待续
 
-- 文件上传漏洞
 - SSRF漏洞
 - CSRF漏洞
 - 逻辑漏洞

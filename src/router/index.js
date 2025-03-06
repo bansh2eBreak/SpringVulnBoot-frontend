@@ -161,6 +161,19 @@ export const constantRoutes = [
   },
 
   {
+    path: '/fileupload',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'fileupload',
+        component: () => import('@/views/fileupload/index'),
+        meta: { title: '文件上传漏洞', icon: 'el-icon-s-help' }
+      }
+    ]
+  },
+
+  {
     path: '/components',
     component: Layout,
     redirect: '/components/fastjson',
