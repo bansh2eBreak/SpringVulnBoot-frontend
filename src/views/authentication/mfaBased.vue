@@ -1,26 +1,26 @@
 <template>
     <div class="root-div">
         <div class="vuln-info">
-            <div class="header-div">身份认证漏洞 -- Mfa-Based authentication</div>
+            <div class="header-div">身份认证漏洞 -- 2FA-Based authentication</div>
             <div class="body-div">
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="漏洞描述" name="first">
                         <div class="vuln-detail">
-                            虽然mfa多因素或者2fa双因素身份认证可以提高账户的安全性，但是如果实现不当，也可能导致漏洞。例如仅仅是前端页面需要验证2fa，其实后端接口并不强制校验2fa，导致可以绕过2fa登录；还有一种场景是通过其他漏洞可以越权拿到其他用户的2fa串，从而非法绑定其他账号的2fa进行非法登录。
+                            虽然2fa双因素身份认证可以提高账户的安全性，但是如果实现不当，也可能导致漏洞。例如仅仅是前端页面需要验证2fa，其实后端接口并不强制校验2fa，导致可以绕过2fa登录；还有一种场景是通过其他漏洞可以越权拿到其他用户的2fa串，从而非法绑定其他账号的2fa进行非法登录。
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="漏洞危害" name="second">
                         <div class="vuln-detail">
-                            mfa相关漏洞会导致系统的身份认证的安全性大大降低，可能导致用户账户遭受未经授权的访问和信息泄露，进而导致个人隐私泄露、财产损失等严重后果。
+                            2fa相关漏洞会导致系统的身份认证的安全性大大降低，可能导致用户账户遭受未经授权的访问和信息泄露，进而导致个人隐私泄露、财产损失等严重后果。
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="安全编码" name="third">
                         <div class="vuln-detail">
-                            【必须】后端必须严格校验mfa
-                            后端需要对每一次前端提交的mfa进行严格的校验，确保mfa的安全性；
+                            【必须】后端必须严格校验2FA
+                            后端需要对每一次前端提交的2FA进行严格的校验，确保2FA的安全性；
                             <br />
-                            【必须】确保Mfa共享密钥的安全性
-                            防止Mfa共享密钥泄露，确保Mfa共享密钥的安全性；
+                            【必须】确保2FA共享密钥的安全性
+                            防止2FA共享密钥泄露，确保2FA共享密钥的安全性；
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="参考文章" name="fourth">
@@ -350,25 +350,7 @@ export default {
             // 假设我们有一个密码列表
             const passwords = [
                 "password1", "password2", "password3", "password4", "password5",
-                "password6", "password7", "password8", "password9", "password10",
-                "password11", "password12", "password13", "password14", "password15",
-                "password16", "password17", "password18", "password19", "password20",
-                "password21", "password22", "password23", "password24", "password25",
-                "password26", "password27", "password28", "password29", "password30",
-                "password31", "password32", "password33", "password34", "password35",
-                "password36", "password37", "password38", "password39", "password40",
-                "password41", "password42", "password43", "password44", "password45",
-                "password46", "password47", "password48", "password49", "password50",
-                "password51", "password52", "password53", "password54", "password55",
-                "password56", "password57", "password58", "password59", "password60",
-                "password61", "password62", "password63", "password64", "password65",
-                "password66", "password67", "password68", "password69", "password70",
-                "password71", "password72", "password73", "password74", "password75",
-                "password76", "password77", "password78", "password79", "password80",
-                "password81", "password82", "password83", "password84", "password85",
-                "password86", "password87", "password88", "password89", "password90",
-                "password91", "password92", "password93", "password94", "password95",
-                "password96", "password97", "password98", "password99", "password100", "123"
+                "password6", "password7", "password8", "password9", "password10", "123"
             ];
 
             // 使用 for 循环遍历密码列表

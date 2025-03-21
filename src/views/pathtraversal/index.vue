@@ -259,7 +259,7 @@ export default {
             dialogFormVisible1: false,
             dialogFormVisible2: false,
             dialogFormVisible3: false,
-            payload1: 'img.png',
+            payload1: 'img_0.png',
             payload2: '../../../../../../etc/hosts',
             resp_text1: '',
             imageUrl: null // 用于存储图片 URL

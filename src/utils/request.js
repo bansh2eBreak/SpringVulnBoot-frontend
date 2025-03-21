@@ -82,7 +82,7 @@ service.interceptors.response.use(
         const res = response.data
         // 优化，当返回的数据不是标准的json格式时，直接返回响应文本
         if (res.code !== undefined && res.code !== null) {
-          if (res.code !== 0) {
+          if (res.code !== 0 && res.code !== 1 ) {
             Message({
               message: res.data || 'Error',
               type: 'error',
