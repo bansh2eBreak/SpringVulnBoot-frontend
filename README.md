@@ -8,6 +8,8 @@
 2. 后端是基于springBoot开发的，[后端工程](https://github.com/bansh2eBreak/SpringVulnBoot-backend)
 
 ## 效果图
+![img_9.png](images/img_9.png)
+![img_10.png](images/img_10.png)
 ![img_1.png](images/img_1.png)
 ![img_2.png](images/img_2.png)
 ![img_3.png](images/img_3.png)
@@ -16,8 +18,6 @@
 ![img_6.png](images/img_6.png)
 ![img_7.png](images/img_7.png)
 ![img_8.png](images/img_8.png)
-![img_9.png](images/img_9.png)
-![img_10.png](images/img_10.png)
 
 ## 更新日志
 
@@ -61,6 +61,10 @@
     - 绕过单IP限制暴力破解
     - HTTP Basic认证登录暴力破解
     - 图形验证码登录暴力破解
+  - 短信认证漏洞
+    - 短信轰炸
+    - 短信验证码回显
+    - 暴力破解短信验证码
 - 组件漏洞
   - Fastjson漏洞
   - Log4j2漏洞
