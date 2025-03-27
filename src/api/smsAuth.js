@@ -16,6 +16,18 @@ export function sendSafe1(data) {
   })
 }
 
+export function sendSafe2(data) {
+  const formData = `phone=${data.phone}&captcha=${data.captcha}`;
+
+  return request({
+    url: '/authentication/smsBased/sendSafe2',
+    method: 'post',
+    data: formData, // 使用 FormData 传递参数
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    }
+  })
+}
 
 export function verifyVuln1(data) {
   return request({

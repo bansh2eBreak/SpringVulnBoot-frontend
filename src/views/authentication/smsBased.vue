@@ -121,9 +121,34 @@ public Result sendSafe1(@RequestBody SmsCode smsCode) {
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - 防短信轰炸<el-button type="success"
-                                round size="mini">去测试</el-button></el-row>
-                        <pre v-highlightjs><code class="java">
-参考密码登录漏洞里面的图形验证码方案
+                                round size="mini" @click="openDialog('smsSpamSafeDialog')">去测试</el-button></el-row>
+                        <pre v-highlightjs><code class="java">// 发送短信接口:图形验证码防短信轰炸
+
+@PostMapping("/sendSafe2")
+public Result sendSafe2(@RequestParam String phone, @RequestParam String captcha, HttpServletRequest request) {
+    //获取服务端生成的验证码
+    HttpSession session = request.getSession();
+    // 从 Session 中获取验证码
+    String sessionCaptcha = (String) request.getSession().getAttribute("captcha");
+    // 校验验证码
+    if (sessionCaptcha == null || !sessionCaptcha.equalsIgnoreCase(captcha)) {
+        return Result.success("图形验证码错误");
+    }
+
+    // 清除验证码
+    session.removeAttribute("captcha");
+
+    // 生成四位随机数作为验证码
+    String smsCode = String.valueOf((int) ((Math.random() * 9 + 1) * 1000));
+    // 设置验证码的创建时间为当前时间
+    LocalDateTime createTime = LocalDateTime.now();
+    // 设置验证码的过期时间为当前时间加5分钟
+    LocalDateTime expireTime = LocalDateTime.now().plusMinutes(5);
+
+    // 验证的使用状态和重试次数默认是0，所以生成验证码的时候可以不设置
+    smsCodeService.generateCodeByPhoneAndCode(phone, smsCode, createTime, expireTime);
+    return Result.success("短信验证码已发送");
+}
 </code></pre>
                     </div>
                 </el-col>
@@ -166,7 +191,7 @@ public Result verifySafe1(@RequestBody SmsCode smsCode) {
         // 更新验证码的重试次数
         smsCodeService.updateSmsCodeRetryCount(smsCode.getPhone());
         // 做一个判断，如果验证码的重试次数小于5，返回验证码错误，否则返回错误次数过多
-        if (smsCodeService.selectRetryCount(smsCode.getPhone()) < 5) {
+        if (smsCodeService.selectRetryCount(smsCode.getPhone()) &lt; 5) {
             return Result.error("验证码错误");
         } else {
             return Result.error("错误次数过多，请重新获取短信验证码");
@@ -222,6 +247,39 @@ public Result verifySafe1(@RequestBody SmsCode smsCode) {
             </div>
         </el-dialog>
 
+        <!-- 图形验证码防短信轰炸测试对话框 -->
+        <el-dialog title="短信发送测试（图形验证码限制）" :visible.sync="smsSpamSafeDialog" class="center-dialog">
+            <div style="text-align: center; color: black; font-style: italic; margin-bottom: 20px;">
+                说明：该接口增加了图形验证码人机交互，防短信轰炸！
+            </div>
+            <div style="margin-bottom: 20px;">
+                <el-form :inline="true" class="demo-form-inline">
+                    <el-form-item label="手机号" label-width="100px">
+                        <el-input v-model="phone" placeholder="请输入手机号"></el-input>
+                    </el-form-item>
+                    <br />
+                    <el-form-item label="图形验证码" label-width="100px">
+                        <div style="display: flex; align-items: center;">
+                            <el-input v-model="captcha" style="flex: 1;" placeholder="请输入图形验证码"></el-input>
+                            <img :src="captchaImageUrl" @click="refreshCaptcha"
+                                style="cursor: pointer; margin-left: 10px;" />
+                        </div>
+                    </el-form-item>
+                    <br />
+                    <el-form-item>
+                        <el-button type="danger" @click="BlockBruteSendSmsCode">短信轰炸</el-button>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="SingleSendSmsCode">正常发送</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+
+            <div>
+                <p v-if="leakMessage" style="color: red;">{{ leakMessage }}</p>
+            </div>
+        </el-dialog>
+
         <!-- 暴力破解短信对话框 -->
         <el-dialog title="短信验证码暴力破解" :visible.sync="bruteSmsDialog" class="center-dialog">
             <div style="text-align: center; color: red; font-style: italic; margin-bottom: 20px;">
@@ -242,7 +300,7 @@ public Result verifySafe1(@RequestBody SmsCode smsCode) {
         </el-dialog>
 
         <!-- 防暴力破解短信对话框 -->
-        <el-dialog title="短信验证码暴力破解" :visible.sync="bruteSmsSafeDialog" class="center-dialog">
+        <el-dialog title="防暴力破解短信对话框 " :visible.sync="bruteSmsSafeDialog" class="center-dialog">
             <div style="text-align: center; color: black; font-style: italic; margin-bottom: 20px;">
                 说明：该短信验证码校验接口增加了错误次数限制，最多错误验证5次！
             </div>
@@ -264,7 +322,7 @@ public Result verifySafe1(@RequestBody SmsCode smsCode) {
 
 <script>
 import axios from 'axios';
-import { sendSafe1, sendVuln1, verifyVuln1, verifySafe1 } from '@/api/smsAuth';
+import { sendSafe1, sendVuln1, verifyVuln1, verifySafe1, sendSafe2 } from '@/api/smsAuth';
 
 export default {
     data() {
@@ -274,9 +332,10 @@ export default {
             smsLeakDialog: false,
             smsSafeDialog: false,
             smsSpamDialog: false,
+            smsSpamSafeDialog: false,
             bruteSmsDialog: false,
             bruteSmsSafeDialog: false,
-
+            captcha: '',
 
             // 表单数据
             phone: '',
@@ -286,23 +345,19 @@ export default {
             message: '',
             leakMessage: '',
             bruteForceMessage: '',
-
-            // 短信轰炸历史记录
-            spamHistory: [],
-
-            // 暴力破解历史记录
-            bruteForceHistory: [],
-
-            // 暴力破解状态
-            isBruteForcing: false,
-            bruteForceCounter: 0
         };
+    },
+    created() {
+        this.refreshCaptcha();
     },
     methods: {
         handleClick(tab, event) {
             // console.log(tab, event);
         },
-
+        // 调用后端接口获取验证码
+        refreshCaptcha() {
+            this.captchaImageUrl = 'http://127.0.0.1:8080/authentication/passwordBased/captcha?t=' + new Date().getTime();
+        },
         // 打开对话框
         openDialog(dialogName) {
             this[dialogName] = true;
@@ -311,12 +366,10 @@ export default {
         // 清除所有提示消息
         clearMessages() {
             this.message = '';
-            this.secureMessage = '';
             this.leakMessage = '';
             this.bruteForceMessage = '';
-            this.secureVerifyMessage = '';
-            this.phone = '',
-                this.smsCode = ''
+            this.phone = '';
+            this.smsCode = ''
         },
         // 查询验证码（泄露接口）
         sendSmsLeak() {
@@ -325,6 +378,13 @@ export default {
                 return;
             }
 
+            // 强化前端校验（使用与后端相同的正则）
+            const phoneRegex = /^1(3[0-9]|4[5-9]|5[0-3,5-9]|6[6]|7[0-8]|8[0-9]|9[1,8,9])\d{8}$/;
+
+            if (!phoneRegex.test(this.phone)) {
+                this.leakMessage = '手机号格式错误'
+                return;
+            }
             // 调用封装的sendVuln1发送请求，获取短信验证码
             sendVuln1({
                 "phone": this.phone
@@ -333,6 +393,7 @@ export default {
                 this.leakMessage = response.data
             }).catch(error => {
                 console.error('Error fetching data:', error)
+                this.leakMessage = response.data
             })
         },
 
@@ -343,6 +404,13 @@ export default {
                 return;
             }
 
+            // 强化前端校验（使用与后端相同的正则）
+            const phoneRegex = /^1(3[0-9]|4[5-9]|5[0-3,5-9]|6[6]|7[0-8]|8[0-9]|9[1,8,9])\d{8}$/;
+
+            if (!phoneRegex.test(this.phone)) {
+                this.leakMessage = '手机号格式错误'
+                return;
+            }
             // 调用封装的sendVuln1发送请求，获取短信验证码
             sendSafe1({
                 "phone": this.phone
@@ -360,6 +428,14 @@ export default {
                 return;
             }
 
+            // 强化前端校验（使用与后端相同的正则）
+            const phoneRegex = /^1(3[0-9]|4[5-9]|5[0-3,5-9]|6[6]|7[0-8]|8[0-9]|9[1,8,9])\d{8}$/;
+
+            if (!phoneRegex.test(this.phone)) {
+                this.leakMessage = '手机号格式错误'
+                return;
+            }
+
             for (let i = 1; i <= 50; i++) {
                 this.leakMessage = `短信轰炸中，第${i}次`;
 
@@ -368,32 +444,91 @@ export default {
                         "phone": this.phone
                     });
 
-                    const now = new Date().toLocaleTimeString();
-                    this.spamHistory.unshift({
-                        time: now,
-                        response: `第${i}次发送成功`
-                    });
-
                     // 等待100ms再发送下一条,避免请求过于频繁
                     await new Promise(resolve => setTimeout(resolve, 100));
 
                 } catch (error) {
                     console.error('Error fetching data:', error);
-                    const now = new Date().toLocaleTimeString();
-                    this.spamHistory.unshift({
-                        time: now,
-                        response: `第${i}次发送失败：${error.response?.data?.message || error.message}`
-                    });
                 }
             }
 
             this.message = '短信轰炸完成';
         },
 
+        // 图形验证码防短信轰炸
+        async BlockBruteSendSmsCode() {
+            if (!this.phone) {
+                this.leakMessage = '手机号不能为空';
+                return;
+            }
+
+            // 强化前端校验（使用与后端相同的正则）
+            const phoneRegex = /^1(3[0-9]|4[5-9]|5[0-3,5-9]|6[6]|7[0-8]|8[0-9]|9[1,8,9])\d{8}$/;
+
+            if (!phoneRegex.test(this.phone)) {
+                this.leakMessage = '手机号格式错误'
+                return;
+            }
+
+            for (let i = 1; i <= 50; i++) {
+                this.leakMessage = `短信轰炸中，第${i}次`;
+
+                try {
+                    const response = await sendSafe2({
+                        "phone": this.phone,
+                        "captcha": this.captcha
+                    });
+
+                    this.leakMessage = "第" + i + "次尝试，" + response.data;
+
+                    // 等待100ms再发送下一条,避免请求过于频繁
+                    await new Promise(resolve => setTimeout(resolve, 100));
+
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            }
+
+            this.message = '短信轰炸完成';
+        },
+
+        // 单次使用图形验证码登录
+        SingleSendSmsCode() {
+            if (!this.phone) {
+                this.leakMessage = '手机号不能为空';
+                return;
+            }
+
+            // 强化前端校验（使用与后端相同的正则）
+            const phoneRegex = /^1(3[0-9]|4[5-9]|5[0-3,5-9]|6[6]|7[0-8]|8[0-9]|9[1,8,9])\d{8}$/;
+
+            if (!phoneRegex.test(this.phone)) {
+                this.leakMessage = '手机号格式错误'
+                return;
+            }
+
+            sendSafe2({
+                "phone": this.phone,
+                "captcha": this.captcha
+            }).then(response => {
+                this.leakMessage = response.data;
+            }).catch(error => {
+                console.error('Error fetching data:', error);
+            })
+        },
+
         // 暴力破解短信验证码
         async BruteVerifySmsCode() {
             if (!this.phone) {
                 this.leakMessage = '手机号不能为空';
+                return;
+            }
+
+            // 强化前端校验（使用与后端相同的正则）
+            const phoneRegex = /^1(3[0-9]|4[5-9]|5[0-3,5-9]|6[6]|7[0-8]|8[0-9]|9[1,8,9])\d{8}$/;
+
+            if (!phoneRegex.test(this.phone)) {
+                this.leakMessage = '手机号格式错误'
                 return;
             }
 
@@ -438,6 +573,14 @@ export default {
                 return;
             }
 
+            // 强化前端校验（使用与后端相同的正则）
+            const phoneRegex = /^1(3[0-9]|4[5-9]|5[0-3,5-9]|6[6]|7[0-8]|8[0-9]|9[1,8,9])\d{8}$/;
+
+            if (!phoneRegex.test(this.phone)) {
+                this.leakMessage = '手机号格式错误'
+                return;
+            }
+
             this.bruteForceMessage = '开始暴力破解验证码...';
 
             for (let i = 0; i <= 9999; i++) {
@@ -459,17 +602,12 @@ export default {
                     }
 
                     if (response.data.includes('错误次数过多')) {
-                        this.bruteForceMessage = '错误次数过多，暴力破解终止';
+                        this.bruteForceMessage = '错误次数过多，暴力破解终止，请重新获取短信验证码';
                         return;
                     }
 
                     // 增加延迟，方便看效果
                     await new Promise(resolve => setTimeout(resolve, 500));
-
-                    // 每100次请求暂停100ms,避免请求过于频繁
-                    // if (i % 100 === 0) {
-                    //     await new Promise(resolve => setTimeout(resolve, 100));
-                    // }
 
                 } catch (error) {
                     console.error('验证失败:', error);
