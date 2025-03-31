@@ -336,6 +336,7 @@ export default {
             bruteSmsDialog: false,
             bruteSmsSafeDialog: false,
             captcha: '',
+            captchaImageUrl: '',
 
             // 表单数据
             phone: '',
@@ -512,6 +513,8 @@ export default {
                 "captcha": this.captcha
             }).then(response => {
                 this.leakMessage = response.data;
+                // 登录成功后刷新验证码
+                this.refreshCaptcha();
             }).catch(error => {
                 console.error('Error fetching data:', error);
             })
