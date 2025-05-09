@@ -1,26 +1,26 @@
 <template>
     <div class="root-div">
         <div class="vuln-info">
-            <div class="header-div">身份认证漏洞 -- 2FA-Based authentication</div>
+            <div class="header-div">MFA认证漏洞 -- MFA-Based authentication</div>
             <div class="body-div">
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="漏洞描述" name="first">
                         <div class="vuln-detail">
-                            虽然2fa双因素身份认证可以提高账户的安全性，但是如果实现不当，也可能导致漏洞。例如仅仅是前端页面需要验证2fa，其实后端接口并不强制校验2fa，导致可以绕过2fa登录；还有一种场景是通过其他漏洞可以越权拿到其他用户的2fa串，从而非法绑定其他账号的2fa进行非法登录。
+                            虽然MFA双因素身份认证可以提高账户的安全性，但是如果实现不当，也可能导致漏洞。例如仅仅是前端页面需要验证MFA，其实后端接口并不强制校验MFA，导致可以绕过MFA登录；还有一种场景是通过其他漏洞可以越权拿到其他用户的MFA串，从而非法绑定其他账号的MFA进行非法登录。
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="漏洞危害" name="second">
                         <div class="vuln-detail">
-                            2fa相关漏洞会导致系统的身份认证的安全性大大降低，可能导致用户账户遭受未经授权的访问和信息泄露，进而导致个人隐私泄露、财产损失等严重后果。
+                            MFA相关漏洞会导致系统的身份认证的安全性大大降低，可能导致用户账户遭受未经授权的访问和信息泄露，进而导致个人隐私泄露、财产损失等严重后果。
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="安全编码" name="third">
                         <div class="vuln-detail">
-                            【必须】后端必须严格校验2FA
-                            后端需要对每一次前端提交的2FA进行严格的校验，确保2FA的安全性；
+                            【必须】后端必须严格校验MFA
+                            后端需要对每一次前端提交的MFA进行严格的校验，确保MFA的安全性；
                             <br />
-                            【必须】确保2FA共享密钥的安全性
-                            防止2FA共享密钥泄露，确保2FA共享密钥的安全性；
+                            【必须】确保MFA共享密钥的安全性
+                            防止MFA共享密钥泄露，确保MFA共享密钥的安全性；
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="参考文章" name="fourth">
@@ -30,6 +30,24 @@
                         </div>
                     </el-tab-pane>
                 </el-tabs>
+            </div>
+        </div>
+        <div class="vuln-info">
+            <div class="header-div">MFA绑定与解绑</div>
+            <div class="body-div">
+                <el-form :inline="true" class="demo-form-inline">
+                    <el-form-item>
+                        <el-button type="primary" @click="bindMfa">绑定MFA</el-button>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="danger" @click="resetMfa">解绑MFA</el-button>
+                    </el-form-item>
+                </el-form>
+                <div v-if="mfaInfo" class="vuln-detail">
+                    <p>MFA Secret: {{ mfaInfo.secret }}</p>
+                    <p>请使用Google Authenticator扫描以下二维码：</p>
+                    <img :src="mfaInfo.qrCodeUrl" alt="MFA QR Code" style="max-width: 200px;">
+                </div>
             </div>
         </div>
         <div class="code-demo">
@@ -295,8 +313,7 @@ public Result httpBasicLogin(HttpServletRequest request, HttpServletResponse res
 </template>
 
 <script>
-import axios from 'axios';
-import { vuln1, vuln2, sec, httpBasicLogin, captcha, sec2, vuln3 } from '@/api/authentication';
+import { bindMfa, resetMfa } from '@/api/mfaAuth.js';
 
 export default {
     data() {
@@ -310,7 +327,8 @@ export default {
             password1: '123',
             captcha: '',
             resp_text1: '',
-            captchaImageUrl: ''
+            captchaImageUrl: '',
+            mfaInfo: null
         };
     },
     created() {
@@ -549,6 +567,71 @@ export default {
                 console.error('Error fetching data:', error);
             });
         },
+        // 从JWT中获取用户ID
+        getUserIdFromJwt() {
+            try {
+                // 1. 获取Authorization
+                const token = localStorage.getItem('Authorization');
+                if (!token) {
+                    throw new Error('未找到Authorization token');
+                }
+
+                // 2. 获取JWT的payload部分
+                const payload = token.split('.')[1];
+                if (!payload) {
+                    throw new Error('JWT格式错误');
+                }
+
+                // 3. Base64解码
+                const decodedPayload = JSON.parse(atob(payload));
+                if (!decodedPayload.id) {
+                    throw new Error('JWT中未找到用户ID');
+                }
+
+                return decodedPayload.id;
+            } catch (error) {
+                console.error('获取用户ID失败:', error);
+                this.$message.error('获取用户ID失败，请确保已登录');
+                return null;
+            }
+        },
+        async bindMfa() {
+            const userId = this.getUserIdFromJwt();
+            if (!userId) return;
+
+            try {
+                const response = await bindMfa({ userId: userId.toString() });
+                if (response.code === 0) {
+                    this.mfaInfo = {
+                        secret: response.data.secret,
+                        qrCodeUrl: response.data.qrCodeUrl
+                    };
+                } else {
+                    this.$message.error(response.message || 'MFA绑定失败');
+                }
+               
+            } catch (error) {
+                // this.$message.error('MFA绑定请求失败');
+                console.error('MFA绑定失败:', error);
+            }
+        },
+        async resetMfa() {
+            const userId = this.getUserIdFromJwt();
+            if (!userId) return;
+
+            try {
+                const response = await resetMfa({ userId: userId.toString() });
+                if (response.code === 0) {
+                    this.mfaInfo = null;
+                    this.$message.success('MFA解绑成功');
+                } else {
+                    this.$message.error(response.message || 'MFA解绑失败');
+                }
+            } catch (error) {
+                // this.$message.error('MFA解绑请求失败');
+                console.error('MFA解绑失败:', error);
+            }
+        }
     }
 };
 </script>

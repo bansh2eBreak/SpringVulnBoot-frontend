@@ -1,7 +1,7 @@
 <template>
     <div class="root-div">
         <div class="vuln-info">
-            <div class="header-div">短信认证漏洞 -- SMS-Based authentication</div>
+            <div class="header-div">水平越权漏洞 -- Horizontal Privilege Escalation</div>
             <div class="body-div">
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="漏洞描述" name="first">

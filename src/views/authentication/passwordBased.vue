@@ -1,7 +1,7 @@
 <template>
     <div class="root-div">
         <div class="vuln-info">
-            <div class="header-div">身份认证漏洞 -- Password-Based authentication</div>
+            <div class="header-div">密码认证漏洞 -- Password-Based authentication</div>
             <div class="body-div">
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="漏洞描述" name="first">

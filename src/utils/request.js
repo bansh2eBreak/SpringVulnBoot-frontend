@@ -79,6 +79,7 @@ service.interceptors.response.use(
       try {
         // const res = JSON.parse(response.data) //response.data.data 是 jwttoken
         const res = response.data
+        console.log("响应码："+res.code)
         // 优化，当返回的数据不是标准的json格式时，直接返回响应文本
         if (res.code !== undefined && res.code !== null) {
           if (res.code !== 0) {
