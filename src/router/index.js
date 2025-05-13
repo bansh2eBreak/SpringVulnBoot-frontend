@@ -117,7 +117,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/accessControl/HorizontalPriVuln',
     name: 'accessControl',
-    meta: { title: '越权漏洞', icon: 'el-icon-s-help' },
+    meta: { title: '权限漏洞', icon: 'el-icon-s-help' },
     children: [
       {
         path: 'horizontalPriVuln',

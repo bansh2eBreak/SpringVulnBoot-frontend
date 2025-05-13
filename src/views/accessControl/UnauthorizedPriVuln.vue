@@ -142,12 +142,12 @@ export default {
         },
         // 测试未授权访问
         testUnauthorizedAccess() {
-            const url = `http://127.0.0.1:8080/accessControl/HorizontalPri/vuln2/${this.targetUserId}`;
+            const url = `http://127.0.0.1:8080/accessControl/UnauthorizedPri/vuln1/${this.targetUserId}`;
             window.open(url, '_blank');
         },
         // 测试权限校验
         testAuthorizedAccess() {
-            const url = `http://127.0.0.1:8080/accessControl/HorizontalPri/sec1/${this.targetUserId}`;
+            const url = `http://127.0.0.1:8080/accessControl/UnauthorizedPri/sec1/${this.targetUserId}`;
             window.open(url, '_blank');
         },
     }

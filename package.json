@@ -16,8 +16,13 @@
   "dependencies": {
     "axios": "0.18.1",
     "core-js": "3.6.5",
+    "crypto-js": "^4.2.0",
     "element-ui": "2.13.2",
+    "js-base64": "^3.7.7",
     "js-cookie": "2.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "jsrsasign": "^11.1.0",
+    "jwt-decode": "^4.0.0",
     "normalize.css": "7.0.0",
     "nprogress": "0.2.0",
     "path-to-regexp": "2.4.0",
