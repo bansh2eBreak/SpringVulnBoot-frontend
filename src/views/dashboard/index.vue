@@ -30,7 +30,7 @@ export default {
         if (index === this.text.length) {
           clearInterval(interval);
         }
-      }, 200); // 每个字展示的间隔时间，单位为毫秒
+      }, 100); // 每个字展示的间隔时间，单位为毫秒
     }
   }
 };

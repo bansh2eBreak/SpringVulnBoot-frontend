@@ -29,10 +29,10 @@
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
         @click.native.prevent="handleLogin">Login</el-button>
 
-      <!-- <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: 123456</span>
-      </div> -->
+      <div class="tips" style="text-align: center;">
+        <div style="margin-bottom: 10px; color: red; font-weight: bold; font-style: italic;">测试账号1: admin/123456</div>
+        <div style="color: red; font-weight: bold; font-style: italic;">测试账号2: zhangsan/123456</div>
+      </div>
 
     </el-form>
   </div>

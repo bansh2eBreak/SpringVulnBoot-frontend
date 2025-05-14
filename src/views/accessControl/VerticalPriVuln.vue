@@ -59,7 +59,9 @@
                         <el-row type="flex" justify="space-between" align="middle">漏洞代码 - 破解JWT提权测试
                             <el-button type="danger" round size="mini"
                                 @click="openDialog('jwtVulnDialog')">去测试</el-button></el-row>
-                        <pre v-highlightjs><code class="java">public class JwtUtils {
+                        <pre v-highlightjs><code class="java">// 请登录zhangsan用户测试提权
+                            
+public class JwtUtils {
 
     private static String signKey = "password";
     private static Long expire = 4320000000L; //表示有效期1200h：1200 * 3600 * 1000 = 43200000
@@ -96,8 +98,8 @@
         <!-- JWT漏洞测试对话框 -->
         <el-dialog title="JWT垂直越权测试" :visible.sync="jwtVulnDialog" class="center-dialog">
             <div style="text-align: center; color: red; font-style: italic; margin-bottom: 20px;">
+                请登录zhangsan用户测试提权！<br /><br />
                 说明：假设已经成功破解了JWT，那么攻击者可以通过篡改JWT的payload中的角色信息，从而获取管理员权限。
-                那么就可以越权以admin身份执行管理员操作。
             </div>
             <div style="margin-bottom: 20px;">
                 <el-button type="danger" @click="testJwtVuln">测试JWT越权</el-button>
@@ -105,9 +107,9 @@
             <div>
                 <p>原始JWT密文：</p>
                 <el-input type="textarea" v-model="currentJwt" :rows="2" readonly></el-input>
-                <p>JWT header和payload原文：</p>
+                <p>原始JWT明文：</p>
                 <el-input type="textarea" v-model="decodedJwt" :rows="4" readonly></el-input>
-                <p>伪造的新JWT密文：</p>
+                <p>伪造新JWT密文（提权）：</p>
                 <el-input type="textarea" v-model="tamperedJwt" :rows="2" readonly></el-input>
                 <p>接口返回结果：</p>
                 <el-input type="textarea" v-model="vulnResult" :rows="4" readonly></el-input>

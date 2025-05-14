@@ -7,6 +7,8 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
+          <span class="user-name">{{ displayName }}</span>
+          <span class="separator">|</span>
           <img :src="avatar + '?imageView2/1/w/80/h/80'" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
@@ -41,8 +43,12 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'avatar'
-    ])
+      'avatar',
+      'username'
+    ]),
+    displayName() {
+      return this.username || '未登录'
+    }
   },
   methods: {
     toggleSideBar() {
@@ -114,12 +120,25 @@ export default {
       .avatar-wrapper {
         margin-top: 5px;
         position: relative;
+        display: flex;
+        align-items: center;
 
         .user-avatar {
           cursor: pointer;
           width: 40px;
           height: 40px;
           border-radius: 10px;
+        }
+
+        .user-name {
+          margin: 0 5px;
+          font-size: 14px;
+          color: #606266;
+        }
+
+        .separator {
+          margin: 0 5px;
+          color: #909399;
         }
 
         .el-icon-caret-bottom {

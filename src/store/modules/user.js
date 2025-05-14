@@ -6,7 +6,8 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    username: ''
   }
 }
 
@@ -24,6 +25,9 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_USERNAME: (state, username) => {
+    state.username = username
   }
 }
 
@@ -34,11 +38,8 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
-        // commit('SET_TOKEN', data.token)
         commit('SET_TOKEN', data)
-        // setToken(data.token)
-        // setToken(data) // 采用Cookie请取消注释这行
-        // 添加到localStorage
+        commit('SET_USERNAME', username.trim())
         localStorage.setItem('Authorization', data)
         resolve()
       }).catch(error => {
@@ -59,10 +60,11 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
+        const { name, avatar, username } = data
 
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
+        commit('SET_USERNAME', username)
         resolve(data)
       }).catch(error => {
         reject(error)
