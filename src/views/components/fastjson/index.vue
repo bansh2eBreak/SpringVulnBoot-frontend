@@ -300,7 +300,7 @@ export default {
                 console.log(response.data);
             }).catch(error => {
                 console.error('Error fetching data:', error);
-                this.resp_text1 = "弹calc了吧^_^";
+                this.resp_text1 = "flag.txt文件写入成功了吧^_^";
             });
         },
         onSubmit21() {
