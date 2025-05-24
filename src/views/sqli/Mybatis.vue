@@ -206,7 +206,7 @@ List&lt;User&gt; selectUserSecByUsername(@Param("username") String username);
         </div>
         <!-- 打开嵌套表格的对话框 -->
         <el-dialog title="查询用户信息接口" :visible.sync="dialogTableVisible">
-            执行的sql语句为: {{ pocUrl }}
+            执行的sql语句为: <span v-html="formattedSql"></span>
             <br />
             <br />
             <el-table :data="gridData">
@@ -232,6 +232,28 @@ export default {
             pocUrl: '',
             dialogTableVisible: false,
         };
+    },
+    computed: {
+        formattedSql() {
+            if (!this.pocUrl) return '';
+            
+            // 处理不同的参数类型
+            const params = ['id=', 'username=', 'orderBy='];
+            let result = this.pocUrl;
+            
+            for (const param of params) {
+                if (result.includes(param)) {
+                    const parts = result.split(param);
+                    if (parts.length === 2) {
+                        // 处理URL编码的参数
+                        const value = decodeURIComponent(parts[1]);
+                        result = parts[0] + param + '<span class="sql-param">' + value + '</span>';
+                    }
+                }
+            }
+            
+            return result;
+        }
     },
     methods: {
         handleClick(tab, event) {
@@ -273,21 +295,6 @@ export default {
                     console.error('Error fetching data:', error);
                 });
         },
-        // fetchDataAndFillTable1() {
-        //     // 从localStorage获取token
-        //     const token = localStorage.getItem('token');
-
-        //     axios.get("http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=username")
-        //         .then(response => {
-        //             this.gridData = response.data.data.rows;
-        //             console.log(this.gridData);
-        //             this.dialogTableVisible = true; // 显示对话框
-        //             this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=username";
-        //         })
-        //         .catch(error => {
-        //             console.error('Error fetching data:', error);
-        //         });
-        // },
         fetchDataAndFillTable4() {
             // 从localStorage获取token
             // const token = localStorage.getItem('token');
@@ -431,5 +438,10 @@ pre code {
 .row-bg {
     padding: 10px 0;
     background-color: #f9fafc;
+}
+
+.sql-param {
+    color: red;
+    font-weight: bold;
 }
 </style>

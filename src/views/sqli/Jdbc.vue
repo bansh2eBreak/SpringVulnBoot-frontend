@@ -205,7 +205,7 @@ public Result getUserSecByUsername(String username) throws Exception {
         </div>
         <!-- 打开嵌套表格的对话框 -->
         <el-dialog title="查询用户信息接口" :visible.sync="dialogTableVisible">
-            执行的sql语句为: {{ pocUrl }}
+            执行的sql语句为: <span v-html="formattedSql"></span>
             <br />
             <br />
             <el-table :data="gridData">
@@ -231,6 +231,14 @@ export default {
             pocUrl: '',
             dialogTableVisible: false,
         };
+    },
+    computed: {
+        formattedSql() {
+            if (!this.pocUrl) return '';
+            const parts = this.pocUrl.split('username=');
+            if (parts.length !== 2) return this.pocUrl;
+            return parts[0] + 'username=<span class="sql-param">' + parts[1] + '</span>';
+        }
     },
     methods: {
         handleClick(tab, event) {
@@ -407,5 +415,10 @@ pre code {
 .row-bg {
     padding: 10px 0;
     background-color: #f9fafc;
+}
+
+.sql-param {
+    color: red;
+    font-weight: bold;
 }
 </style>
