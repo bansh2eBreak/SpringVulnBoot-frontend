@@ -100,6 +100,19 @@ export const constantRoutes = [
   },
 
   {
+    path: '/ssrf',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'SSRF',
+        component: () => import('@/views/ssrf/index'),
+        meta: { title: 'SSRF漏洞', icon: 'el-icon-s-help' }
+      }
+    ]
+  },
+
+  {
     path: '/cmd',
     component: Layout,
     children: [
