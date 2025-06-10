@@ -276,12 +276,15 @@ export default {
         },
         fetchDataAndFillTable1() {
             this.dialogFormVisible1 = true; // 显示对话框
+            this.message = ''; // 清空消息
         },
         fetchDataAndFillTable2() {
             this.dialogFormVisible2 = true; // 显示对话框
+            this.message = ''; // 清空消息
         },
         fetchDataAndFillTable3() {
             this.dialogFormVisible3 = true; // 显示对话框
+            this.message = ''; // 清空消息
         },
         onFileChange(event) {
             this.selectedFile = event.target.files[0];

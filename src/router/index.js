@@ -60,19 +60,19 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/sqli/jdbc',
     name: 'sqli',
-    meta: { title: 'Sql注入', icon: 'el-icon-s-help' },
+    meta: { title: 'Sql注入', icon: 'el-icon-s-platform' },
     children: [
       {
         path: 'jdbc',
         name: 'Jdbc类型',
         component: () => import('@/views/sqli/Jdbc'),
-        meta: { title: 'Jdbc类型', icon: 'table' }
+        meta: { title: 'Jdbc类型', icon: 'el-icon-connection' }
       },
       {
         path: 'mybatis',
         name: 'Mybatis类型',
         component: () => import('@/views/sqli/Mybatis'),
-        meta: { title: 'Mybatis类型', icon: 'tree' }
+        meta: { title: 'Mybatis类型', icon: 'el-icon-document' }
       }
     ]
   },
@@ -82,19 +82,19 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/xss/reflected',
     name: 'xss',
-    meta: { title: 'XSS跨站脚本', icon: 'el-icon-s-help' },
+    meta: { title: 'XSS跨站脚本', icon: 'el-icon-s-flag' },
     children: [
       {
         path: 'reflected',
         name: '反射型',
         component: () => import('@/views/xss/Reflected'),
-        meta: { title: '反射型', icon: 'table' }
+        meta: { title: '反射型', icon: 'el-icon-refresh' }
       },
       {
         path: 'stored',
         name: '存储型',
         component: () => import('@/views/xss/Stored'),
-        meta: { title: '存储型', icon: 'tree' }
+        meta: { title: '存储型', icon: 'el-icon-folder' }
       }
     ]
   },
@@ -107,7 +107,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'SSRF',
         component: () => import('@/views/ssrf/index'),
-        meta: { title: 'SSRF漏洞', icon: 'el-icon-s-help' }
+        meta: { title: 'SSRF漏洞', icon: 'el-icon-s-opportunity' }
       }
     ]
   },
@@ -120,7 +120,7 @@ export const constantRoutes = [
         path: 'exec',
         name: 'CmdExec',
         component: () => import('@/views/cmdexec/CmdExec'),
-        meta: { title: '任意命令执行', icon: 'el-icon-s-help' }
+        meta: { title: '任意命令执行', icon: 'el-icon-s-tools' }
       }
     ]
   },
@@ -130,25 +130,25 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/accessControl/HorizontalPriVuln',
     name: 'accessControl',
-    meta: { title: '权限漏洞', icon: 'el-icon-s-help' },
+    meta: { title: '权限漏洞', icon: 'el-icon-lock' },
     children: [
       {
         path: 'horizontalPriVuln',
         name: 'Horizontal Privilege Escalation',
         component: () => import('@/views/accessControl/HorizontalPriVuln'),
-        meta: { title: '水平越权漏洞', icon: 'table' }
+        meta: { title: '水平越权漏洞', icon: 'el-icon-sort' }
       },
       {
         path: 'verticalPriVuln',
         name: 'Vertical Privilege Escalation',
         component: () => import('@/views/accessControl/VerticalPriVuln'),
-        meta: { title: '垂直越权漏洞', icon: 'tree' }
+        meta: { title: '垂直越权漏洞', icon: 'el-icon-sort-up' }
       },
       {
         path: 'unauthorized',
         name: 'Unauthorized',
         component: () => import('@/views/accessControl/UnauthorizedPriVuln'),
-        meta: { title: '未授权访问漏洞', icon: 'tree' }
+        meta: { title: '未授权访问漏洞', icon: 'el-icon-warning' }
       }
     ]
   },
@@ -161,7 +161,7 @@ export const constantRoutes = [
         path: 'openUrl',
         name: 'openUrl',
         component: () => import('@/views/openUrl/OpenUrl'),
-        meta: { title: '任意URL跳转', icon: 'el-icon-s-help' }
+        meta: { title: '任意URL跳转', icon: 'el-icon-s-promotion' }
       }
     ]
   },
@@ -171,25 +171,25 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/authentication/passwordBased',
     name: 'authentication',
-    meta: { title: '身份认证漏洞', icon: 'el-icon-s-help' },
+    meta: { title: '身份认证漏洞', icon: 'el-icon-s-custom' },
     children: [
       {
         path: 'passwordBased',
         name: 'password-based authentication',
         component: () => import('@/views/authentication/passwordBased'),
-        meta: { title: '密码登录漏洞', icon: 'table' }
+        meta: { title: '密码登录漏洞', icon: 'el-icon-key' }
       },
       {
         path: '2faBased',
         name: 'multi-factor authentication',
         component: () => import('@/views/authentication/mfaBased'),
-        meta: { title: 'MFA登录漏洞', icon: 'tree' }
+        meta: { title: 'MFA登录漏洞', icon: 'el-icon-mobile' }
       },
       {
         path: 'smsBased',
         name: 'sms-based authentication',
         component: () => import('@/views/authentication/smsBased'),
-        meta: { title: '短信验证码漏洞', icon: 'tree' }
+        meta: { title: '短信验证码漏洞', icon: 'el-icon-message' }
       }
     ]
   },
@@ -202,7 +202,7 @@ export const constantRoutes = [
         path: '',
         name: 'pathtraversal',
         component: () => import('@/views/pathtraversal/index'),
-        meta: { title: '路径穿越漏洞', icon: 'el-icon-s-help' }
+        meta: { title: '路径穿越漏洞', icon: 'el-icon-s-management' }
       }
     ]
   },
@@ -215,7 +215,7 @@ export const constantRoutes = [
         path: '',
         name: 'fileupload',
         component: () => import('@/views/fileupload/index'),
-        meta: { title: '文件上传漏洞', icon: 'el-icon-s-help' }
+        meta: { title: '文件上传漏洞', icon: 'el-icon-upload2' }
       }
     ]
   },
@@ -234,16 +234,67 @@ export const constantRoutes = [
         path: 'fastjson',
         component: () => import('@/views/components/fastjson/index'),
         name: 'fastjson',
-        meta: { title: 'Fastjson漏洞' }
+        meta: { title: 'Fastjson漏洞', icon: 'el-icon-document-copy' }
       },
       {
         path: 'log4j2',
         component: () => import('@/views/components/log4j2/index'),
         name: 'log4j2',
-        meta: { title: 'Log4j2漏洞' }
+        meta: { title: 'Log4j2漏洞', icon: 'el-icon-notebook-2' }
       }
     ]
   },
+
+  {
+    path: '/configuration',
+    component: Layout,
+    redirect: '/components/fastjson',
+    name: 'components',
+    meta: {
+      title: '配置漏洞（待更新）',
+      icon: 'nested'
+    },
+    children: [
+      {
+        path: 'fastjson',
+        component: () => import('@/views/components/fastjson/index'),
+        name: '配置问题1',
+        meta: { title: '配置问题1', icon: 'el-icon-setting' }
+      },
+      {
+        path: 'log4j2',
+        component: () => import('@/views/components/log4j2/index'),
+        name: '配置问题2',
+        meta: { title: '配置问题2', icon: 'el-icon-setting' }
+      }
+    ]
+  },
+
+  {
+    path: '/other',
+    component: Layout,
+    redirect: '/components/fastjson',
+    name: 'components',
+    meta: {
+      title: '其他漏洞（待更新）',
+      icon: 'nested'
+    },
+    children: [
+      {
+        path: 'fastjson',
+        component: () => import('@/views/components/fastjson/index'),
+        name: '其他漏洞1',
+        meta: { title: '其他漏洞1', icon: 'el-icon-more' }
+      },
+      {
+        path: 'log4j2',
+        component: () => import('@/views/components/log4j2/index'),
+        name: '其他漏洞2',
+        meta: { title: '其他漏洞2', icon: 'el-icon-more' }
+      }
+    ]
+  },
+
   {
     path: 'external-link',
     component: Layout,
