@@ -111,29 +111,15 @@ export default {
   },
   methods: {
     handleClick(tab, event) {},
-    showVulnDialog(path = '/static/') {
+    showVulnDialog() {
       this.vulnDialogVisible = true;
       this.loading = true;
       this.dirListHtml = '';
-      fetch(path)
+      fetch('/static/')
         .then(r => r.text())
         .then(html => {
           this.dirListHtml = html;
           this.loading = false;
-          this.$nextTick(() => {
-            // 绑定弹窗内所有a标签的点击事件，实现多级目录浏览
-            const links = document.querySelectorAll('.preview-text a');
-            links.forEach(link => {
-              link.onclick = (e) => {
-                const href = link.getAttribute('href');
-                // 只处理/static/开头的相对目录
-                if (href && href.startsWith('/static/')) {
-                  e.preventDefault();
-                  this.showVulnDialog(href);
-                }
-              };
-            });
-          });
         })
         .catch(() => {
           this.dirListHtml = '<div style="color:red;">获取目录失败</div>';
