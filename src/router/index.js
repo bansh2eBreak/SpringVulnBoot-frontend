@@ -248,13 +248,19 @@ export const constantRoutes = [
   {
     path: '/configuration',
     component: Layout,
-    redirect: '/components/fastjson',
+    redirect: '/components/dirlist',
     name: 'components',
     meta: {
-      title: '配置漏洞（待更新）',
+      title: '配置漏洞',
       icon: 'nested'
     },
     children: [
+      {
+        path: 'dirlist',
+        component: () => import('@/views/dirlist/index.vue'),
+        name: '列目录漏洞',
+        meta: { title: '列目录漏洞', icon: 'el-icon-folder-opened' }
+      },
       {
         path: 'fastjson',
         component: () => import('@/views/components/fastjson/index'),
@@ -266,12 +272,6 @@ export const constantRoutes = [
         component: () => import('@/views/components/log4j2/index'),
         name: '配置问题2',
         meta: { title: '配置问题2', icon: 'el-icon-setting' }
-      },
-      {
-        path: 'dirlist',
-        component: () => import('@/views/dirlist/index.vue'),
-        name: '列目录漏洞',
-        meta: { title: '列目录漏洞', icon: 'el-icon-folder-opened' }
       }
     ]
   },
