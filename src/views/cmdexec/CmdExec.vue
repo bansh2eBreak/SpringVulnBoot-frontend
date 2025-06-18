@@ -47,7 +47,7 @@
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">漏洞代码 - Runtime方式<div><el-button
-                                    type="danger" round size="mini" @click="fetchDataAndFillTable1">测试</el-button>
+                                    type="danger" round size="mini" @click="fetchDataAndFillTable1">去测试</el-button>
                             </div></el-row>
                         <pre v-highlightjs><code class="java">@RestController
 @Slf4j
@@ -97,7 +97,7 @@ public class RCEController {
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - 自定义过滤<div><el-button
-                                    type="success" round size="mini" @click="fetchDataAndFillTable2">测试</el-button>
+                                    type="success" round size="mini" @click="fetchDataAndFillTable2">去测试</el-button>
                             </div></el-row>
                         <pre v-highlightjs><code class="java">/**
  * 命令执行恶意字符检测
@@ -136,7 +136,7 @@ public String secPing(String ip) {
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">漏洞代码 - ProcessBuilder方式
                             <div><el-button type="danger" round size="mini"
-                                    @click="fetchDataAndFillTable3">测试</el-button>
+                                    @click="fetchDataAndFillTable3">去测试</el-button>
                             </div>
                         </el-row>
                         <pre v-highlightjs><code class="java">/**
@@ -185,7 +185,7 @@ public String vulnPing2(String ip) {
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - 合法IP地址检测
                             <div><el-button type="success" round size="mini"
-                                    @click="fetchDataAndFillTable4">测试</el-button>
+                                    @click="fetchDataAndFillTable4">去测试</el-button>
                             </div>
                         </el-row>
                         <pre v-highlightjs><code class="java">// 合法IP地址检测

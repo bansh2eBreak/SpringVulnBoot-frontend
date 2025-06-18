@@ -49,8 +49,8 @@
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">漏洞代码 - 直接拼接输入内容 <div>
-                                <el-button type="text" @click="fetchDataAndFillTable1"
-                                    style="color: red;">去测试</el-button>
+                                <el-button type="danger" round size="mini" @click="fetchDataAndFillTable1"
+                                    >去测试</el-button>
                             </div></el-row>
                         <pre v-highlightjs><code class="java">// Controller层
 @PostMapping("/addMessage")
@@ -86,8 +86,8 @@ void insertMessage(MessageBoard messageBoard);
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - 无需特殊配置，默认Vue方式 <div>
-                                <el-button type="text" @click="fetchDataAndFillTable2"
-                                    style="color: green;">去测试</el-button>
+                                <el-button type="success" round size="mini" @click="fetchDataAndFillTable2"
+                                   >去测试</el-button>
                             </div></el-row>
                         <pre v-highlightjs><code class="java">//前端代码
 &lt;el-dialog title="留言板" :visible.sync="dialogFormVisible" class="center-dialog"&gt;
