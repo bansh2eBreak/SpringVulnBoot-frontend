@@ -54,10 +54,10 @@
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">漏洞代码 - 语句拼接(Statement) <div>
                                 <!-- <el-button type="danger" round size="mini" @click="handleButtonClick1">去测试</el-button> -->
-                                <el-button type="text" @click="fetchDataAndFillTable1"
-                                    style="color: green;">正常查询</el-button>
-                                <el-button type="text" @click="fetchDataAndFillTable2"
-                                    style="color: red;">注入查询</el-button>
+                                <el-button type="success" round size="mini" @click="fetchDataAndFillTable1"
+                                    >正常查询</el-button>
+                                <el-button type="danger" round size="mini" @click="fetchDataAndFillTable2"
+                                    >去测试</el-button>
                             </div></el-row>
                         <pre v-highlightjs><code class="java">@GetMapping("/getUserByUsername")
 public Result getUserByUsername(String username) throws Exception {
@@ -90,8 +90,8 @@ public Result getUserByUsername(String username) throws Exception {
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - 恶意字符过滤 <div>
-                                <el-button type="text" @click="fetchDataAndFillTable3"
-                                    style="color: red;">注入查询</el-button>
+                                <el-button type="success" round size="mini" @click="fetchDataAndFillTable3"
+                                    >去测试</el-button>
                             </div></el-row>
                         <pre v-highlightjs><code class="java">// 安全工具类
 public class Security {
@@ -132,10 +132,10 @@ public Result getUserByUsernameFilter(String username) throws Exception {
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">漏洞代码 -
                             语句拼接(PrepareStatement)<div>
-                                <el-button type="text" @click="fetchDataAndFillTable4"
-                                    style="color: green;">正常查询</el-button>
-                                <el-button type="text" @click="fetchDataAndFillTable5"
-                                    style="color: red;">注入查询</el-button>
+                                <el-button type="success" round size="mini" @click="fetchDataAndFillTable4"
+                                    >正常查询</el-button>
+                                <el-button type="danger" round size="mini" @click="fetchDataAndFillTable5"
+                                    >去测试</el-button>
                             </div></el-row>
                         <pre v-highlightjs><code class="java">@GetMapping("/getUserSecByUsernameError")
 public Result getUserSecByUsernameError(String username) throws Exception {
@@ -168,8 +168,8 @@ public Result getUserSecByUsernameError(String username) throws Exception {
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - 预编译 <div>
-                                <el-button type="text" @click="fetchDataAndFillTable6"
-                                    style="color: red;">注入查询</el-button>
+                                <el-button type="success" round size="mini" @click="fetchDataAndFillTable6"
+                                    >去测试</el-button>
                             </div></el-row>
                         <pre v-highlightjs><code class="java">@GetMapping("/getUserSecByUsername")
 public Result getUserSecByUsername(String username) throws Exception {
