@@ -63,3 +63,37 @@ export function getUserSecByUsername2(params) {
     params: params
   })
 }
+
+// 报错注入相关接口
+export function getUserByUsernameError(params) {
+  return request({
+    url: '/sqli/error/getUserByUsernameError',
+    method: 'get',
+    params: params
+  })
+}
+
+export function getUserByIdError(params) {
+  return request({
+    url: '/sqli/error/getUserByIdError',
+    method: 'get',
+    params: params
+  })
+}
+
+export function getUserCountError(params) {
+  return request({
+    url: '/sqli/error/getUserCountError',
+    method: 'get',
+    params: params
+  })
+}
+
+// 新增：报错注入专用安全接口
+export function getUserSecByUsernameErrorApi(params) {
+  return request({
+    url: '/sqli/error/getUserSecByUsername',
+    method: 'get',
+    params: params
+  })
+}

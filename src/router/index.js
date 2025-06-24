@@ -73,6 +73,12 @@ export const constantRoutes = [
         name: 'Mybatis类型',
         component: () => import('@/views/sqli/Mybatis'),
         meta: { title: 'Mybatis类型', icon: 'el-icon-document' }
+      },
+      {
+        path: 'errorInjection',
+        name: '报错注入',
+        component: () => import('@/views/sqli/ErrorInjection'),
+        meta: { title: '报错注入', icon: 'el-icon-warning' }
       }
     ]
   },
