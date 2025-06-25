@@ -7,6 +7,8 @@
 1. 前端是基于流行的vue-admin-template基础模板进行改改改，[前端工程](https://github.com/bansh2eBreak/SpringVulnBoot-frontend)
 2. 后端是基于springBoot开发的，[后端工程](https://github.com/bansh2eBreak/SpringVulnBoot-backend)
 
+如需快速部署，请移步[后端工程](https://github.com/bansh2eBreak/SpringVulnBoot-backend)。
+
 ## 靶场已编写的漏洞
 
 - SQLi注入
