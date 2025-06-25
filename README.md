@@ -7,21 +7,12 @@
 1. 前端是基于流行的vue-admin-template基础模板进行改改改，[前端工程](https://github.com/bansh2eBreak/SpringVulnBoot-frontend)
 2. 后端是基于springBoot开发的，[后端工程](https://github.com/bansh2eBreak/SpringVulnBoot-backend)
 
-## 更新日志
-
-2025/05/13：
-
-- 增加身份认证漏洞-MFA登录漏洞中的MFA绑定与MFA解绑操作
-- 增加越权漏洞：
-  - 平行越权漏洞
-  - 未授权访问漏洞
-  - 垂直越权漏洞
-
 ## 靶场已编写的漏洞
 
 - SQLi注入
   - 基于Jdbc的SQLi注入
   - 基于Mybatis的SQLi注入
+  - 报错注入
 - XSS跨站脚本
   - 反射型XSS
   - 存储型XSS
@@ -55,24 +46,6 @@
 - CSRF漏洞
 - 逻辑漏洞
 - 配置漏洞
-
-## 效果图
-
-![img_11.png](images/img_11.png)
-![img_12.png](images/img_12.png)
-![img_13.png](images/img_13.png)
-![img_9.png](images/img_9.png)
-![img_10.png](images/img_10.png)
-![img_1.png](images/img_1.png)
-![img_2.png](images/img_2.png)
-![img_3.png](images/img_3.png)
-![img_4.png](images/img_4.png)
-![img_5.png](images/img_5.png)
-![img_6.png](images/img_6.png)
-![img_7.png](images/img_7.png)
-![img_8.png](images/img_8.png)
-
-说明：对于不熟悉前端框架的人来说，基于 vue-admin-template 进行简单的改改改就可以形成好看的前端页面。下面是 vue-admin-template 官网和简介。
 
 ## vue-admin-template
 
