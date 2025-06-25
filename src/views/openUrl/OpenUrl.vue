@@ -77,7 +77,7 @@ public void secRedirect1(String url, HttpServletResponse response) throws IOExce
         response.sendRedirect(url);
     } else {
         // 处理 URL 为空的情况，例如跳转到默认页面
-        response.sendRedirect("http://localhost:9528/?#/dashboard");
+        response.sendRedirect("http://localhost/?#/dashboard");
     }
 }
 </code></pre>
@@ -120,7 +120,7 @@ public void secRedirect(String url, HttpServletResponse response) throws IOExcep
         response.sendRedirect(url);
     } else {
         // 处理 URL 为空的情况，例如跳转到默认页面
-        response.sendRedirect("http://localhost:9528/?#/dashboard");
+        response.sendRedirect("http://localhost/?#/dashboard");
     }
 }
 </code></pre>
