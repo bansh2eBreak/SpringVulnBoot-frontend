@@ -41,13 +41,15 @@
 - 组件漏洞
   - Fastjson漏洞
   - Log4j2漏洞
+- 配置漏洞
+  - 列目录漏洞
+  - Actuator未授权
 
 ## 未完待续
 
 - SSRF漏洞
 - CSRF漏洞
 - 逻辑漏洞
-- 配置漏洞
 
 ## vue-admin-template
 

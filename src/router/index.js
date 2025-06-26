@@ -252,10 +252,10 @@ export const constantRoutes = [
   },
 
   {
-    path: '/configuration',
+    path: '/configVuln',
     component: Layout,
-    redirect: '/components/dirlist',
-    name: 'components',
+    redirect: '/configVuln/dirlist',
+    name: 'configVuln',
     meta: {
       title: '配置漏洞',
       icon: 'nested'
@@ -263,21 +263,15 @@ export const constantRoutes = [
     children: [
       {
         path: 'dirlist',
-        component: () => import('@/views/dirlist/index.vue'),
+        component: () => import('@/views/configVuln/dirlist/index'),
         name: '列目录漏洞',
         meta: { title: '列目录漏洞', icon: 'el-icon-folder-opened' }
       },
       {
-        path: 'fastjson',
-        component: () => import('@/views/components/fastjson/index'),
-        name: '配置问题1',
-        meta: { title: '配置问题1', icon: 'el-icon-setting' }
-      },
-      {
-        path: 'log4j2',
-        component: () => import('@/views/components/log4j2/index'),
-        name: '配置问题2',
-        meta: { title: '配置问题2', icon: 'el-icon-setting' }
+        path: 'actuator',
+        component: () => import('@/views/configVuln/actuator/index'),
+        name: 'Actuator未授权',
+        meta: { title: 'Actuator未授权', icon: 'el-icon-monitor' }
       }
     ]
   },
