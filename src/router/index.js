@@ -79,6 +79,12 @@ export const constantRoutes = [
         name: '报错注入',
         component: () => import('@/views/sqli/ErrorInjection'),
         meta: { title: '报错注入', icon: 'el-icon-warning' }
+      },
+      {
+        path: 'timeBased',
+        name: '时间盲注',
+        component: () => import('@/views/sqli/TimeBased'),
+        meta: { title: '时间盲注', icon: 'el-icon-time' }
       }
     ]
   },

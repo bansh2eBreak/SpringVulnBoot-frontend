@@ -97,3 +97,20 @@ export function getUserSecByUsernameErrorApi(params) {
     params: params
   })
 }
+
+// 基于时间盲注相关接口
+export function getUserByUsernameTime(params) {
+  return request({
+    url: '/sqli/time/getUserByUsernameTime',
+    method: 'get',
+    params: params
+  })
+}
+
+export function getUserByUsernameTimeSafe(params) {
+  return request({
+    url: '/sqli/time/getUserByUsernameTimeSafe',
+    method: 'get',
+    params: params
+  })
+}
