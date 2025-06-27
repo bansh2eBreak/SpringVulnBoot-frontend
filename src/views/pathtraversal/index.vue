@@ -6,7 +6,7 @@
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="漏洞描述" name="first">
                         <div class="vuln-detail">
-                            路径穿越漏洞，又称目录穿越漏洞，是一种常见的Web安全漏洞。攻击者利用该漏洞，可以通过在文件名或路径中插入特殊字符（如../），来访问Web服务器文件系统上受限制的文件或目录。简单来说，就是攻击者可以“穿越”到Web目录以外的地方，去访问其他文件。
+                            路径穿越漏洞，又称目录穿越漏洞，是一种常见的Web安全漏洞。攻击者利用该漏洞，可以通过在文件名或路径中插入特殊字符（如../），来访问Web服务器文件系统上受限制的文件或目录。简单来说，就是攻击者可以"穿越"到Web目录以外的地方，去访问其他文件。
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="漏洞危害" name="second">
@@ -25,8 +25,30 @@
                     </el-tab-pane>
                     <el-tab-pane label="参考文章" name="fourth">
                         <div class="vuln-detail">
-                            <a href="https://blog.csdn.net/angry_program/article/details/107855078" target="_blank"
-                                style="text-decoration: underline;">《目录穿越/遍历漏洞 -- 学习笔记》</a><br />
+                            <b>相关技术文档和参考资源：</b><br/><br/>
+                            <b>官方文档：</b>
+                            <ul>
+                                <li><a href="https://owasp.org/www-community/attacks/Path_Traversal" target="_blank" style="text-decoration: underline;">OWASP Path Traversal 官方文档</a></li>
+                                <li><a href="https://portswigger.net/web-security/file-path-traversal" target="_blank" style="text-decoration: underline;">PortSwigger 路径穿越漏洞详解</a></li>
+                            </ul>
+                            <br/>
+                            <b>安全最佳实践：</b>
+                            <ul>
+                                <li><a href="https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration" target="_blank" style="text-decoration: underline;">OWASP A06:2021 - 安全配置错误</a></li>
+                                <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html" target="_blank" style="text-decoration: underline;">OWASP 文件上传安全检查清单</a></li>
+                            </ul>
+                            <br/>
+                            <b>漏洞分析文章：</b>
+                            <ul>
+                                <li><a href="https://www.acunetix.com/blog/web-security-zone/directory-traversal/" target="_blank" style="text-decoration: underline;">路径穿越漏洞深度分析</a></li>
+                                <li><a href="https://www.freebuf.com/articles/web/218442.html" target="_blank" style="text-decoration: underline;">FreeBuf | 路径穿越漏洞原理与实战</a></li>
+                            </ul>
+                            <br/>
+                            <b>防护工具和检测：</b>
+                            <ul>
+                                <li><a href="https://github.com/OWASP/CheatSheetSeries" target="_blank" style="text-decoration: underline;">OWASP 安全配置检查清单</a></li>
+                                <li><a href="https://github.com/projectdiscovery/nuclei-templates/blob/main/vulnerabilities/path-traversal.yaml" target="_blank" style="text-decoration: underline;">Nuclei 路径穿越检测模板</a></li>
+                            </ul>
                         </div>
                     </el-tab-pane>
                 </el-tabs>
@@ -42,50 +64,40 @@
                                 <el-button type="danger" round size="mini"
                                     @click="fetchDataAndFillTable1">去测试</el-button>
                             </div></el-row>
-                        <pre v-highlightjs><code class="java">@RequestMapping("/pathtraversal")
-public class PathTraversalController {
+                        <pre v-highlightjs><code class="java">@GetMapping("/vuln1")
+public ResponseEntity&lt;byte[]&gt; vuln1(@RequestParam String filename) throws IOException {
+    //System.out.println(System.getProperty("user.dir"));
+    // 1. 构建文件路径（存在路径穿越漏洞！）
+    File file = new File("images/" + filename);
 
-    @GetMapping("/loadImageVuln1")
-    public ResponseEntity&lt;byte[]&gt; loadImageVuln1(@RequestParam String filename) throws IOException {
-        // 1. 构建图片文件路径
-        File file = new File("images/" + filename);
+    log.info("文件位置: {}", file.getAbsolutePath());
 
-        /**
-         * 1）项目的根目录通常是指包含pom.xml文件的目录
-         *      -- 打印文件路径可知：/Users/liujianping/IdeaProjects/SpringVulnBoot/images/img.png
-         * 2）如果是读取resources下面的图片呢
-         *      File file = new File("src/main/resources/images/" + filename);
-         */
-        log.info("文件位置: {}", file.getAbsolutePath());
-
-        // 2. 检查文件是否存在
-        if (!file.exists()) {
-            return ResponseEntity.notFound().build(); // 文件不存在，返回 404
-        }
-
-        // 3. 读取文件内容并返回
-        FileInputStream fis = new FileInputStream(file);
-        byte[] imageBytes = IOUtils.toByteArray(fis);
-        fis.close();
-
-        // 4. 获取图片类型 (根据实际情况修改)
-        String contentType; // 默认图片类型
-        if (filename.toLowerCase().endsWith(".jpg") || filename.toLowerCase().endsWith(".jpeg")) {
-            contentType = "image/jpeg";
-        } else if (filename.toLowerCase().endsWith(".gif")) {
-            contentType = "image/gif";
-        } else if (filename.toLowerCase().endsWith(".png")) {
-            contentType = "image/png";
-        } else {
-            contentType = "text/plain";
-        }
-
-        // 5. 设置 Content-Type 响应头并返回 ResponseEntity
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(imageBytes);
+    // 2. 检查文件是否存在
+    if (!file.exists()) {
+        return ResponseEntity.notFound().build(); // 文件不存在，返回 404
     }
 
+    // 3. 读取文件内容并返回
+    FileInputStream fis = new FileInputStream(file);
+    byte[] fileBytes = IOUtils.toByteArray(fis);
+    fis.close();
+
+    // 4. 获取内容类型
+    String contentType;
+    if (filename.toLowerCase().endsWith(".jpg") || filename.toLowerCase().endsWith(".jpeg")) {
+        contentType = "image/jpeg";
+    } else if (filename.toLowerCase().endsWith(".gif")) {
+        contentType = "image/gif";
+    } else if (filename.toLowerCase().endsWith(".png")) {
+        contentType = "image/png";
+    } else {
+        contentType = "text/plain";
+    }
+
+    // 5. 设置 Content-Type 响应头并返回 ResponseEntity
+    return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType(contentType))
+            .body(fileBytes);
 }
 </code></pre>
                     </div>
@@ -259,7 +271,7 @@ export default {
             dialogFormVisible1: false,
             dialogFormVisible2: false,
             dialogFormVisible3: false,
-            payload1: 'img_0.png',
+            payload1: 'springvulnboot_network.jpg',
             payload2: '../../../../../../etc/hosts',
             resp_text1: '',
             imageUrl: null // 用于存储图片 URL
