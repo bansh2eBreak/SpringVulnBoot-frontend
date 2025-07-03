@@ -283,36 +283,11 @@ export const constantRoutes = [
   },
 
   {
-    path: '/other',
-    component: Layout,
-    redirect: '/components/fastjson',
-    name: 'components',
-    meta: {
-      title: '其他漏洞（待更新）',
-      icon: 'nested'
-    },
-    children: [
-      {
-        path: 'fastjson',
-        component: () => import('@/views/components/fastjson/index'),
-        name: '其他漏洞1',
-        meta: { title: '其他漏洞1', icon: 'el-icon-more' }
-      },
-      {
-        path: 'log4j2',
-        component: () => import('@/views/components/log4j2/index'),
-        name: '其他漏洞2',
-        meta: { title: '其他漏洞2', icon: 'el-icon-more' }
-      }
-    ]
-  },
-
-  {
     path: 'external-link',
     component: Layout,
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
+        path: 'https://github.com/bansh2eBreak/SpringVulnBoot-backend',
         meta: { title: 'External Link', icon: 'link' }
       }
     ]
