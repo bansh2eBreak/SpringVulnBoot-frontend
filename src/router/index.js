@@ -278,6 +278,12 @@ export const constantRoutes = [
         component: () => import('@/views/configVuln/actuator/index'),
         name: 'Actuator未授权',
         meta: { title: 'Actuator未授权', icon: 'el-icon-monitor' }
+      },
+      {
+        path: 'swagger',
+        component: () => import('@/views/configVuln/swagger/index.vue'),
+        name: 'Swagger未授权',
+        meta: { title: 'Swagger未授权', icon: 'el-icon-document' }
       }
     ]
   },

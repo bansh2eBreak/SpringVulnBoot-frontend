@@ -82,7 +82,8 @@
               危险配置 - 暴露所有端点
               <el-button type="danger" round size="mini" @click="showVulnDialog">去测试</el-button>
             </el-row>
-            <pre v-highlightjs><code class="yaml"># Actuator配置 - 启用所有端点
+            <pre v-highlightjs><code class="yaml">// Actuator配置 - 启用所有端点
+// application.yml 配置启用所有端点
 management:
   endpoints:
     web:
@@ -93,33 +94,51 @@ management:
     health:
       show-details: always
     env:
-      show-values: always</code></pre>
+      show-values: always
+
+
+// SecurityConfig配置
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        // 创建管理员用户，用于访问Actuator端点
+        UserDetails admin = User.builder()
+                .username("admin")
+                .password(passwordEncoder().encode("admin123"))
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(admin);
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable()) // 禁用CSRF，因为这是API服务
+            .authorizeRequests(authz -> authz
+                .antMatchers("/actuator/env").hasRole("ADMIN") // 只有env端点需要认证
+                .antMatchers("/swagger-ui.html", "/swagger-ui/**",
+                "/v3/api-docs", "/v3/api-docs/**").hasRole("ADMIN") // 需认证访问Swagger UI
+                .anyRequest().permitAll() // 允许所有其他请求（包括其他Actuator端点）
+            )
+            .httpBasic(httpBasic -> httpBasic
+                .realmName("Spring Security")
+            );
+
+        return http.build();
+    }
+
+} 
+    </code></pre>
           </div>
-        </el-col>
-        <el-col :span="12">
-          <div class="grid-content bg-purple">
-            <el-row type="flex" justify="space-between" align="middle">
-              安全配置 - 限制端点暴露
-              <el-button type="success" round size="mini" @click="showSecDialog">去测试</el-button>
-            </el-row>
-            <pre v-highlightjs><code class="yaml">management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-        exclude: env,configprops
-      base-path: /actuator
-  endpoint:
-    health:
-      show-details: when-authorized
-    env:
-      show-values: never</code></pre>
-          </div>
-        </el-col>
-      </el-row>
-      <el-row :gutter="20" class="grid-flex">
-        <el-col :span="12">
-          
         </el-col>
         <el-col :span="12">
           <div class="grid-content bg-purple">
@@ -153,17 +172,45 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // 禁用CSRF，因为这是API服务
             .authorizeRequests(authz -> authz
-                // 允许所有非Actuator端点的请求
-                .antMatchers("/actuator/**").hasRole("ADMIN")
-                .anyRequest().permitAll()
+                .antMatchers("/actuator/env").hasRole("ADMIN") // 只有env端点需要认证
+                .antMatchers("/swagger-ui.html", "/swagger-ui/**",
+                "/v3/api-docs", "/v3/api-docs/**").hasRole("ADMIN") // 需认证访问Swagger UI
+                .anyRequest().permitAll() // 允许所有其他请求（包括其他Actuator端点）
             )
             .httpBasic(httpBasic -> httpBasic
-                .realmName("Spring Boot Actuator")
+                .realmName("Spring Security")
             );
 
         return http.build();
     }
+
 } </code></pre>
+          </div>
+        </el-col>
+
+      </el-row>
+      <el-row :gutter="20" class="grid-flex">
+        <el-col :span="12">
+          
+        </el-col>
+        <el-col :span="12">
+          <div class="grid-content bg-purple">
+            <el-row type="flex" justify="space-between" align="middle">
+              安全配置 - 限制端点暴露
+              <el-button type="success" round size="mini" @click="showSecDialog">去测试</el-button>
+            </el-row>
+            <pre v-highlightjs><code class="yaml">management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+        exclude: env,configprops
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+    env:
+      show-values: never</code></pre>
           </div>
         </el-col>
       </el-row>
@@ -178,9 +225,6 @@ public class SecurityConfig {
       </div>
       <div v-else class="preview-content">
         <el-tabs v-model="endpointTab" type="card">
-          <el-tab-pane label="环境变量" name="env">
-            <div v-html="envData" class="preview-text"></div>
-          </el-tab-pane>
           <el-tab-pane label="配置属性" name="configprops">
             <div v-html="configPropsData" class="preview-text"></div>
           </el-tab-pane>
@@ -218,17 +262,17 @@ public class SecurityConfig {
     </el-dialog>
     <el-dialog title="安全配置-Actuator授权测试" :visible.sync="authDialogVisible" class="center-dialog" width="60%">
       <div style="text-align: left; color: #409EFF; font-style: italic;">
-        现在Actuator端点已开启认证，未登录用户无法访问。<br/>
-        <br/>
-        <b>测试方法：</b>
-        <pre>
-# 未认证访问（会被拒绝）
-curl http://localhost:8080/actuator/health
-
-# 使用admin/admin123认证访问（可访问）
-curl -u admin:admin123 http://localhost:8080/actuator/health
-        </pre>
-        <el-alert title="只有拥有ADMIN角色的用户才能访问/actuator端点" type="info" show-icon />
+        现在Actuator的env端点已开启认证，只有认证用户才能访问环境变量信息：
+      </div>
+      <div v-if="authLoading" style="text-align:center;padding:20px;">
+        <el-spinner /> 加载中...
+      </div>
+      <div v-else class="preview-content">
+        <el-tabs v-model="authEndpointTab" type="card">
+          <el-tab-pane label="环境变量" name="env">
+            <div v-html="authEnvData" class="preview-text"></div>
+          </el-tab-pane>
+        </el-tabs>
       </div>
     </el-dialog>
   </div>
@@ -242,15 +286,17 @@ export default {
   data() {
     return {
       activeName: 'first',
-      endpointTab: 'env',
+      endpointTab: 'configprops',
       vulnDialogVisible: false,
       secDialogVisible: false,
       authDialogVisible: false,
       loading: false,
-      envData: '',
+      authLoading: false,
       configPropsData: '',
       healthData: '',
-      metricsData: ''
+      metricsData: '',
+      authEnvData: '',
+      authEndpointTab: 'env'
     }
   },
   methods: {
@@ -265,17 +311,10 @@ export default {
     },
     showAuthDialog() {
       this.authDialogVisible = true;
+      this.authLoading = true;
+      this.loadAuthEndpointData();
     },
     loadEndpointData() {
-      // 加载环境变量数据
-      getEnvInfo()
-        .then(data => {
-          this.envData = this.formatJson(data);
-        })
-        .catch(() => {
-          this.envData = '<div style="color:red;">获取环境变量失败</div>';
-        });
-
       // 加载配置属性数据
       getConfigProps()
         .then(data => {
@@ -304,6 +343,18 @@ export default {
         });
 
       this.loading = false;
+    },
+    loadAuthEndpointData() {
+      // 加载环境变量数据（需要认证）
+      getEnvInfo()
+        .then(data => {
+          this.authEnvData = this.formatJson(data);
+        })
+        .catch(() => {
+          this.authEnvData = '<div style="color:red;">获取环境变量失败，因为后端SpringSecurity限制了env端点的访问，请使用admin/admin123账号访问</div>';
+        });
+
+      this.authLoading = false;
     },
     formatJson(data) {
       return '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
