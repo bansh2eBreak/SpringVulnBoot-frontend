@@ -107,6 +107,12 @@ export const constantRoutes = [
         name: '存储型',
         component: () => import('@/views/xss/Stored'),
         meta: { title: '存储型', icon: 'el-icon-folder' }
+      },
+      {
+        path: 'dom',
+        name: 'DOM型',
+        component: () => import('@/views/xss/Dom'),
+        meta: { title: 'DOM型', icon: 'el-icon-s-operation' }
       }
     ]
   },
