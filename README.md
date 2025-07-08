@@ -18,6 +18,7 @@
 - XSS跨站脚本
   - 反射型XSS
   - 存储型XSS
+  - DOM型XSS
 - 任意命令执行
   - Runtime方式
   - ProcessBuilder方式
