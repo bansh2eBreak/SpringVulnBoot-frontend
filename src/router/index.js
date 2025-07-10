@@ -201,7 +201,7 @@ export const constantRoutes = [
         path: '2faBased',
         name: 'multi-factor authentication',
         component: () => import('@/views/authentication/mfaBased'),
-        meta: { title: 'MFA登录漏洞', icon: 'el-icon-mobile' }
+        meta: { title: 'MFA认证漏洞', icon: 'el-icon-mobile' }
       },
       {
         path: 'smsBased',
