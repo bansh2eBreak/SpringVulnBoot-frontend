@@ -74,6 +74,11 @@ service.interceptors.response.use(
     }
   }, */
   response => {
+    // 对于blob类型的响应，直接返回response对象
+    if (response.config.responseType === 'blob') {
+      return response
+    }
+    
     if (response.status === 200) {
       // HTTP状态码为200，表示请求成功
       try {

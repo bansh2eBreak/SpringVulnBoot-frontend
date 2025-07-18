@@ -239,6 +239,19 @@ export const constantRoutes = [
   },
 
   {
+    path: '/deserialize',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'deserialize',
+        component: () => import('@/views/deserialize/index'),
+        meta: { title: '反序列化漏洞', icon: 'el-icon-s-data' }
+      }
+    ]
+  },
+
+  {
     path: '/components',
     component: Layout,
     redirect: '/components/fastjson',

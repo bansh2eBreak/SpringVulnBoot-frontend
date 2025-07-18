@@ -304,7 +304,7 @@ export default {
             }
             loadImageVuln1({ filename: this.payload1 }).then(response => {
                 // console.log(response);
-                const blob = new Blob([response]);
+                const blob = new Blob([response.data]);
                 this.imageUrl = URL.createObjectURL(blob);
                 this.resp_text1 = ''; // 清空文本内容
             }).catch(error => {
@@ -335,7 +335,7 @@ export default {
             }
             loadImageSec1({ filename: this.payload1 }).then(response => {
                 // console.log(response);
-                const blob = new Blob([response]);
+                const blob = new Blob([response.data]);
                 this.imageUrl = URL.createObjectURL(blob);
                 this.resp_text1 = ''; // 清空文本内容
             }).catch(error => {
@@ -367,7 +367,7 @@ export default {
             }
             loadImageSec2({ filename: this.payload1 }).then(response => {
                 // console.log(response);
-                const blob = new Blob([response]);
+                const blob = new Blob([response.data]);
                 this.imageUrl = URL.createObjectURL(blob);
                 this.resp_text1 = ''; // 清空文本内容
             }).catch(error => {
