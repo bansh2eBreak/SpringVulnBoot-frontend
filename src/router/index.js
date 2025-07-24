@@ -272,6 +272,12 @@ export const constantRoutes = [
         component: () => import('@/views/components/log4j2/index'),
         name: 'log4j2',
         meta: { title: 'Log4j2漏洞', icon: 'el-icon-notebook-2' }
+      },
+      {
+        path: 'snakeyaml',
+        component: () => import('@/views/components/snakeyaml/index'),
+        name: 'snakeyaml',
+        meta: { title: 'SnakeYAML漏洞', icon: 'el-icon-document' }
       }
     ]
   },
