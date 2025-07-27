@@ -278,6 +278,12 @@ export const constantRoutes = [
         component: () => import('@/views/components/snakeyaml/index'),
         name: 'snakeyaml',
         meta: { title: 'SnakeYAML漏洞', icon: 'el-icon-document' }
+      },
+      {
+        path: 'xmldecoder',
+        component: () => import('@/views/components/xmldecoder/index'),
+        name: 'xmldecoder',
+        meta: { title: 'XMLDecoder漏洞', icon: 'el-icon-document-copy' }
       }
     ]
   },
