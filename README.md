@@ -47,6 +47,7 @@
   - Log4j2漏洞
   - SnakeYAML漏洞
   - XMLDecoder漏洞
+  - -Shiro-550漏洞
 - 配置漏洞
   - 列目录漏洞
   - Actuator未授权

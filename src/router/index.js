@@ -284,6 +284,12 @@ export const constantRoutes = [
         component: () => import('@/views/components/xmldecoder/index'),
         name: 'xmldecoder',
         meta: { title: 'XMLDecoder漏洞', icon: 'el-icon-document-copy' }
+      },
+      {
+        path: 'shiro',
+        component: () => import('@/views/components/shiro/index'),
+        name: 'shiro',
+        meta: { title: 'Shiro-550漏洞', icon: 'el-icon-key' }
       }
     ]
   },
