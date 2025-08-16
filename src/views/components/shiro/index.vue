@@ -891,15 +891,16 @@ this.shiroUserInfo = {
 </script>
 
 <style scoped>
-.root-div {
-    padding: 20px;
-}
-
 .vuln-info {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* 设置边框 */
+    /* border: 1px solid #ccc; */
+    /* 设置边框圆角 */
+    border-radius: 10px;
+    /* 设置外边距 */
+    margin-left: 20px;
+    margin-right: 20px;
     margin-bottom: 20px;
+    margin-top: 10px;
 }
 
 .header-div {
