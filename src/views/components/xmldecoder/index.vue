@@ -582,4 +582,18 @@ pre code {
 .center-dialog-table {
     text-align: center;
 }
+
+/* 确保选项卡居中对齐 */
+.center-dialog .el-tabs__header {
+    text-align: center;
+}
+
+.center-dialog .el-tabs__nav-wrap {
+    text-align: center;
+}
+
+.center-dialog .el-tabs__nav {
+    float: none;
+    display: inline-block;
+}
 </style> 

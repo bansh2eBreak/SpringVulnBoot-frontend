@@ -258,14 +258,14 @@ export const constantRoutes = [
     name: 'components',
     meta: {
       title: '组件漏洞',
-      icon: 'nested'
+      icon: 'el-icon-s-platform'
     },
     children: [
       {
         path: 'fastjson',
         component: () => import('@/views/components/fastjson/index'),
         name: 'fastjson',
-        meta: { title: 'Fastjson漏洞', icon: 'el-icon-document-copy' }
+        meta: { title: 'Fastjson漏洞', icon: 'el-icon-s-data' }
       },
       {
         path: 'log4j2',
@@ -277,19 +277,25 @@ export const constantRoutes = [
         path: 'snakeyaml',
         component: () => import('@/views/components/snakeyaml/index'),
         name: 'snakeyaml',
-        meta: { title: 'SnakeYAML漏洞', icon: 'el-icon-document' }
+        meta: { title: 'SnakeYAML漏洞', icon: 'el-icon-s-order' }
       },
       {
         path: 'xmldecoder',
         component: () => import('@/views/components/xmldecoder/index'),
         name: 'xmldecoder',
-        meta: { title: 'XMLDecoder漏洞', icon: 'el-icon-document-copy' }
+        meta: { title: 'XMLDecoder漏洞', icon: 'el-icon-s-marketing' }
       },
       {
         path: 'shiro',
         component: () => import('@/views/components/shiro/index'),
         name: 'shiro',
-        meta: { title: 'Shiro-550漏洞', icon: 'el-icon-key' }
+        meta: { title: 'Shiro-550漏洞', icon: 'el-icon-s-check' }
+      },
+      {
+        path: 'xstream',
+        component: () => import('@/views/components/xstream/index'),
+        name: 'xstream',
+        meta: { title: 'XStream漏洞', icon: 'el-icon-s-operation' }
       }
     ]
   },
@@ -301,7 +307,7 @@ export const constantRoutes = [
     name: 'configVuln',
     meta: {
       title: '配置漏洞',
-      icon: 'nested'
+      icon: 'el-icon-s-tools'
     },
     children: [
       {
