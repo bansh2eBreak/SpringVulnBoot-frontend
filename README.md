@@ -49,6 +49,7 @@
   - XMLDecoder漏洞
   - Shiro-550漏洞
   - XStream漏洞
+  - Jackson漏洞
 - 配置漏洞
   - 列目录漏洞
   - Actuator未授权

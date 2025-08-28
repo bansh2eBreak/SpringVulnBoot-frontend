@@ -296,6 +296,12 @@ export const constantRoutes = [
         component: () => import('@/views/components/xstream/index'),
         name: 'xstream',
         meta: { title: 'XStream漏洞', icon: 'el-icon-s-operation' }
+      },
+      {
+        path: 'jackson',
+        component: () => import('@/views/components/jackson/index'),
+        name: 'jackson',
+        meta: { title: 'Jackson漏洞', icon: 'el-icon-s-data' }
       }
     ]
   },
