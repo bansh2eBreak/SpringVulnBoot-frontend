@@ -213,6 +213,34 @@ export const constantRoutes = [
   },
 
   {
+    path: '/jwt',
+    component: Layout,
+    redirect: '/jwt/weakPassword',
+    name: 'jwt',
+    meta: { title: 'JWT安全漏洞', icon: 'el-icon-key' },
+    children: [
+      {
+        path: 'weakPassword',
+        component: () => import('@/views/jwt/WeakPassword'),
+        name: 'JWT弱密码',
+        meta: { title: 'JWT弱密码', icon: 'el-icon-warning' }
+      },
+      {
+        path: 'sensitiveInfo',
+        component: () => import('@/views/jwt/SensitiveInfo'),
+        name: 'JWT存储敏感信息',
+        meta: { title: 'JWT存储敏感信息', icon: 'el-icon-document' }
+      },
+      {
+        path: 'arbitrarySignature',
+        component: () => import('@/views/jwt/ArbitrarySignature'),
+        name: 'JWT接受任意签名',
+        meta: { title: 'JWT接受任意签名', icon: 'el-icon-s-check' }
+      }
+    ]
+  },
+
+  {
     path: '/pathtraversal',
     component: Layout,
     children: [

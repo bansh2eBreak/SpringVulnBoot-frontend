@@ -22,6 +22,15 @@ service.interceptors.request.use(
       config.headers['Authorization'] = localStorage.getItem('Authorization')
       Credential: 'include'
     }
+    
+    // 检查是否是JWT相关的请求，如果是则使用jwt token
+    if (config.url && config.url.includes('jwt/')) {
+      const jwtToken = localStorage.getItem('jwt')
+      if (jwtToken) {
+        config.headers['jwt'] = jwtToken
+      }
+    }
+    
     return config
   },
   error => {

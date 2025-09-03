@@ -5,6 +5,7 @@ import app from './modules/app'
 import settings from './modules/settings'
 import user from './modules/user'
 import shiro from './modules/shiro'
+import jwt from './modules/jwt'
 
 Vue.use(Vuex)
 
@@ -13,7 +14,8 @@ const store = new Vuex.Store({
     app,
     settings,
     user,
-    shiro
+    shiro,
+    jwt
   },
   getters
 })
