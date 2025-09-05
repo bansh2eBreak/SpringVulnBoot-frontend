@@ -46,14 +46,13 @@
                         <el-row type="flex" justify="space-between" align="middle">
                             漏洞代码 - JWT接受任意签名
                             <div>
-                                <el-button type="success" round size="mini" @click="handleArbitraryLogin">登录测试</el-button>
-                                <el-button type="danger" round size="mini" @click="handleArbitraryGetInfo">获取信息</el-button>
+                                <el-button type="danger" round size="mini" @click="handleArbitraryTest">去测试</el-button>
                             </div>
                         </el-row>
                         <pre v-highlightjs><code class="java">// JWT接受任意签名漏洞 - 不验证签名或接受任意签名
 public class JwtArbitraryUtils {
     private static String signKey = "password";
-    private static Long expire = 4320000000L;
+    private static Long expire = 3600000L; // 1小时
 
     public static String generateJwt(Map&lt;String, Object&gt; claims) {
         String jwttoken = Jwts.builder()
@@ -101,14 +100,13 @@ public class JwtArbitraryUtils {
                         <el-row type="flex" justify="space-between" align="middle">
                             安全代码 - JWT安全签名
                             <div>
-                                <el-button type="success" round size="mini" @click="handleSecureLogin">登录测试</el-button>
-                                <el-button type="success" round size="mini" @click="handleSecureGetInfo">获取信息</el-button>
+                                <el-button type="success" round size="mini" @click="handleSecureTest">去测试</el-button>
                             </div>
                         </el-row>
                         <pre v-highlightjs><code class="java">// JWT安全实现 - 严格验证签名
 public class JwtSecureUtils {
     private static String signKey = "password";
-    private static Long expire = 4320000000L;
+    private static Long expire = 3600000L; // 1小时
 
     public static String generateJwt(Map&lt;String, Object&gt; claims) {
         String jwttoken = Jwts.builder()
@@ -146,45 +144,211 @@ public class JwtSecureUtils {
             </el-row>
         </div>
 
-        <!-- 登录对话框 -->
-        <el-dialog title="JWT接受任意签名漏洞登录" :visible.sync="loginDialogVisible" width="400px">
-            <el-form :model="loginForm" :rules="loginRules" ref="loginForm" label-width="80px">
-                <el-form-item label="用户名" prop="username">
-                    <el-input v-model="loginForm.username" placeholder="请输入用户名"></el-input>
-                </el-form-item>
-                <el-form-item label="密码" prop="password">
-                    <el-input v-model="loginForm.password" type="password" placeholder="请输入密码"></el-input>
-                </el-form-item>
-            </el-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="loginDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="submitLogin">确 定</el-button>
+        <!-- JWT接受任意签名测试对话框 -->
+        <el-dialog :visible.sync="arbitraryTestDialogVisible" width="800px" :show-close="true" :close-on-click-modal="true" @close="handleArbitraryDialogClose">
+            <div slot="title" style="text-align: center; font-size: 18px;">
+                JWT接受任意签名漏洞测试
+            </div>
+            <div class="test-container">
+                <!-- 1. 登录部分 -->
+                <div class="test-section">
+                    <h3>1. 用户登录 <span style="color: red; font-size: 14px; font-weight: normal;">(测试账号: zhangsan/123)</span></h3>
+                    <el-form :model="loginForm" :rules="loginRules" ref="loginForm" label-width="80px" inline>
+                        <el-form-item label="用户名" prop="username">
+                            <el-input v-model="loginForm.username" placeholder="请输入用户名" style="width: 200px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="密码" prop="password">
+                            <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" style="width: 200px;"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="handleArbitraryLogin">登录</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+
+                <!-- 2. JWT校验测试 -->
+                <div class="test-section">
+                    <h3>2. JWT校验测试</h3>
+                    <div class="jwt-input-section">
+                        <el-input
+                            v-model="jwtToken"
+                            type="textarea"
+                            :rows="3"
+                            placeholder="JWT Token将在这里显示"
+                            readonly>
+                        </el-input>
+                    </div>
+                    <div class="jwt-test-buttons">
+                        <el-button type="primary" @click="handleVerifyOriginalJwt" :disabled="!jwtToken">
+                            校验原始JWT
+                        </el-button>
+                    </div>
+                    <div v-if="verifyResult" class="result-box">
+                        <el-alert
+                            :title="verifyResult.success ? '校验成功' : '校验失败'"
+                            :description="verifyResult.message"
+                            :type="verifyResult.success ? 'success' : 'error'"
+                            show-icon>
+                        </el-alert>
+                    </div>
+                </div>
+
+                <!-- 3. 校验篡改JWT -->
+                <div class="test-section">
+                    <h3>3. 校验篡改JWT <span style="color: red; font-size: 14px; font-weight: normal;">(篡改为用户lisi)</span></h3>
+                    <div class="jwt-input-section">
+                        <el-input
+                            v-model="tamperedJwtToken"
+                            type="textarea"
+                            :rows="3"
+                            placeholder="篡改的JWT Token将在这里显示"
+                            readonly>
+                        </el-input>
+                    </div>
+                    <div class="jwt-test-buttons">
+                        <el-button type="warning" @click="handleVerifyTamperedJwt" :disabled="!tamperedJwtToken">
+                            校验篡改JWT
+                        </el-button>
+                    </div>
+                    <div v-if="tamperedVerifyResult" class="result-box">
+                        <el-alert
+                            :title="tamperedVerifyResult.success ? '校验成功' : '校验失败'"
+                            :description="tamperedVerifyResult.message"
+                            :type="tamperedVerifyResult.success ? 'success' : 'error'"
+                            show-icon>
+                        </el-alert>
+                    </div>
+                </div>
+
+                <!-- 4. 攻击测试 -->
+                <div class="test-section">
+                    <h3>4. 攻击测试</h3>
+                    <p>点击按钮生成篡改的JWT（使用任意密钥签名）：</p>
+                    <div class="attack-buttons">
+                        <el-button type="danger" @click="handleTamperJwt" :disabled="!jwtToken">
+                            篡改JWT
+                        </el-button>
+                    </div>
+                    <div v-if="tamperResult" class="result-box">
+                        <el-alert
+                            :title="tamperResult.success ? '篡改成功' : '篡改失败'"
+                            :description="tamperResult.message"
+                            :type="tamperResult.success ? 'success' : 'error'"
+                            show-icon>
+                        </el-alert>
+                    </div>
+                </div>
             </div>
         </el-dialog>
 
-        <!-- 用户信息对话框 -->
-        <el-dialog title="用户信息" :visible.sync="infoDialogVisible" width="500px">
-            <div v-if="userInfo">
-                <p><strong>用户名：</strong>{{ userInfo.username }}</p>
-                <p><strong>姓名：</strong>{{ userInfo.name }}</p>
-                <p><strong>JWT Token：</strong>{{ userInfo.jwt }}</p>
+        <!-- JWT安全实现测试对话框 -->
+        <el-dialog :visible.sync="secureTestDialogVisible" width="800px" :show-close="true" :close-on-click-modal="true" @close="handleSecureDialogClose">
+            <div slot="title" style="text-align: center; font-size: 18px;">
+                JWT安全实现测试
             </div>
-            <div v-else>
-                <p>获取用户信息失败</p>
+            <div class="test-container">
+                <!-- 1. 登录部分 -->
+                <div class="test-section">
+                    <h3>1. 用户登录 <span style="color: red; font-size: 14px; font-weight: normal;">(测试账号: zhangsan/123)</span></h3>
+                    <el-form :model="loginForm" :rules="loginRules" ref="loginForm2" label-width="80px" inline>
+                        <el-form-item label="用户名" prop="username">
+                            <el-input v-model="loginForm.username" placeholder="请输入用户名" style="width: 200px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="密码" prop="password">
+                            <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" style="width: 200px;"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="handleSecureLogin">登录</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+
+                <!-- 2. JWT校验测试 -->
+                <div class="test-section">
+                    <h3>2. JWT校验测试</h3>
+                    <div class="jwt-input-section">
+                        <el-input
+                            v-model="secureJwtToken"
+                            type="textarea"
+                            :rows="3"
+                            placeholder="JWT Token将在这里显示"
+                            readonly>
+                        </el-input>
+                    </div>
+                    <div class="jwt-test-buttons">
+                        <el-button type="primary" @click="handleSecureVerifyOriginalJwt" :disabled="!secureJwtToken">
+                            校验原始JWT
+                        </el-button>
+                    </div>
+                    <div v-if="secureVerifyResult" class="result-box">
+                        <el-alert
+                            :title="secureVerifyResult.success ? '校验成功' : '校验失败'"
+                            :description="secureVerifyResult.message"
+                            :type="secureVerifyResult.success ? 'success' : 'error'"
+                            show-icon>
+                        </el-alert>
+                    </div>
+                </div>
+
+                <!-- 3. 校验篡改JWT -->
+                <div class="test-section">
+                    <h3>3. 校验篡改JWT <span style="color: red; font-size: 14px; font-weight: normal;">(篡改为用户lisi)</span></h3>
+                    <div class="jwt-input-section">
+                        <el-input
+                            v-model="secureTamperedJwtToken"
+                            type="textarea"
+                            :rows="3"
+                            placeholder="篡改的JWT Token将在这里显示"
+                            readonly>
+                        </el-input>
+                    </div>
+                    <div class="jwt-test-buttons">
+                        <el-button type="warning" @click="handleSecureVerifyTamperedJwt" :disabled="!secureTamperedJwtToken">
+                            校验篡改JWT
+                        </el-button>
+                    </div>
+                    <div v-if="secureTamperedVerifyResult" class="result-box">
+                        <el-alert
+                            :title="secureTamperedVerifyResult.success ? '校验成功' : '校验失败'"
+                            :description="secureTamperedVerifyResult.message"
+                            :type="secureTamperedVerifyResult.success ? 'success' : 'error'"
+                            show-icon>
+                        </el-alert>
+                    </div>
+                </div>
+
+                <!-- 4. 攻击测试 -->
+                <div class="test-section">
+                    <h3>4. 攻击测试</h3>
+                    <p>尝试篡改JWT（安全实现会拒绝）：</p>
+                    <div class="attack-buttons">
+                        <el-button type="danger" @click="handleSecureTamperJwt" :disabled="!secureJwtToken">
+                            篡改JWT
+                        </el-button>
+                    </div>
+                    <div v-if="secureTamperResult" class="result-box">
+                        <el-alert
+                            :title="secureTamperResult.success ? '篡改成功' : '篡改失败'"
+                            :description="secureTamperResult.message"
+                            :type="secureTamperResult.success ? 'success' : 'error'"
+                            show-icon>
+                        </el-alert>
+                    </div>
+                </div>
             </div>
         </el-dialog>
     </div>
 </template>
 
 <script>
-import { jwtArbitraryLogin, jwtArbitraryGetInfo } from '@/api/jwt'
+import { jwtArbitraryLogin, jwtArbitraryGetInfo, jwtSecureArbitraryLogin, jwtSecureArbitraryGetInfo } from '@/api/jwt'
 
 export default {
     data() {
         return {
             activeName: 'first',
-            loginDialogVisible: false,
-            infoDialogVisible: false,
+            arbitraryTestDialogVisible: false,
+            secureTestDialogVisible: false,
             loginForm: {
                 username: '',
                 password: ''
@@ -197,72 +361,285 @@ export default {
                     { required: true, message: '请输入密码', trigger: 'blur' }
                 ]
             },
-            userInfo: null,
-            currentLoginType: '' // 'arbitrary' 或 'secure'
+            jwtToken: '',
+            secureJwtToken: '',
+            tamperedJwtToken: '',
+            secureTamperedJwtToken: '',
+            verifyResult: null,
+            secureVerifyResult: null,
+            tamperedVerifyResult: null,
+            secureTamperedVerifyResult: null,
+            tamperResult: null,
+            secureTamperResult: null
         }
     },
     methods: {
         handleClick(tab, event) {
             // console.log(tab, event);
         },
+        handleArbitraryTest() {
+            this.arbitraryTestDialogVisible = true
+            this.loginForm.username = 'zhangsan'
+            this.loginForm.password = '123'
+            this.jwtToken = ''
+            this.tamperedJwtToken = ''
+            this.verifyResult = null
+            this.tamperedVerifyResult = null
+            this.tamperResult = null
+        },
+        handleSecureTest() {
+            this.secureTestDialogVisible = true
+            this.loginForm.username = 'zhangsan'
+            this.loginForm.password = '123'
+            this.secureJwtToken = ''
+            this.secureTamperedJwtToken = ''
+            this.secureVerifyResult = null
+            this.secureTamperedVerifyResult = null
+            this.secureTamperResult = null
+        },
         handleArbitraryLogin() {
-            this.currentLoginType = 'arbitrary'
-            this.loginDialogVisible = true
-        },
-        handleSecureLogin() {
-            this.currentLoginType = 'secure'
-            this.loginDialogVisible = true
-        },
-        handleArbitraryGetInfo() {
-            jwtArbitraryGetInfo().then(response => {
-                this.userInfo = response.data
-                this.infoDialogVisible = true
-            }).catch(error => {
-                this.$message.error('获取用户信息失败：' + error.message)
-            })
-        },
-        handleSecureGetInfo() {
-            // 这里应该调用安全版本的API，暂时使用任意签名版本演示
-            jwtArbitraryGetInfo().then(response => {
-                this.userInfo = response.data
-                this.infoDialogVisible = true
-            }).catch(error => {
-                this.$message.error('获取用户信息失败：' + error.message)
-            })
-        },
-        submitLogin() {
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
-                    if (this.currentLoginType === 'arbitrary') {
-                        jwtArbitraryLogin(this.loginForm).then(response => {
-                            // 存储到localStorage的jwt键中
-                            localStorage.setItem('jwt', response.data)
-                            this.$message.success('登录成功')
-                            this.loginDialogVisible = false
-                        }).catch(error => {
-                            // 检查错误是否已经在响应拦截器中处理过
-                            // 如果error.message是"Error"或"error"，说明是响应拦截器处理的，不需要重复显示
-                            if (error.message && error.message !== 'Error' && error.message !== 'error') {
-                                this.$message.error('登录失败：' + error.message)
-                            }
-                        })
-                    } else {
-                        // 安全版本的登录，暂时使用任意签名版本演示
-                        jwtArbitraryLogin(this.loginForm).then(response => {
-                            // 存储到localStorage的jwt键中
-                            localStorage.setItem('jwt', response.data)
-                            this.$message.success('登录成功')
-                            this.loginDialogVisible = false
-                        }).catch(error => {
-                            // 检查错误是否已经在响应拦截器中处理过
-                            // 如果error.message是"Error"或"error"，说明是响应拦截器处理的，不需要重复显示
-                            if (error.message && error.message !== 'Error' && error.message !== 'error') {
-                                this.$message.error('登录失败：' + error.message)
-                            }
-                        })
-                    }
+                    jwtArbitraryLogin(this.loginForm).then(response => {
+                        this.jwtToken = response.data
+                        // 存储到localStorage的jwt键中
+                        localStorage.setItem('jwt', response.data)
+                        this.$message.success('登录成功，JWT已生成')
+                    }).catch(error => {
+                        // 检查错误是否已经在响应拦截器中处理过
+                        if (error.message && error.message !== 'Error' && error.message !== 'error') {
+                            this.$message.error('登录失败：' + error.message)
+                        }
+                    })
                 }
             })
+        },
+        handleSecureLogin() {
+            this.$refs.loginForm2.validate((valid) => {
+                if (valid) {
+                    jwtSecureArbitraryLogin(this.loginForm).then(response => {
+                        this.secureJwtToken = response.data
+                        // 存储到localStorage的jwt键中
+                        localStorage.setItem('jwt', response.data)
+                        this.$message.success('登录成功，JWT已生成')
+                    }).catch(error => {
+                        // 检查错误是否已经在响应拦截器中处理过
+                        if (error.message && error.message !== 'Error' && error.message !== 'error') {
+                            this.$message.error('登录失败：' + error.message)
+                        }
+                    })
+                }
+            })
+        },
+        handleVerifyOriginalJwt() {
+            if (!this.jwtToken) {
+                this.$message.warning('请先登录获取JWT Token')
+                return
+            }
+            
+            jwtArbitraryGetInfo().then(response => {
+                this.verifyResult = {
+                    success: true,
+                    message: '原始JWT校验成功，用户信息：' + response.data.username
+                }
+            }).catch(error => {
+                this.verifyResult = {
+                    success: false,
+                    message: '原始JWT校验失败：' + error.message
+                }
+            })
+        },
+        handleVerifyTamperedJwt() {
+            if (!this.tamperedJwtToken) {
+                this.$message.warning('请先生成篡改的JWT Token')
+                return
+            }
+            
+            // 临时存储篡改的JWT到localStorage
+            const originalJwt = localStorage.getItem('jwt')
+            localStorage.setItem('jwt', this.tamperedJwtToken)
+            
+            // 使用篡改的JWT调用getInfo接口
+            jwtArbitraryGetInfo().then(response => {
+                this.tamperedVerifyResult = {
+                    success: true,
+                    message: '篡改JWT验证成功，用户信息：' + response.data.username
+                }
+                // 恢复原始JWT
+                if (originalJwt) {
+                    localStorage.setItem('jwt', originalJwt)
+                } else {
+                    localStorage.removeItem('jwt')
+                }
+            }).catch(error => {
+                this.tamperedVerifyResult = {
+                    success: false,
+                    message: '篡改JWT验证失败：' + error.message
+                }
+                // 恢复原始JWT
+                if (originalJwt) {
+                    localStorage.setItem('jwt', originalJwt)
+                } else {
+                    localStorage.removeItem('jwt')
+                }
+            })
+        },
+        handleTamperJwt() {
+            if (!this.jwtToken) {
+                this.$message.warning('请先登录获取JWT Token')
+                return
+            }
+            
+            try {
+                // 解析原始JWT
+                const parts = this.jwtToken.split('.')
+                if (parts.length !== 3) {
+                    throw new Error('无效的JWT格式')
+                }
+                
+                // 解码payload
+                const payload = JSON.parse(atob(parts[1]))
+                
+                // 修改payload中的用户信息
+                const tamperedPayload = {
+                    ...payload,
+                    name: "李四",
+                    id: 2,
+                    username: "lisi"
+                }
+                
+                // 使用任意密钥重新签名（演示漏洞）
+                const tamperedPayloadBase64 = btoa(JSON.stringify(tamperedPayload))
+                const tamperedJwt = `${parts[0]}.${tamperedPayloadBase64}.${parts[2]}`
+                
+                this.tamperedJwtToken = tamperedJwt
+                this.tamperResult = {
+                    success: true,
+                    message: 'JWT篡改成功！已修改用户信息为：李四(id=2, username=lisi)'
+                }
+                
+                this.$message.success('JWT篡改成功')
+            } catch (error) {
+                this.tamperResult = {
+                    success: false,
+                    message: 'JWT篡改失败：' + error.message
+                }
+                this.$message.error('JWT篡改失败：' + error.message)
+            }
+        },
+        handleSecureVerifyOriginalJwt() {
+            if (!this.secureJwtToken) {
+                this.$message.warning('请先登录获取JWT Token')
+                return
+            }
+            
+            jwtSecureArbitraryGetInfo().then(response => {
+                this.secureVerifyResult = {
+                    success: true,
+                    message: '原始JWT校验成功，用户信息：' + response.data.username
+                }
+            }).catch(error => {
+                this.secureVerifyResult = {
+                    success: false,
+                    message: '原始JWT校验失败：' + error.message
+                }
+            })
+        },
+        handleSecureVerifyTamperedJwt() {
+            if (!this.secureTamperedJwtToken) {
+                this.$message.warning('请先生成篡改的JWT Token')
+                return
+            }
+            
+            // 临时存储篡改的JWT到localStorage
+            const originalJwt = localStorage.getItem('jwt')
+            localStorage.setItem('jwt', this.secureTamperedJwtToken)
+            
+            // 使用篡改的JWT调用getInfo接口
+            jwtSecureArbitraryGetInfo().then(response => {
+                this.secureTamperedVerifyResult = {
+                    success: true,
+                    message: '篡改JWT验证成功，用户信息：' + response.data.username
+                }
+                // 恢复原始JWT
+                if (originalJwt) {
+                    localStorage.setItem('jwt', originalJwt)
+                } else {
+                    localStorage.removeItem('jwt')
+                }
+            }).catch(error => {
+                this.secureTamperedVerifyResult = {
+                    success: false,
+                    message: '篡改JWT验证失败：' + error.message
+                }
+                // 恢复原始JWT
+                if (originalJwt) {
+                    localStorage.setItem('jwt', originalJwt)
+                } else {
+                    localStorage.removeItem('jwt')
+                }
+            })
+        },
+        handleSecureTamperJwt() {
+            if (!this.secureJwtToken) {
+                this.$message.warning('请先登录获取JWT Token')
+                return
+            }
+            
+            try {
+                // 解析原始JWT
+                const parts = this.secureJwtToken.split('.')
+                if (parts.length !== 3) {
+                    throw new Error('无效的JWT格式')
+                }
+                
+                // 解码payload
+                const payload = JSON.parse(atob(parts[1]))
+                
+                // 修改payload中的用户信息
+                const tamperedPayload = {
+                    ...payload,
+                    name: "王五",
+                    id: 3,
+                    username: "wangwu"
+                }
+                
+                // 使用任意密钥重新签名（演示漏洞）
+                const tamperedPayloadBase64 = btoa(JSON.stringify(tamperedPayload))
+                const tamperedJwt = `${parts[0]}.${tamperedPayloadBase64}.${parts[2]}`
+                
+                this.secureTamperedJwtToken = tamperedJwt
+                this.secureTamperResult = {
+                    success: true,
+                    message: 'JWT篡改成功！已修改用户信息为：王五(id=3, username=wangwu)'
+                }
+                
+                this.$message.success('JWT篡改成功')
+            } catch (error) {
+                this.secureTamperResult = {
+                    success: false,
+                    message: 'JWT篡改失败：' + error.message
+                }
+                this.$message.error('JWT篡改失败：' + error.message)
+            }
+        },
+        handleArbitraryDialogClose() {
+            this.jwtToken = ''
+            this.tamperedJwtToken = ''
+            this.verifyResult = null
+            this.tamperedVerifyResult = null
+            this.tamperResult = null
+            // 关闭对话框时清除localStorage中的jwt
+            localStorage.removeItem('jwt')
+        },
+        handleSecureDialogClose() {
+            this.secureJwtToken = ''
+            this.secureTamperedJwtToken = ''
+            this.secureVerifyResult = null
+            this.secureTamperedVerifyResult = null
+            this.secureTamperResult = null
+            // 关闭对话框时清除localStorage中的jwt
+            localStorage.removeItem('jwt')
         }
     }
 }
@@ -348,5 +725,48 @@ pre code {
 .row-bg {
     padding: 10px 0;
     background-color: #f9fafc;
+}
+
+.test-container {
+    padding: 20px;
+}
+
+.test-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #e4e7ed;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+.test-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #409EFF;
+    font-size: 16px;
+}
+
+.jwt-input-section {
+    margin-bottom: 15px;
+}
+
+.jwt-test-buttons {
+    margin-bottom: 15px;
+}
+
+.jwt-test-buttons .el-button {
+    margin-right: 10px;
+}
+
+.attack-buttons {
+    margin-bottom: 15px;
+}
+
+.attack-buttons .el-button {
+    margin-right: 10px;
+}
+
+.result-box {
+    margin-top: 15px;
 }
 </style>

@@ -52,21 +52,25 @@
                         <pre v-highlightjs><code class="java">// JWT弱密码漏洞 - 使用简单密码作为签名密钥
 public class JwtWeakUtils {
     // 使用弱密码作为签名密钥
-    private static String signKey = "Aa123123";
+    private static String weakSignKey = "Aa123123";
+    // 使用强密码作为签名密钥（至少32位，包含大小写字母、数字、特殊字符）
+    private static String strongSignKey = "A9b8C7d6E5f4G3h2I1j0K9l8M7n6O5p4Q3r2";
     private static Long expire = 3600000L; // 1小时
 
-    public static String generateJwt(Map&lt;String, Object&gt; claims) {
+    // 弱密码生成JWT
+    public static String generateWeakJwt(Map&lt;String, Object&gt; claims) {
         String jwttoken = Jwts.builder()
-                .signWith(SignatureAlgorithm.HS256, signKey)
+                .signWith(SignatureAlgorithm.HS256, weakSignKey)
                 .setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + expire))
                 .compact();
         return jwttoken;
     }
 
-    public static Claims parseJwt(String jwttoken) {
+    // 弱密码解析JWT
+    public static Claims parseWeakJwt(String jwttoken) {
         Claims claims = Jwts.parser()
-                .setSigningKey(signKey)
+                .setSigningKey(weakSignKey)
                 .parseClaimsJws(jwttoken)
                 .getBody();
         return claims;
@@ -83,23 +87,27 @@ public class JwtWeakUtils {
                             </div>
                         </el-row>
                         <pre v-highlightjs><code class="java">// JWT安全实现 - 使用强密码作为签名密钥
-public class JwtStrongUtils {
+public class JwtWeakUtils {
+    // 使用弱密码作为签名密钥
+    private static String weakSignKey = "Aa123123";
     // 使用强密码作为签名密钥（至少32位，包含大小写字母、数字、特殊字符）
-    private static String signKey = "A9b8C7d6E5f4G3h2I1j0K9l8M7n6O5p4Q3r2";
+    private static String strongSignKey = "A9b8C7d6E5f4G3h2I1j0K9l8M7n6O5p4Q3r2";
     private static Long expire = 3600000L; // 1小时
 
-    public static String generateJwt(Map&lt;String, Object&gt; claims) {
+    // 强密码生成JWT
+    public static String generateStrongJwt(Map&lt;String, Object&gt; claims) {
         String jwttoken = Jwts.builder()
-                .signWith(SignatureAlgorithm.HS256, signKey)
+                .signWith(SignatureAlgorithm.HS256, strongSignKey)
                 .setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + expire))
                 .compact();
         return jwttoken;
     }
 
-    public static Claims parseJwt(String jwttoken) {
+    // 强密码解析JWT
+    public static Claims parseStrongJwt(String jwttoken) {
         Claims claims = Jwts.parser()
-                .setSigningKey(signKey)
+                .setSigningKey(strongSignKey)
                 .parseClaimsJws(jwttoken)
                 .getBody();
         return claims;

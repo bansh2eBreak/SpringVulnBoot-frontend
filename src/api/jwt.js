@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // JWT弱密码漏洞相关接口
 export function jwtWeakLogin(data) {
   return request({
-    url: 'jwt/weak/login',
+    url: 'jwt/weak/weakLogin',
     method: 'post',
     data
   })
@@ -11,7 +11,7 @@ export function jwtWeakLogin(data) {
 
 export function jwtWeakGetInfo() {
   return request({
-    url: 'jwt/weak/getInfo',
+    url: 'jwt/weak/weakGetInfo',
     method: 'get'
   })
 }
@@ -19,7 +19,7 @@ export function jwtWeakGetInfo() {
 // JWT强密码安全相关接口
 export function jwtStrongLogin(data) {
   return request({
-    url: 'jwt/strong/login',
+    url: 'jwt/weak/strongLogin',
     method: 'post',
     data
   })
@@ -27,7 +27,23 @@ export function jwtStrongLogin(data) {
 
 export function jwtStrongGetInfo() {
   return request({
-    url: 'jwt/strong/getInfo',
+    url: 'jwt/weak/strongGetInfo',
+    method: 'get'
+  })
+}
+
+// JWT安全签名相关接口
+export function jwtSecureArbitraryLogin(data) {
+  return request({
+    url: 'jwt/secureArbitrary/login',
+    method: 'post',
+    data
+  })
+}
+
+export function jwtSecureArbitraryGetInfo() {
+  return request({
+    url: 'jwt/secureArbitrary/getInfo',
     method: 'get'
   })
 }
