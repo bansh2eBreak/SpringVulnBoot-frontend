@@ -232,11 +232,11 @@ export const constantRoutes = [
         meta: { title: 'JWT存储敏感信息', icon: 'el-icon-document' }
       },
       {
-        path: 'arbitrarySignature',
-        component: () => import('@/views/jwt/ArbitrarySignature'),
-        name: 'JWT接受任意签名',
-        meta: { title: 'JWT接受任意签名', icon: 'el-icon-s-check' }
-      }
+        path: 'signatureVuln',
+        component: () => import('@/views/jwt/SignatureVuln'),
+        name: 'JWT None算法漏洞',
+        meta: { title: 'JWT None算法漏洞', icon: 'el-icon-s-check' }
+      },
     ]
   },
 

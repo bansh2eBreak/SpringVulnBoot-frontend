@@ -787,9 +787,9 @@ export default {
                 // 2. 修改payload中的用户信息
                 const tamperedPayload = {
                     ...payload,
-                    name: "王五",
-                    id: 3,
-                    username: "wangwu"
+                    name: "李四",
+                    id: 2,
+                    username: "lisi"
                 }
                 
                 // 3. 使用相同的header和修改后的payload重新签名
@@ -814,7 +814,7 @@ export default {
                 
                 this.strongTamperResult = {
                     success: true,
-                    message: 'JWT篡改成功！已修改用户信息为：王五(id=3, username=wangwu)'
+                    message: 'JWT篡改成功！已修改用户信息为：李四(id=2, username=lisi)'
                 }
                 
                 this.$message.success('JWT篡改成功')

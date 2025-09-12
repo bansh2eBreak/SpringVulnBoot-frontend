@@ -1,4 +1,4 @@
-import { jwtWeakLogin, jwtWeakGetInfo, jwtSensitiveLogin, jwtSensitiveGetInfo, jwtArbitraryLogin, jwtArbitraryGetInfo } from '@/api/jwt'
+import { jwtWeakLogin, jwtWeakGetInfo, jwtSensitiveVulnLogin, jwtSignatureVulnLogin, jwtSignatureVulnGetInfo, jwtSignatureSecureLogin, jwtSignatureSecureGetInfo } from '@/api/jwt'
 
 const getDefaultState = () => {
   return {
@@ -72,7 +72,7 @@ const actions = {
   jwtSensitiveLogin({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      jwtSensitiveLogin({ username: username.trim(), password: password }).then(response => {
+      jwtSensitiveVulnLogin({ username: username.trim(), password: password }).then(response => {
         const { data } = response
         commit('SET_JWT', data)
         commit('SET_USERNAME', username.trim())
@@ -106,11 +106,11 @@ const actions = {
     })
   },
 
-  // JWT接受任意签名漏洞登录
-  jwtArbitraryLogin({ commit }, userInfo) {
+  // JWT None算法漏洞登录
+  jwtSignatureVulnLogin({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      jwtArbitraryLogin({ username: username.trim(), password: password }).then(response => {
+      jwtSignatureVulnLogin({ username: username.trim(), password: password }).then(response => {
         const { data } = response
         commit('SET_JWT', data)
         commit('SET_USERNAME', username.trim())
@@ -122,10 +122,48 @@ const actions = {
     })
   },
 
-  // JWT接受任意签名漏洞获取用户信息
-  jwtArbitraryGetInfo({ commit, state }) {
+  // JWT None算法漏洞获取用户信息
+  jwtSignatureVulnGetInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      jwtArbitraryGetInfo().then(response => {
+      jwtSignatureVulnGetInfo().then(response => {
+        const { data } = response
+
+        if (!data) {
+          return reject('Verification failed, please Login again.')
+        }
+
+        const { name, avatar, username } = data
+
+        commit('SET_NAME', name)
+        commit('SET_AVATAR', avatar)
+        commit('SET_USERNAME', username)
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // JWT安全签名登录
+  jwtSignatureSecureLogin({ commit }, userInfo) {
+    const { username, password } = userInfo
+    return new Promise((resolve, reject) => {
+      jwtSignatureSecureLogin({ username: username.trim(), password: password }).then(response => {
+        const { data } = response
+        commit('SET_JWT', data)
+        commit('SET_USERNAME', username.trim())
+        localStorage.setItem('jwt', data)
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // JWT安全签名获取用户信息
+  jwtSignatureSecureGetInfo({ commit, state }) {
+    return new Promise((resolve, reject) => {
+      jwtSignatureSecureGetInfo().then(response => {
         const { data } = response
 
         if (!data) {

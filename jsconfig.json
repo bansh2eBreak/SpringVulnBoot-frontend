@@ -3,7 +3,10 @@
     "baseUrl": "./",
     "paths": {
         "@/*": ["src/*"]
-    }
+    },
+    "skipLibCheck": true,
+    "allowJs": true,
+    "checkJs": false
   },
   "exclude": ["node_modules", "dist"]
 }

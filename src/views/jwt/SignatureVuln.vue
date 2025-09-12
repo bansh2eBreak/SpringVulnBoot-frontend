@@ -1,17 +1,17 @@
 <template>
     <div class="root-div">
         <div class="vuln-info">
-            <div class="header-div">JWT安全漏洞 -- JWT接受任意签名</div>
+            <div class="header-div">JWT安全漏洞 -- JWT None算法漏洞</div>
             <div class="body-div">
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="漏洞描述" name="first">
                         <div class="vuln-detail">
-                            JWT接受任意签名漏洞是指JWT验证过程中没有正确验证签名，或者接受任意签名算法。<span style="color: red;">攻击者可以修改JWT的payload部分并使用任意密钥重新签名</span>，从而伪造JWT令牌。
+                            JWT None算法漏洞是指JWT验证过程中没有正确验证签名算法，或者接受没有签名的令牌。<span style="color: red;">攻击者可以修改JWT的Header部分，将算法改为"none"，从而绕过签名验证</span>，伪造JWT令牌。
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="漏洞危害" name="second">
                         <div class="vuln-detail">
-                            JWT接受任意签名的危害包括：<br /><br />
+                            JWT None算法漏洞的危害包括：<br /><br />
                             身份伪造：攻击者可以伪造任意用户的JWT令牌；<br />
                             权限提升：攻击者可以修改JWT中的权限信息；<br />
                             会话劫持：攻击者可以劫持用户的会话；<br />
@@ -20,13 +20,13 @@
                     </el-tab-pane>
                     <el-tab-pane label="安全编码" name="third">
                         <div class="vuln-detail">
-                            【必须】严格验证JWT签名
-                            验证JWT时必须使用正确的签名密钥和算法。<br /><br />
-                            【必须】指定签名算法
-                            在JWT验证时明确指定允许的签名算法。<br /><br />
-                            【建议】使用非对称加密
+                            【必须】严格验证JWT签名算法<br />
+                            验证JWT时必须明确指定允许的签名算法。<br /><br />
+                            【必须】拒绝none算法<br />
+                            在JWT验证时明确拒绝"none"算法。<br /><br />
+                            【建议】使用非对称加密<br />
                             考虑使用RS256等非对称加密算法。<br /><br />
-                            【建议】密钥轮换
+                            【建议】密钥轮换<br />
                             定期更换签名密钥，降低密钥泄露风险。
                         </div>
                     </el-tab-pane>
@@ -44,53 +44,44 @@
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">
-                            漏洞代码 - JWT接受任意签名
+                            漏洞代码 - JWT None算法漏洞
                             <div>
-                                <el-button type="danger" round size="mini" @click="handleArbitraryTest">去测试</el-button>
+                                <el-button type="danger" round size="mini" @click="handleVulnTest">去测试</el-button>
                             </div>
                         </el-row>
-                        <pre v-highlightjs><code class="java">// JWT接受任意签名漏洞 - 不验证签名或接受任意签名
-public class JwtArbitraryUtils {
-    private static String signKey = "password";
+                        <pre v-highlightjs><code class="java">// JWT None算法漏洞 - 接受没有签名的令牌
+public class JwtSignatureUtils {
+    private static String signKey = "K9mN8bV7cX6zA5qW4eR3tY2uI1oP0aS9dF8gH7jK6lZ5xC4vB3nM2qW1eR0tY9uI8oP7aS6dF5gH4jK3lZ2xC1vB0nM9qW8eR7tY6uI5oP4aS3dF2gH1jK0lZ9xC8vB7nM6qW5eR4tY3uI2oP1aS0dF9gH8jK7lZ6xC5vB4nM3qW2eR1tY0uI9oP8aS7dF6gH5jK4lZ3xC2vB1nM0qW9eR8tY7uI6oP5aS4dF3gH2jK1lZ0xC9vB8nM7qW6eR5tY4uI3oP2aS1dF0gH9jK8lZ7xC6vB5nM4qW3eR2tY1uI0oP9aS8dF7gH6jK5lZ4xC3vB2nM1qW0eR9tY8uI7oP6aS5dF4gH3jK2lZ1xC0vB9nM8qW7eR6tY5uI4oP3aS2dF1gH0jK9lZ8xC7vB6nM5qW4eR3tY2uI1oP0aS9dF8gH7jK6lZ5x";
     private static Long expire = 3600000L; // 1小时
 
+    /**
+     * JWT 令牌生成方法 - 正常生成
+     * @param claims JWT第二部分载荷，payload中存储的内容
+     * @return
+     */
     public static String generateJwt(Map&lt;String, Object&gt; claims) {
         String jwttoken = Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, signKey)
                 .setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + expire))
                 .compact();
+
         return jwttoken;
     }
 
-    public static Claims parseJwt(String jwttoken) {
-        // 漏洞：不验证签名或接受任意签名
-        try {
-            // 尝试使用原始密钥解析
-            Claims claims = Jwts.parser()
-                    .setSigningKey(signKey)
-                    .parseClaimsJws(jwttoken)
-                    .getBody();
-            return claims;
-        } catch (Exception e) {
-            // 漏洞：如果原始密钥解析失败，尝试使用空密钥或默认密钥
-            try {
-                Claims claims = Jwts.parser()
-                        .setSigningKey("") // 使用空密钥
-                        .parseClaimsJws(jwttoken)
-                        .getBody();
-                return claims;
-            } catch (Exception e2) {
-                // 漏洞：如果还是失败，尝试不验证签名
-                String[] parts = jwttoken.split("\\\\.");
-                if (parts.length == 3) {
-                    // 直接解码payload部分，不验证签名
-                    String payload = new String(Base64.getDecoder().decode(parts[1]));
-                    return new DefaultClaims(payload);
-                }
-            }
-        }
-        return null;
+    /**
+     * JWT 令牌解析方法 - 漏洞实现（接受没有签名的令牌）
+     * @param jwttoken
+     * @return
+     */
+    public static Claims parseVulnJwt(String jwttoken) {
+        // 漏洞：接受没有签名的令牌
+        // 重点是使用 .parse() 方法而不是 .parseClaimsJws()
+        Jwt jwt = Jwts.parser()
+            .setSigningKey(signKey)
+            .parse(jwttoken);
+
+        return (Claims) jwt.getBody();
     }
 }</code></pre>
                     </div>
@@ -104,39 +95,38 @@ public class JwtArbitraryUtils {
                             </div>
                         </el-row>
                         <pre v-highlightjs><code class="java">// JWT安全实现 - 严格验证签名
-public class JwtSecureUtils {
-    private static String signKey = "password";
+public class JwtSignatureUtils {
+    private static String signKey = "K9mN8bV7cX6zA5qW4eR3tY2uI1oP0aS9dF8gH7jK6lZ5xC4vB3nM2qW1eR0tY9uI8oP7aS6dF5gH4jK3lZ2xC1vB0nM9qW8eR7tY6uI5oP4aS3dF2gH1jK0lZ9xC8vB7nM6qW5eR4tY3uI2oP1aS0dF9gH8jK7lZ6xC5vB4nM3qW2eR1tY0uI9oP8aS7dF6gH5jK4lZ3xC2vB1nM0qW9eR8tY7uI6oP5aS4dF3gH2jK1lZ0xC9vB8nM7qW6eR5tY4uI3oP2aS1dF0gH9jK8lZ7xC6vB5nM4qW3eR2tY1uI0oP9aS8dF7gH6jK5lZ4xC3vB2nM1qW0eR9tY8uI7oP6aS5dF4gH3jK2lZ1xC0vB9nM8qW7eR6tY5uI4oP3aS2dF1gH0jK9lZ8xC7vB6nM5qW4eR3tY2uI1oP0aS9dF8gH7jK6lZ5x";
     private static Long expire = 3600000L; // 1小时
 
+    /**
+     * JWT 令牌生成方法 - 正常生成
+     * @param claims JWT第二部分载荷，payload中存储的内容
+     * @return
+     */
     public static String generateJwt(Map&lt;String, Object&gt; claims) {
         String jwttoken = Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, signKey)
                 .setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + expire))
                 .compact();
+
         return jwttoken;
     }
 
-    public static Claims parseJwt(String jwttoken) {
-        // 安全：严格验证签名
-        try {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(signKey)
-                    .requireIssuer("secure-app") // 验证发行者
-                    .requireAudience("secure-users") // 验证受众
-                    .parseClaimsJws(jwttoken)
-                    .getBody();
-            
-            // 验证过期时间
-            if (claims.getExpiration().before(new Date())) {
-                throw new RuntimeException("Token已过期");
-            }
-            
-            return claims;
-        } catch (Exception e) {
-            // 安全：验证失败时抛出异常，不尝试其他方式
-            throw new RuntimeException("JWT验证失败: " + e.getMessage());
-        }
+    /**
+     * JWT 令牌解析方法 - 安全实现（严格验证签名）
+     * @param jwttoken
+     * @return
+     */
+    public static Claims parseSecureJwt(String jwttoken) {
+        // .parseClaimsJws() 方法严格验证签名，拒绝none算法
+        Claims claims = Jwts.parser()
+                .setSigningKey(signKey)
+                .parseClaimsJws(jwttoken)
+                .getBody();
+
+        return claims;
     }
 }</code></pre>
                     </div>
@@ -144,10 +134,10 @@ public class JwtSecureUtils {
             </el-row>
         </div>
 
-        <!-- JWT接受任意签名测试对话框 -->
-        <el-dialog :visible.sync="arbitraryTestDialogVisible" width="800px" :show-close="true" :close-on-click-modal="true" @close="handleArbitraryDialogClose">
+        <!-- JWT None算法漏洞测试对话框 -->
+        <el-dialog :visible.sync="vulnTestDialogVisible" width="800px" :show-close="true" :close-on-click-modal="true" @close="handleVulnDialogClose">
             <div slot="title" style="text-align: center; font-size: 18px;">
-                JWT接受任意签名漏洞测试
+                JWT None算法漏洞测试
             </div>
             <div class="test-container">
                 <!-- 1. 登录部分 -->
@@ -161,7 +151,7 @@ public class JwtSecureUtils {
                             <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" style="width: 200px;"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" @click="handleArbitraryLogin">登录</el-button>
+                            <el-button type="primary" @click="handleVulnLogin">登录</el-button>
                         </el-form-item>
                     </el-form>
                 </div>
@@ -223,7 +213,7 @@ public class JwtSecureUtils {
                 <!-- 4. 攻击测试 -->
                 <div class="test-section">
                     <h3>4. 攻击测试</h3>
-                    <p>点击按钮生成篡改的JWT（使用任意密钥签名）：</p>
+                    <p>点击按钮生成篡改的JWT（使用none算法）：</p>
                     <div class="attack-buttons">
                         <el-button type="danger" @click="handleTamperJwt" :disabled="!jwtToken">
                             篡改JWT
@@ -341,13 +331,14 @@ public class JwtSecureUtils {
 </template>
 
 <script>
-import { jwtArbitraryLogin, jwtArbitraryGetInfo, jwtSecureArbitraryLogin, jwtSecureArbitraryGetInfo } from '@/api/jwt'
+import { jwtSignatureVulnLogin, jwtSignatureVulnGetInfo, jwtSignatureSecureLogin, jwtSignatureSecureGetInfo } from '@/api/jwt'
+import { Base64 } from 'js-base64'
 
 export default {
     data() {
         return {
             activeName: 'first',
-            arbitraryTestDialogVisible: false,
+            vulnTestDialogVisible: false,
             secureTestDialogVisible: false,
             loginForm: {
                 username: '',
@@ -377,8 +368,8 @@ export default {
         handleClick(tab, event) {
             // console.log(tab, event);
         },
-        handleArbitraryTest() {
-            this.arbitraryTestDialogVisible = true
+        handleVulnTest() {
+            this.vulnTestDialogVisible = true
             this.loginForm.username = 'zhangsan'
             this.loginForm.password = '123'
             this.jwtToken = ''
@@ -397,16 +388,14 @@ export default {
             this.secureTamperedVerifyResult = null
             this.secureTamperResult = null
         },
-        handleArbitraryLogin() {
+        handleVulnLogin() {
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
-                    jwtArbitraryLogin(this.loginForm).then(response => {
+                    jwtSignatureVulnLogin(this.loginForm).then(response => {
                         this.jwtToken = response.data
-                        // 存储到localStorage的jwt键中
                         localStorage.setItem('jwt', response.data)
                         this.$message.success('登录成功，JWT已生成')
                     }).catch(error => {
-                        // 检查错误是否已经在响应拦截器中处理过
                         if (error.message && error.message !== 'Error' && error.message !== 'error') {
                             this.$message.error('登录失败：' + error.message)
                         }
@@ -417,13 +406,11 @@ export default {
         handleSecureLogin() {
             this.$refs.loginForm2.validate((valid) => {
                 if (valid) {
-                    jwtSecureArbitraryLogin(this.loginForm).then(response => {
+                    jwtSignatureSecureLogin(this.loginForm).then(response => {
                         this.secureJwtToken = response.data
-                        // 存储到localStorage的jwt键中
                         localStorage.setItem('jwt', response.data)
                         this.$message.success('登录成功，JWT已生成')
                     }).catch(error => {
-                        // 检查错误是否已经在响应拦截器中处理过
                         if (error.message && error.message !== 'Error' && error.message !== 'error') {
                             this.$message.error('登录失败：' + error.message)
                         }
@@ -437,7 +424,7 @@ export default {
                 return
             }
             
-            jwtArbitraryGetInfo().then(response => {
+            jwtSignatureVulnGetInfo().then(response => {
                 this.verifyResult = {
                     success: true,
                     message: '原始JWT校验成功，用户信息：' + response.data.username
@@ -455,17 +442,14 @@ export default {
                 return
             }
             
-            // 临时存储篡改的JWT到localStorage
             const originalJwt = localStorage.getItem('jwt')
             localStorage.setItem('jwt', this.tamperedJwtToken)
             
-            // 使用篡改的JWT调用getInfo接口
-            jwtArbitraryGetInfo().then(response => {
+            jwtSignatureVulnGetInfo().then(response => {
                 this.tamperedVerifyResult = {
                     success: true,
                     message: '篡改JWT验证成功，用户信息：' + response.data.username
                 }
-                // 恢复原始JWT
                 if (originalJwt) {
                     localStorage.setItem('jwt', originalJwt)
                 } else {
@@ -476,7 +460,6 @@ export default {
                     success: false,
                     message: '篡改JWT验证失败：' + error.message
                 }
-                // 恢复原始JWT
                 if (originalJwt) {
                     localStorage.setItem('jwt', originalJwt)
                 } else {
@@ -491,14 +474,19 @@ export default {
             }
             
             try {
-                // 解析原始JWT
                 const parts = this.jwtToken.split('.')
                 if (parts.length !== 3) {
                     throw new Error('无效的JWT格式')
                 }
                 
-                // 解码payload
-                const payload = JSON.parse(atob(parts[1]))
+                const header = JSON.parse(Base64.decode(parts[0]))
+                const payload = JSON.parse(Base64.decode(parts[1]))
+                
+                // 修改header为none算法
+                const tamperedHeader = {
+                    ...header,
+                    alg: "none"
+                }
                 
                 // 修改payload中的用户信息
                 const tamperedPayload = {
@@ -508,9 +496,13 @@ export default {
                     username: "lisi"
                 }
                 
-                // 使用任意密钥重新签名（演示漏洞）
-                const tamperedPayloadBase64 = btoa(JSON.stringify(tamperedPayload))
-                const tamperedJwt = `${parts[0]}.${tamperedPayloadBase64}.${parts[2]}`
+                // 使用Base64编码并移除填充字符
+                const tamperedHeaderBase64 = Base64.encode(JSON.stringify(tamperedHeader)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+                const tamperedPayloadBase64 = Base64.encode(JSON.stringify(tamperedPayload)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+                
+                // 生成篡改的JWT（使用none算法，不需要签名）
+                const tamperedJwt = `${tamperedHeaderBase64}.${tamperedPayloadBase64}.`
+                console.log(tamperedJwt)
                 
                 this.tamperedJwtToken = tamperedJwt
                 this.tamperResult = {
@@ -533,7 +525,7 @@ export default {
                 return
             }
             
-            jwtSecureArbitraryGetInfo().then(response => {
+            jwtSignatureSecureGetInfo().then(response => {
                 this.secureVerifyResult = {
                     success: true,
                     message: '原始JWT校验成功，用户信息：' + response.data.username
@@ -551,17 +543,14 @@ export default {
                 return
             }
             
-            // 临时存储篡改的JWT到localStorage
             const originalJwt = localStorage.getItem('jwt')
             localStorage.setItem('jwt', this.secureTamperedJwtToken)
             
-            // 使用篡改的JWT调用getInfo接口
-            jwtSecureArbitraryGetInfo().then(response => {
+            jwtSignatureSecureGetInfo().then(response => {
                 this.secureTamperedVerifyResult = {
                     success: true,
                     message: '篡改JWT验证成功，用户信息：' + response.data.username
                 }
-                // 恢复原始JWT
                 if (originalJwt) {
                     localStorage.setItem('jwt', originalJwt)
                 } else {
@@ -572,7 +561,6 @@ export default {
                     success: false,
                     message: '篡改JWT验证失败：' + error.message
                 }
-                // 恢复原始JWT
                 if (originalJwt) {
                     localStorage.setItem('jwt', originalJwt)
                 } else {
@@ -587,31 +575,39 @@ export default {
             }
             
             try {
-                // 解析原始JWT
                 const parts = this.secureJwtToken.split('.')
                 if (parts.length !== 3) {
                     throw new Error('无效的JWT格式')
                 }
                 
-                // 解码payload
-                const payload = JSON.parse(atob(parts[1]))
+                const header = JSON.parse(Base64.decode(parts[0]))
+                const payload = JSON.parse(Base64.decode(parts[1]))
+                
+                // 修改header为none算法
+                const tamperedHeader = {
+                    ...header,
+                    alg: "none"
+                }
                 
                 // 修改payload中的用户信息
                 const tamperedPayload = {
                     ...payload,
-                    name: "王五",
-                    id: 3,
-                    username: "wangwu"
+                    name: "李四",
+                    id: 2,
+                    username: "lisi"
                 }
                 
-                // 使用任意密钥重新签名（演示漏洞）
-                const tamperedPayloadBase64 = btoa(JSON.stringify(tamperedPayload))
-                const tamperedJwt = `${parts[0]}.${tamperedPayloadBase64}.${parts[2]}`
+                // 使用Base64编码并移除填充字符
+                const tamperedHeaderBase64 = Base64.encode(JSON.stringify(tamperedHeader)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+                const tamperedPayloadBase64 = Base64.encode(JSON.stringify(tamperedPayload)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+                
+                // 生成篡改的JWT（使用none算法，不需要签名）
+                const tamperedJwt = `${tamperedHeaderBase64}.${tamperedPayloadBase64}.`
                 
                 this.secureTamperedJwtToken = tamperedJwt
                 this.secureTamperResult = {
                     success: true,
-                    message: 'JWT篡改成功！已修改用户信息为：王五(id=3, username=wangwu)'
+                    message: 'JWT篡改成功！已修改用户信息为：李四(id=2, username=lisi)'
                 }
                 
                 this.$message.success('JWT篡改成功')
@@ -623,13 +619,12 @@ export default {
                 this.$message.error('JWT篡改失败：' + error.message)
             }
         },
-        handleArbitraryDialogClose() {
+        handleVulnDialogClose() {
             this.jwtToken = ''
             this.tamperedJwtToken = ''
             this.verifyResult = null
             this.tamperedVerifyResult = null
             this.tamperResult = null
-            // 关闭对话框时清除localStorage中的jwt
             localStorage.removeItem('jwt')
         },
         handleSecureDialogClose() {
@@ -638,7 +633,6 @@ export default {
             this.secureVerifyResult = null
             this.secureTamperedVerifyResult = null
             this.secureTamperResult = null
-            // 关闭对话框时清除localStorage中的jwt
             localStorage.removeItem('jwt')
         }
     }

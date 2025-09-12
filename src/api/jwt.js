@@ -32,21 +32,6 @@ export function jwtStrongGetInfo() {
   })
 }
 
-// JWT安全签名相关接口
-export function jwtSecureArbitraryLogin(data) {
-  return request({
-    url: 'jwt/secureArbitrary/login',
-    method: 'post',
-    data
-  })
-}
-
-export function jwtSecureArbitraryGetInfo() {
-  return request({
-    url: 'jwt/secureArbitrary/getInfo',
-    method: 'get'
-  })
-}
 
 // JWT存储敏感信息漏洞相关接口
 export function jwtSensitiveVulnLogin(data) {
@@ -65,18 +50,34 @@ export function jwtSensitiveSecLogin(data) {
   })
 }
 
-// JWT接受任意签名漏洞相关接口
-export function jwtArbitraryLogin(data) {
+// JWT None算法漏洞相关接口
+export function jwtSignatureVulnLogin(data) {
   return request({
-    url: 'jwt/arbitrary/login',
+    url: 'jwt/signature/vulnLogin',
     method: 'post',
     data
   })
 }
 
-export function jwtArbitraryGetInfo() {
+export function jwtSignatureVulnGetInfo() {
   return request({
-    url: 'jwt/arbitrary/getInfo',
+    url: 'jwt/signature/vulnGetInfo',
     method: 'get'
   })
 }
+
+export function jwtSignatureSecureLogin(data) {
+  return request({
+    url: 'jwt/signature/secureLogin',
+    method: 'post',
+    data
+  })
+}
+
+export function jwtSignatureSecureGetInfo() {
+  return request({
+    url: 'jwt/signature/secureGetInfo',
+    method: 'get'
+  })
+}
+
