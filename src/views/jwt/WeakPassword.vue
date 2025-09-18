@@ -387,10 +387,14 @@ export default {
         },
         handleWeakTest() {
             this.weakTestDialogVisible = true
+            this.loginForm.username = 'zhangsan'
+            this.loginForm.password = '123'
             this.resetTestData()
         },
         handleStrongTest() {
             this.strongTestDialogVisible = true
+            this.loginForm.username = 'zhangsan'
+            this.loginForm.password = '123'
             this.resetTestData()
         },
         handleWeakDialogClose() {
@@ -402,11 +406,6 @@ export default {
             localStorage.removeItem('jwt')
         },
         resetTestData() {
-            // 重置登录表单为测试账号
-            this.loginForm = {
-                username: 'zhangsan',
-                password: '123'
-            }
             this.jwtToken = ''
             this.strongJwtToken = ''
             this.tamperedJwtToken = ''
