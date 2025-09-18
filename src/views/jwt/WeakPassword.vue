@@ -402,6 +402,11 @@ export default {
             localStorage.removeItem('jwt')
         },
         resetTestData() {
+            // 重置登录表单为测试账号
+            this.loginForm = {
+                username: 'zhangsan',
+                password: '123'
+            }
             this.jwtToken = ''
             this.strongJwtToken = ''
             this.tamperedJwtToken = ''
