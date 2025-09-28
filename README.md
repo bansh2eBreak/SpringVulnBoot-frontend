@@ -8,6 +8,10 @@
 
 ![info.png](images/springvulnboot_network.jpg)
 
+## 部署方式
+
+本项目前后端分离，需与后端工程一同部署，请移步后端工程查看部署说明。
+
 ## 靶场已编写的漏洞
 
 - SQLi注入
@@ -46,6 +50,7 @@
   - JWT弱密码
   - JWT存储敏感信息
   - JWT None算法漏洞
+  - JWT 算法混淆漏洞
 - 组件漏洞
   - Fastjson漏洞
   - Log4j2漏洞

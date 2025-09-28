@@ -81,3 +81,64 @@ export function jwtSignatureSecureGetInfo() {
   })
 }
 
+// RS256 JWT学习相关API
+/**
+ * RS256登录
+ */
+export function rs256Login(data) {
+  return request({
+    url: '/jwt/algorithmConfusion/login',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 验证RS256 JWT
+ */
+export function verifyJwt(jwt) {
+  return request({
+    url: '/jwt/algorithmConfusion/verify',
+    method: 'get',
+    headers: {
+      'jwt': jwt
+    }
+  })
+}
+
+/**
+ * 获取用于算法混淆攻击的公钥
+ */
+export function getPublicKey() {
+  return request({
+    url: '/jwt/algorithmConfusion/public',
+    method: 'get'
+  })
+}
+
+/**
+ * 验证易受攻击的JWT
+ */
+export function verifyVulnerableJwt(jwt) {
+  return request({
+    url: '/jwt/algorithmConfusion/verifyVulnerable',
+    method: 'get',
+    headers: {
+      'jwt': jwt
+    }
+  })
+}
+
+/**
+ * 安全的JWT验证 - 修复算法混淆漏洞
+ */
+export function verifySecureJwt(jwt) {
+  return request({
+    url: '/jwt/algorithmConfusion/verifySecure',
+    method: 'get',
+    headers: {
+      'jwt': jwt
+    }
+  })
+}
+

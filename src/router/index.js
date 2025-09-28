@@ -237,6 +237,12 @@ export const constantRoutes = [
         name: 'JWT None算法漏洞',
         meta: { title: 'JWT None算法漏洞', icon: 'el-icon-s-check' }
       },
+      {
+        path: 'algorithmConfusion',
+        component: () => import('@/views/jwt/AlgorithmConfusion'),
+        name: 'JWT 算法混淆漏洞',
+        meta: { title: 'JWT 算法混淆漏洞', icon: 'el-icon-lock' }
+      },
     ]
   },
 
