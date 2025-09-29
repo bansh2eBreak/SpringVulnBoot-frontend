@@ -1,7 +1,7 @@
 <template>
   <div class="root-div">
     <div class="vuln-info">
-      <div class="header-div">Swagger未授权访问漏洞（Swagger UI Unauthorized Exposure）</div>
+      <div class="header-div">配置漏洞 -- Swagger未授权访问漏洞（Swagger UI Unauthorized Exposure）</div>
       <div class="body-div">
         <el-tabs v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="漏洞描述" name="first">

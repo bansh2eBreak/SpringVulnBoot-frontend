@@ -1,7 +1,7 @@
 <template>
   <div class="root-div">
     <div class="vuln-info">
-      <div class="header-div">Actuator端点暴露漏洞（Spring Boot Actuator Endpoint Exposure）</div>
+      <div class="header-div">配置漏洞 -- Actuator端点暴露漏洞（Spring Boot Actuator Endpoint Exposure）</div>
       <div class="body-div">
         <el-tabs v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="漏洞描述" name="first">

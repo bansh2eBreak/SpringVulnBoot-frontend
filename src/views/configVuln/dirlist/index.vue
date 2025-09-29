@@ -1,7 +1,7 @@
 <template>
   <div class="root-div">
     <div class="vuln-info">
-      <div class="header-div">列目录漏洞（Directory Listing Vulnerability）</div>
+      <div class="header-div">配置漏洞 -- 列目录漏洞（Directory Listing Vulnerability）</div>
       <div class="body-div">
         <el-tabs v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="漏洞描述" name="first">

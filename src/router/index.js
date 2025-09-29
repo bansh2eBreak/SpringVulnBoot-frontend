@@ -372,6 +372,31 @@ export const constantRoutes = [
   },
 
   {
+    path: '/otherVuln',
+    component: Layout,
+    redirect: '/otherVuln/redos',
+    name: 'otherVuln',
+    meta: {
+      title: '其他漏洞',
+      icon: 'el-icon-plus'
+    },
+    children: [
+      {
+        path: 'redos',
+        component: () => import('@/views/otherVuln/redos/index'),
+        name: '拒绝服务漏洞',
+        meta: { title: '拒绝服务漏洞', icon: 'el-icon-close' }
+      },
+      {
+        path: 'other',
+        component: () => import('@/views/otherVuln/redos/index'),
+        name: 'IP地址伪造',
+        meta: { title: 'IP地址伪造', icon: 'el-icon-close' }
+      }
+    ]
+  },
+
+  {
     path: 'external-link',
     component: Layout,
     children: [
