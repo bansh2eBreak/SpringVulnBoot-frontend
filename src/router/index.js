@@ -388,10 +388,10 @@ export const constantRoutes = [
         meta: { title: '拒绝服务漏洞', icon: 'el-icon-close' }
       },
       {
-        path: 'other',
-        component: () => import('@/views/otherVuln/redos/index'),
+        path: 'ipspoofing',
+        component: () => import('@/views/otherVuln/ipspoofing/index'),
         name: 'IP地址伪造',
-        meta: { title: 'IP地址伪造', icon: 'el-icon-close' }
+        meta: { title: 'IP地址伪造', icon: 'el-icon-connection' }
       }
     ]
   },
