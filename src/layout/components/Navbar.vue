@@ -21,12 +21,34 @@
           <a target="_blank" href="">
             <el-dropdown-item>Github</el-dropdown-item>
           </a>
+          <el-dropdown-item @click.native="showUpdatePasswordDialog">
+            <span style="display:block;">ResetPass</span>
+          </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">Log Out</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+
+    <!-- 修改密码对话框 -->
+    <el-dialog title="修改管理员密码" :visible.sync="updatePasswordDialogVisible" width="400px" class="center-dialog">
+      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordForm" label-width="100px">
+        <el-form-item label="新密码" prop="newPassword">
+          <el-input v-model="passwordForm.newPassword" type="password" placeholder="请输入新密码"></el-input>
+        </el-form-item>
+        <el-form-item label="确认新密码" prop="confirmPassword">
+          <el-input v-model="passwordForm.confirmPassword" type="password" placeholder="请再次输入新密码"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitPasswordChange">提交</el-button>
+          <el-button @click="cancelPasswordChange">取消</el-button>
+        </el-form-item>
+      </el-form>
+      <div v-if="passwordChangeResult" style="margin-top: 15px;">
+        <el-alert :title="passwordChangeResult" :type="passwordChangeResultType" show-icon></el-alert>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -34,11 +56,41 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import { changePassword } from '@/api/csrf'
 
 export default {
   components: {
     Breadcrumb,
     Hamburger
+  },
+  data() {
+    const validateConfirmPassword = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入新密码'))
+      } else if (value !== this.passwordForm.newPassword) {
+        callback(new Error('两次输入密码不一致!'))
+      } else {
+        callback()
+      }
+    }
+    return {
+      updatePasswordDialogVisible: false,
+      passwordForm: {
+        newPassword: '',
+        confirmPassword: ''
+      },
+      passwordRules: {
+        newPassword: [
+          { required: true, message: '请输入新密码', trigger: 'blur' },
+          { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+        ],
+        confirmPassword: [
+          { required: true, validator: validateConfirmPassword, trigger: 'blur' }
+        ]
+      },
+      passwordChangeResult: '',
+      passwordChangeResultType: 'success'
+    }
   },
   computed: {
     ...mapGetters([
@@ -57,6 +109,47 @@ export default {
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
+    showUpdatePasswordDialog() {
+      this.updatePasswordDialogVisible = true
+      this.passwordChangeResult = ''
+      this.passwordForm = {
+        newPassword: '',
+        confirmPassword: ''
+      }
+    },
+    submitPasswordChange() {
+      this.$refs.passwordForm.validate((valid) => {
+        if (valid) {
+          const data = {
+            newPassword: this.passwordForm.newPassword
+          }
+          changePassword(data)
+            .then(response => {
+              this.passwordChangeResult = '密码修改成功！请重新登录。'
+              this.passwordChangeResultType = 'success'
+              // 3秒后自动退出登录
+              setTimeout(() => {
+                this.updatePasswordDialogVisible = false
+                this.logout()
+              }, 3000)
+            })
+            .catch(error => {
+              this.passwordChangeResult = '密码修改失败：' + (error.message || '未知错误')
+              this.passwordChangeResultType = 'error'
+            })
+        } else {
+          return false
+        }
+      })
+    },
+    cancelPasswordChange() {
+      this.updatePasswordDialogVisible = false
+      this.passwordForm = {
+        newPassword: '',
+        confirmPassword: ''
+      }
+      this.passwordChangeResult = ''
     }
   }
 }
@@ -150,6 +243,20 @@ export default {
         }
       }
     }
+  }
+}
+
+.center-dialog {
+  ::v-deep .el-dialog {
+    margin-top: 10vh !important;
+  }
+  
+  ::v-deep .el-dialog__body {
+    padding: 20px 30px;
+  }
+  
+  ::v-deep .el-form-item {
+    margin-bottom: 20px;
   }
 }
 </style>

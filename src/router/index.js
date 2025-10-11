@@ -118,6 +118,19 @@ export const constantRoutes = [
   },
 
   {
+    path: '/csrf',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'csrf',
+        component: () => import('@/views/csrf/index'),
+        meta: { title: 'CSRF漏洞', icon: 'el-icon-s-claim' }
+      }
+    ]
+  },
+
+  {
     path: '/ssrf',
     component: Layout,
     children: [
