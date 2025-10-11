@@ -1,7 +1,7 @@
 <template>
   <div class="root-div">
     <div class="vuln-info">
-      <div class="header-div">SSRF服务器端请求伪造漏洞 -- Server-Side Request Forgery</div>
+      <div class="header-div">SSRF服务器端请求伪造漏洞</div>
       <div class="body-div">
         <el-tabs v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="漏洞描述" name="first">
