@@ -405,6 +405,12 @@ export const constantRoutes = [
         component: () => import('@/views/otherVuln/ipspoofing/index'),
         name: 'IP地址伪造',
         meta: { title: 'IP地址伪造', icon: 'el-icon-connection' }
+      },
+      {
+        path: 'spel',
+        component: () => import('@/views/spel/index'),
+        name: 'SpEL表达式注入',
+        meta: { title: 'SpEL表达式注入', icon: 'el-icon-s-operation' }
       }
     ]
   },
