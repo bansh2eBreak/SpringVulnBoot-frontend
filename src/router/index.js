@@ -299,6 +299,25 @@ export const constantRoutes = [
   },
 
   {
+    path: '/xml',
+    component: Layout,
+    redirect: '/xml/xxe',
+    name: 'xmlVuln',
+    meta: {
+      title: 'XML安全漏洞',
+      icon: 'el-icon-document'
+    },
+    children: [
+      {
+        path: 'xxe',
+        component: () => import('@/views/xml/xxe/index'),
+        name: 'XML外部实体注入',
+        meta: { title: 'XML外部实体注入', icon: 'el-icon-warning' }
+      }
+    ]
+  },
+
+  {
     path: '/components',
     component: Layout,
     redirect: '/components/fastjson',
