@@ -180,3 +180,28 @@ export function xsltSecure(data) {
   })
 }
 
+// ==================== XPath注入漏洞 ====================
+
+/**
+ * XPath注入 - 登录验证漏洞接口
+ */
+export function xpathLoginVulnerable(data) {
+  return request({
+    url: '/xml/xpath/login/vuln',
+    method: 'post',
+    data: data
+  })
+}
+
+/**
+ * XPath注入 - 登录验证安全接口
+ */
+export function xpathLoginSecure(data) {
+  return request({
+    url: '/xml/xpath/login/sec',
+    method: 'post',
+    data: data
+  })
+}
+
+

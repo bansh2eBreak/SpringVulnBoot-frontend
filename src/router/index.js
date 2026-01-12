@@ -313,6 +313,12 @@ export const constantRoutes = [
         component: () => import('@/views/xml/xxe/index'),
         name: 'XML外部实体注入',
         meta: { title: 'XML外部实体注入', icon: 'el-icon-warning' }
+      },
+      {
+        path: 'xpath',
+        component: () => import('@/views/xml/xpath/index'),
+        name: 'XPath注入',
+        meta: { title: 'XPath注入', icon: 'el-icon-connection' }
       }
     ]
   },
