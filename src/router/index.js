@@ -319,6 +319,12 @@ export const constantRoutes = [
         component: () => import('@/views/xml/xpath/index'),
         name: 'XPath注入',
         meta: { title: 'XPath注入', icon: 'el-icon-connection' }
+      },
+      {
+        path: 'bomb',
+        component: () => import('@/views/xml/bomb/index'),
+        name: 'XML炸弹',
+        meta: { title: 'XML炸弹', icon: 'el-icon-warning-outline' }
       }
     ]
   },

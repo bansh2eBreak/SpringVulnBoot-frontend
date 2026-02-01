@@ -204,4 +204,34 @@ export function xpathLoginSecure(data) {
   })
 }
 
+// ==================== XML 炸弹漏洞 ====================
+
+/**
+ * XML 炸弹 - 漏洞接口（默认配置，允许实体扩展）
+ */
+export function xmlBombVulnerable(data) {
+  return request({
+    url: '/xml/bomb/vuln',
+    method: 'post',
+    data: data,
+    headers: {
+      'Content-Type': 'application/xml'
+    }
+  })
+}
+
+/**
+ * XML 炸弹 - 安全接口（禁用 DTD）
+ */
+export function xmlBombSecure(data) {
+  return request({
+    url: '/xml/bomb/sec',
+    method: 'post',
+    data: data,
+    headers: {
+      'Content-Type': 'application/xml'
+    }
+  })
+}
+
 
