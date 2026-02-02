@@ -325,6 +325,18 @@ export const constantRoutes = [
         component: () => import('@/views/xml/bomb/index'),
         name: 'XML炸弹',
         meta: { title: 'XML炸弹', icon: 'el-icon-warning-outline' }
+      },
+      {
+        path: 'xxe-ssrf',
+        component: () => import('@/views/xml/xxe-ssrf/index'),
+        name: 'SSRF via XXE',
+        meta: { title: 'SSRF via XXE', icon: 'el-icon-connection' }
+      },
+      {
+        path: 'xinclude',
+        component: () => import('@/views/xml/xinclude/index'),
+        name: 'XInclude注入',
+        meta: { title: 'XInclude注入', icon: 'el-icon-document' }
       }
     ]
   },

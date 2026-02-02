@@ -234,4 +234,64 @@ export function xmlBombSecure(data) {
   })
 }
 
+// ==================== SSRF via XXE ====================
+
+/**
+ * SSRF via XXE - 漏洞接口（默认配置允许外部实体）
+ */
+export function xxeSsrfVulnerable(data) {
+  return request({
+    url: '/xml/xxe-ssrf/vuln',
+    method: 'post',
+    data: data,
+    headers: {
+      'Content-Type': 'application/xml'
+    }
+  })
+}
+
+/**
+ * SSRF via XXE - 安全接口（禁用 DTD 与外部实体）
+ */
+export function xxeSsrfSecure(data) {
+  return request({
+    url: '/xml/xxe-ssrf/sec',
+    method: 'post',
+    data: data,
+    headers: {
+      'Content-Type': 'application/xml'
+    }
+  })
+}
+
+// ==================== XInclude 注入 ====================
+
+/**
+ * XInclude 注入 - 漏洞接口（开启 XInclude）
+ */
+export function xincludeVulnerable(data) {
+  return request({
+    url: '/xml/xinclude/vuln',
+    method: 'post',
+    data: data,
+    headers: {
+      'Content-Type': 'application/xml'
+    }
+  })
+}
+
+/**
+ * XInclude 注入 - 安全接口（关闭 XInclude 与 DTD）
+ */
+export function xincludeSecure(data) {
+  return request({
+    url: '/xml/xinclude/sec',
+    method: 'post',
+    data: data,
+    headers: {
+      'Content-Type': 'application/xml'
+    }
+  })
+}
+
 
