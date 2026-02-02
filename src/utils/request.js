@@ -20,7 +20,9 @@ service.interceptors.request.use(
       // please modify it according to the actual situation
       // config.headers['Authorization'] = getToken()
       config.headers['Authorization'] = localStorage.getItem('Authorization')
-      Credential: 'include'
+      // Credential: 'include'  // ❌ 已注释：这是语法错误（标签语句），不起作用
+      // ✅ 正确方式：withCredentials 已在创建 axios 实例时设置（第9行），无需重复设置
+      // 如果需要在特定请求中覆盖，使用：config.withCredentials = true
     }
     
     // 检查是否是JWT相关的请求，如果是则使用jwt token
