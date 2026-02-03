@@ -286,6 +286,19 @@ export const constantRoutes = [
   },
 
   {
+    path: '/fileInclusion',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'FileInclusion',
+        component: () => import('@/views/file-inclusion/index'),
+        meta: { title: '文件包含漏洞', icon: 'el-icon-document-copy' }
+      }
+    ]
+  },
+
+  {
     path: '/deserialize',
     component: Layout,
     children: [
