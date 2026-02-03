@@ -75,25 +75,32 @@ public void groovyIncludeVuln(
     HttpServletRequest request,
     HttpServletResponse response) throws IOException {
     
+    // 设置字符编码
+    response.setContentType("text/html;charset=UTF-8");
     PrintWriter out = response.getWriter();
     
-    // 漏洞：直接执行用户上传的Groovy脚本
-    String scriptPath = UPLOAD_DIR + file;
-    File scriptFile = new File(scriptPath);
-    
-    // 读取脚本内容
-    String scriptContent = Files.readString(scriptFile.toPath());
-    
-    // ⚠️ 危险！直接执行（类似 PHP include）
-    GroovyShell shell = new GroovyShell();
-    
-    // 将request、response、out绑定到脚本环境
-    shell.setVariable("request", request);
-    shell.setVariable("response", response);
-    shell.setVariable("out", out);
-    
-    // 执行脚本 - 相当于 PHP 的 include($file);
-    Object result = shell.evaluate(scriptContent);
+    try {
+        // 漏洞：直接执行用户上传的Groovy脚本
+        String scriptPath = UPLOAD_DIR + file;
+        File scriptFile = new File(scriptPath);
+        
+        // 读取脚本内容
+        String scriptContent = Files.readString(scriptFile.toPath());
+        
+        // ⚠️ 危险！直接执行（类似 PHP include）
+        GroovyShell shell = new GroovyShell();
+        
+        // 将request、response、out绑定到脚本环境
+        shell.setVariable("request", request);
+        shell.setVariable("response", response);
+        shell.setVariable("out", out);
+        
+        // 执行脚本 - 相当于 PHP 的 include($file);
+        Object result = shell.evaluate(scriptContent);
+        
+    } catch (Exception e) {
+        out.println("❌ 脚本执行失败: " + e.getMessage());
+    }
 }</code></pre>
                     </div>
                 </el-col>
@@ -104,60 +111,48 @@ public void groovyIncludeVuln(
                                 type="success" round size="mini"
                                 @click="fetchDataAndFillTable2">去测试</el-button></el-row>
                         <pre v-highlightjs><code class="java">@GetMapping("/groovy/sec")
-public Result groovyIncludeSecure(@RequestParam String file) {
-    // 防御1: 白名单验证
-    Set&lt;String&gt; allowedScripts = Set.of(
-        "utils.groovy",
-        "helpers.groovy",
-        "validators.groovy"
-    );
+public void groovyIncludeSecure(
+    @RequestParam String file,
+    HttpServletRequest request,
+    HttpServletResponse response) throws IOException {
     
-    if (!allowedScripts.contains(file)) {
-        log.warn("⚠️ 拒绝执行非白名单脚本: {}", file);
-        return Result.error("非法脚本名称: " + file);
+    response.setContentType("text/html;charset=UTF-8");
+    PrintWriter out = response.getWriter();
+    
+    try {
+        // 防御1: 白名单验证
+        Set&lt;String&gt; allowedScripts = Set.of(
+            "utils.groovy", "helpers.groovy", "validators.groovy"
+        );
+        
+        if (!allowedScripts.contains(file)) {
+            out.println("❌ 拒绝执行非白名单脚本！");
+            return; // ⚠️ 拦截恶意脚本
+        }
+        
+        // 防御2: 禁止路径遍历
+        if (file.contains("..") || file.contains("/") || file.contains("\\")) {
+            out.println("❌ 检测到路径遍历攻击！");
+            return;
+        }
+        
+        // 防御3: 从固定目录读取（攻击者无法上传到这里）
+        String scriptPath = SAFE_SCRIPTS_DIR + file; // /app/file/
+        String scriptContent = Files.readString(Paths.get(scriptPath));
+        
+        // 防御4: 使用 Groovy 沙箱环境
+        GroovyShell shell = new GroovyShell();
+        shell.setVariable("request", request);
+        shell.setVariable("response", response);
+        shell.setVariable("out", out);
+        
+        // ✅ 只有白名单脚本能执行
+        shell.evaluate(scriptContent);
+        
+    } catch (Exception e) {
+        out.println("❌ 脚本执行失败: " + e.getMessage());
     }
-    
-    // 防御2: 禁止路径遍历
-    if (file.contains("..") || file.contains("/") || file.contains("\\")) {
-        return Result.error("检测到路径遍历攻击");
-    }
-    
-    // 防御3: 使用沙箱环境执行
-    // 实际应使用 SecureASTCustomizer 限制脚本权限
-    
-    return Result.success("安全执行");
 }</code></pre>
-                    </div>
-                </el-col>
-            </el-row>
-            
-            <el-row :gutter="20" class="grid-flex">
-                <el-col :span="12"></el-col>
-                <el-col :span="12">
-                    <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">安全代码-其他</el-row>
-                        <pre v-highlightjs><code class="java">文件包含漏洞其他加固方案：
-
-1）文件上传限制：
-   - 禁止上传 .groovy、.jsp、.php 等可执行脚本文件
-   - 使用文件类型白名单（只允许图片、文档等）
-   - 验证文件内容（检查Magic Number）
-
-2）路径安全：
-   - 使用绝对路径，避免相对路径遍历
-   - 禁止 .. 和 / 等路径符号
-   - 文件名使用随机字符串重命名
-   
-3）执行环境隔离：
-   - 使用沙箱环境（SecureASTCustomizer）
-   - 禁用危险类和方法（Runtime.exec等）
-   - 限制脚本可访问的资源
-
-4）其他建议：
-   - 最小权限原则（非root用户运行）
-   - 禁止上传目录执行权限
-   - 使用对象存储（OSS）存储上传文件
-   - 记录所有文件操作日志</code></pre>
                     </div>
                 </el-col>
             </el-row>
@@ -281,39 +276,92 @@ public Result groovyIncludeSecure(@RequestParam String file) {
         </el-dialog>
 
         <!-- 打开嵌套表格的对话框2 - 安全测试 -->
-        <el-dialog :visible.sync="dialogFormVisible2" width="700px" :show-close="true">
+        <el-dialog :visible.sync="dialogFormVisible2" width="900px" :show-close="true">
             <div slot="title" style="text-align: center; font-size: 18px;">
-                安全版本测试 - 白名单验证
+                安全版本测试 - 白名单验证（完整攻击流程演示）
             </div>
             <div class="test-container">
                 <!-- 说明 -->
                 <div style="text-align: left; color: green; font-style: italic; margin-bottom: 20px; padding: 15px; background-color: #f0f9ff; border-radius: 4px; border: 1px solid #b3d8ff;">
-                    <strong>安全机制：</strong><br>
-                    使用白名单验证，只允许包含预定义的安全文件。<br>
-                    <strong>白名单：</strong>
-                    <span style="color: #67c23a; font-weight: bold;">utils.groovy, helpers.groovy, validators.groovy</span>
+                    <strong>🔒 三层安全机制：</strong><br>
+                    1️⃣ <strong>白名单验证：</strong>只允许执行预定义的脚本名称<br>
+                    2️⃣ <strong>固定目录：</strong>从 <code>/app/file/</code> 根目录读取白名单脚本，不是用户上传目录<br>
+                    3️⃣ <strong>权限隔离：</strong>攻击者只能写 <code>/app/file/upload/</code>，无法写 <code>/app/file/</code> 根目录<br><br>
+                    <strong>白名单脚本：</strong>
+                    <span style="color: #67c23a; font-weight: bold;">utils.groovy, helpers.groovy, validators.groovy</span><br>
+                    <span style="color: #666; font-size: 12px;">（位于 /app/file/*.groovy，攻击者不可写）</span>
                 </div>
 
-                <!-- 测试区域 -->
+                <!-- 1. 下载 Webshell -->
                 <div class="test-section">
-                    <h3>测试文件包含</h3>
-                    <p style="margin-bottom: 15px; color: #606266;">输入文件名，观察安全机制如何阻止非白名单文件的包含：</p>
-                    <el-input 
-                        v-model="secureScript" 
-                        placeholder="例如: shell.groovy" 
-                        style="width: 400px; margin-right: 10px;">
-                    </el-input>
-                    <el-button type="primary" @click="testSecureInclude" :disabled="!secureScript">
-                        测试
+                    <h3>1. 下载示例 Webshell 文件</h3>
+                    <el-button type="primary" @click="downloadExampleFileSecure('basic')">
+                        下载 shell.groovy
                     </el-button>
-                    
-                    <div v-if="secureMessage.text" style="margin-top: 15px;">
-                        <el-alert 
-                            :title="secureMessage.text" 
-                            :type="secureMessage.type" 
-                            :closable="false"
-                            show-icon>
-                        </el-alert>
+                    <div v-if="downloadMessageSecure.text" class="result-box" :style="{ color: downloadMessageSecure.type === 'success' ? '#67c23a' : '#f56c6c' }">
+                        {{ downloadMessageSecure.text }}
+                    </div>
+                </div>
+
+                <!-- 2. 上传 Webshell -->
+                <div class="test-section">
+                    <h3>2. 上传 Webshell 文件（攻击者尝试）</h3>
+                    <input type="file" @change="onFileChangeSecure" accept=".groovy" style="margin-right: 10px;" />
+                    <el-button type="primary" @click="uploadFileSecure">上传</el-button>
+                    <div v-if="uploadMessageSecure.text" class="result-box" :style="{ color: uploadMessageSecure.type === 'success' ? '#67c23a' : '#f56c6c' }">
+                        {{ uploadMessageSecure.text }}
+                    </div>
+                </div>
+
+                <!-- 3. 触发文件包含（被拦截） -->
+                <div class="test-section">
+                    <h3>3. 触发文件包含（尝试执行上传的脚本）</h3>
+                    <p style="margin-bottom: 10px; color: #606266; font-size: 13px;">
+                        攻击者尝试执行刚才上传的 <code>shell.groovy</code>，看看会发生什么...
+                    </p>
+                    <el-input 
+                        v-model="secureIncludeFilename" 
+                        placeholder="shell.groovy" 
+                        style="width: 300px; margin-right: 10px;">
+                    </el-input>
+                    <el-button type="danger" @click="testSecureIncludeAttack">
+                        尝试触发包含（模拟攻击）
+                    </el-button>
+                    <div v-if="includeMessageSecure.text" class="result-box" :style="{ color: includeMessageSecure.type === 'success' ? '#67c23a' : '#f56c6c' }">
+                        {{ includeMessageSecure.text }}
+                    </div>
+                    <div v-if="secureAttackResult" class="result-box">
+                        <iframe
+                            :srcdoc="secureAttackResult"
+                            style="width: 100%; min-height: 250px; border: 1px solid #dcdfe6; border-radius: 4px; background-color: #fff;"
+                            sandbox="allow-same-origin allow-forms allow-top-navigation-by-user-activation">
+                        </iframe>
+                    </div>
+                </div>
+
+                <!-- 4. 测试白名单脚本 -->
+                <div class="test-section">
+                    <h3>4. 测试白名单脚本（正确使用方式）</h3>
+                    <p style="margin-bottom: 10px; color: #606266; font-size: 13px;">
+                        输入 <code>utils.groovy</code> 查看白名单脚本的正确执行（从 /app/file/ 读取）
+                    </p>
+                    <el-input 
+                        v-model="secureWhitelistScript" 
+                        placeholder="utils.groovy" 
+                        style="width: 300px; margin-right: 10px;">
+                    </el-input>
+                    <el-button type="success" @click="testSecureWhitelist">
+                        测试白名单脚本
+                    </el-button>
+                    <div v-if="whitelistMessageSecure.text" class="result-box" :style="{ color: whitelistMessageSecure.type === 'success' ? '#67c23a' : '#f56c6c' }">
+                        {{ whitelistMessageSecure.text }}
+                    </div>
+                    <div v-if="secureWhitelistResult" class="result-box">
+                        <iframe
+                            :srcdoc="secureWhitelistResult"
+                            style="width: 100%; min-height: 300px; border: 1px solid #dcdfe6; border-radius: 4px; background-color: #fff;"
+                            sandbox="allow-same-origin allow-forms allow-top-navigation-by-user-activation">
+                        </iframe>
                     </div>
                 </div>
             </div>
@@ -350,9 +398,16 @@ export default {
             shellCommand: 'whoami',
             executionResult: '',
             
-            // 安全测试相关
-            secureScript: 'shell.groovy',
-            secureMessage: { text: '', type: 'success' }
+            // 安全测试相关 - 独立的文件和消息
+            selectedFileSecure: null,
+            downloadMessageSecure: { text: '', type: 'success' },
+            uploadMessageSecure: { text: '', type: 'success' },
+            includeMessageSecure: { text: '', type: 'success' },
+            whitelistMessageSecure: { text: '', type: 'success' },
+            secureIncludeFilename: 'shell.groovy',
+            secureWhitelistScript: 'utils.groovy',
+            secureAttackResult: '',
+            secureWhitelistResult: ''
         };
     },
     methods: {
@@ -374,7 +429,13 @@ export default {
         // 显示安全测试对话框
         fetchDataAndFillTable2() {
             this.dialogFormVisible2 = true;
-            this.secureMessage = { text: '', type: 'success' };
+            // 清空所有安全测试消息
+            this.downloadMessageSecure = { text: '', type: 'success' };
+            this.uploadMessageSecure = { text: '', type: 'success' };
+            this.includeMessageSecure = { text: '', type: 'success' };
+            this.whitelistMessageSecure = { text: '', type: 'success' };
+            this.secureAttackResult = '';
+            this.secureWhitelistResult = '';
         },
         
         // 下载示例文件
@@ -459,25 +520,99 @@ export default {
             }
         },
         
-        // 测试安全版本
-        async testSecureInclude() {
-            if (!this.secureScript) {
-                this.secureMessage = { text: '请输入脚本名称', type: 'error' };
+        // ========== 安全版本独立方法 ==========
+        
+        // 下载示例文件（安全版本）
+        downloadExampleFileSecure(type) {
+            downloadExample(type);
+            this.downloadMessageSecure = { text: '示例文件下载成功', type: 'success' };
+        },
+        
+        // 文件选择（安全版本）
+        onFileChangeSecure(event) {
+            this.selectedFileSecure = event.target.files[0];
+        },
+        
+        // 上传文件（安全版本）
+        async uploadFileSecure() {
+            if (!this.selectedFileSecure) {
+                this.uploadMessageSecure = { text: '请选择要上传的文件', type: 'error' };
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', this.selectedFileSecure);
+
+            try {
+                const response = await uploadScript(formData);
+                if (response.code === 0) {
+                    this.uploadMessageSecure = { text: `上传成功: ${response.data.filename}`, type: 'success' };
+                    this.secureIncludeFilename = response.data.filename;
+                } else {
+                    this.uploadMessageSecure = { text: `上传失败: ${response.msg}`, type: 'error' };
+                }
+            } catch (error) {
+                this.uploadMessageSecure = { text: '文件上传时发生错误: ' + error.message, type: 'error' };
+            }
+        },
+        
+        // 测试安全接口 - 模拟攻击（会被拦截）
+        async testSecureIncludeAttack() {
+            if (!this.secureIncludeFilename) {
+                this.includeMessageSecure = { text: '请输入文件名', type: 'error' };
                 return;
             }
 
             try {
+                this.includeMessageSecure = { text: '正在尝试触发文件包含...', type: 'success' };
+                
                 const response = await groovyIncludeSecure({
-                    file: this.secureScript
+                    file: this.secureIncludeFilename
                 });
 
-                if (response.code === 0) {
-                    this.secureMessage = { text: '验证通过：脚本在白名单中', type: 'success' };
+                const html = await response.text();
+                this.secureAttackResult = html;
+                
+                // 判断是否被拦截
+                if (html.includes('拒绝执行') || html.includes('安全防护')) {
+                    this.includeMessageSecure = { text: '✅ 攻击被成功拦截！（非白名单脚本）', type: 'success' };
                 } else {
-                    this.secureMessage = { text: `验证失败：${response.msg || response.data}`, type: 'error' };
+                    this.includeMessageSecure = { text: '触发完成', type: 'success' };
                 }
+
             } catch (error) {
-                this.secureMessage = { text: '测试失败: ' + error.message, type: 'error' };
+                this.includeMessageSecure = { text: '请求失败: ' + error.message, type: 'error' };
+            }
+        },
+        
+        // 测试白名单脚本（正确使用）
+        async testSecureWhitelist() {
+            if (!this.secureWhitelistScript) {
+                this.whitelistMessageSecure = { text: '请输入脚本名称', type: 'error' };
+                return;
+            }
+
+            try {
+                this.whitelistMessageSecure = { text: '正在执行白名单脚本...', type: 'success' };
+                
+                const response = await groovyIncludeSecure({
+                    file: this.secureWhitelistScript
+                });
+
+                const html = await response.text();
+                this.secureWhitelistResult = html;
+                
+                // 判断执行结果
+                if (html.includes('安全脚本执行成功') || html.includes('✅')) {
+                    this.whitelistMessageSecure = { text: '✅ 白名单脚本执行成功（从 /app/file/ 读取）', type: 'success' };
+                } else if (html.includes('拒绝执行') || html.includes('安全防护')) {
+                    this.whitelistMessageSecure = { text: '❌ 脚本被拦截（非白名单）', type: 'error' };
+                } else {
+                    this.whitelistMessageSecure = { text: '执行完成', type: 'success' };
+                }
+
+            } catch (error) {
+                this.whitelistMessageSecure = { text: '请求失败: ' + error.message, type: 'error' };
             }
         }
     }

@@ -32,12 +32,17 @@ export function groovyIncludeVuln(params) {
 
 /**
  * Groovy 脚本安全执行（安全版本）
+ * 注意：这个接口返回HTML，不是JSON
  */
 export function groovyIncludeSecure(params) {
-  return request({
-    url: '/fileInclusion/groovy/sec',
-    method: 'get',
-    params
+  // 去除可能的双斜杠问题
+  const baseUrl = process.env.VUE_APP_BASE_API.replace(/\/$/, '')
+  const url = `/fileInclusion/groovy/sec?file=${encodeURIComponent(params.file)}`
+  const cmdParam = params.cmd ? `&cmd=${encodeURIComponent(params.cmd)}` : ''
+  
+  return fetch(baseUrl + url + cmdParam, {
+    method: 'GET',
+    credentials: 'include'
   })
 }
 
