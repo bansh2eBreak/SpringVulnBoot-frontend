@@ -370,7 +370,7 @@ export default {
                 const response = await changePasswordVuln({
                     targetUserId: this.mfaBypassForm.targetUserId,
                     newPassword: this.mfaBypassForm.newPassword,
-                    mfaCode: this.mfaBypassForm.mfaCode || 123456 // 漏洞场景：即使提供错误的MFA验证码也能成功
+                    mfaCode: this.mfaBypassForm.mfaCode // 漏洞场景：即使不提供MFA验证码也能成功
                 });
 
                 if (response.code === 0) {
