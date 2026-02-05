@@ -20,22 +20,31 @@ router.beforeEach(async(to, from, next) => {
   // determine whether the user has logged in
   const hasToken = getToken()
 
-  if (hasToken) { // hasToken 是 jwttoken
+  if (hasToken) {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })
       NProgress.done()
     } else {
-      const hasGetUserInfo = store.getters.name //store.getters.name 没有值
-      if (hasGetUserInfo) {
+      // 判断是否已获取用户角色
+      const hasRoles = store.getters.roles && store.getters.roles.length > 0
+      
+      if (hasRoles) {
         next()
       } else {
         try {
-          console.log('555555')
-          // get user info
-          await store.dispatch('user/getInfo')
+          // 获取用户信息（包含roles）
+          const { roles } = await store.dispatch('user/getInfo')
 
-          next()
+          // 根据角色生成可访问的路由
+          const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+
+          // 动态添加可访问路由
+          router.addRoutes(accessRoutes)
+
+          // hack方法 确保addRoutes已完成
+          // set the replace: true, so the navigation will not leave a history record
+          next({ ...to, replace: true })
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')

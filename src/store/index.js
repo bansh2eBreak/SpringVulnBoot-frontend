@@ -6,6 +6,7 @@ import settings from './modules/settings'
 import user from './modules/user'
 import shiro from './modules/shiro'
 import jwt from './modules/jwt'
+import permission from './modules/permission'
 
 Vue.use(Vuex)
 
@@ -15,7 +16,8 @@ const store = new Vuex.Store({
     settings,
     user,
     shiro,
-    jwt
+    jwt,
+    permission
   },
   getters
 })

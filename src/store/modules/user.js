@@ -7,7 +7,8 @@ const getDefaultState = () => {
     token: getToken(),
     name: '',
     avatar: '',
-    username: ''
+    username: '',
+    roles: []  // 新增：用户角色数组
   }
 }
 
@@ -28,6 +29,9 @@ const mutations = {
   },
   SET_USERNAME: (state, username) => {
     state.username = username
+  },
+  SET_ROLES: (state, roles) => {
+    state.roles = roles
   }
 }
 
@@ -50,21 +54,27 @@ const actions = {
 
   // get user info
   getInfo({ commit, state }) {
-    console.log('444444') //流程走到这里
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
-        console.log("---------" +response.data.avatar)
         const { data } = response
 
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar, username } = data
+        const { name, avatar, username, roles } = data
 
+        // roles必须是一个非空数组
+        if (!roles || roles.length <= 0) {
+          reject('getInfo: roles must be a non-null array!')
+          return
+        }
+
+        commit('SET_ROLES', roles)
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         commit('SET_USERNAME', username)
+        
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -78,6 +88,10 @@ const actions = {
       logout(state.token).then(() => {
         removeToken() // must remove  token  first
         resetRouter()
+        
+        // 重置访问的路由
+        commit('permission/SET_ROUTES', [], { root: true })
+        
         commit('RESET_STATE')
         resolve()
       }).catch(error => {
