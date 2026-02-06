@@ -129,6 +129,19 @@ export const constantRoutes = [
         meta: { title: '任意命令执行', icon: 'el-icon-s-tools' }
       }
     ]
+  },
+
+  {
+    path: '/mass-assignment',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'MassAssignment',
+        component: () => import('@/views/massAssignment/index'),
+        meta: { title: '批量赋值漏洞', icon: 'el-icon-edit-outline' }
+      }
+    ]
   }
 ]
 
