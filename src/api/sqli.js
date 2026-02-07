@@ -114,3 +114,71 @@ export function getUserByUsernameTimeSafe(params) {
     params: params
   })
 }
+
+// UNION联合注入相关接口 - JDBC版本
+export function getArticleVulnJdbc(params) {
+  return request({
+    url: '/sqli/union/getArticleVuln',
+    method: 'get',
+    params: params
+  })
+}
+
+export function getArticleSecJdbc(params) {
+  return request({
+    url: '/sqli/union/getArticleSec',
+    method: 'get',
+    params: params
+  })
+}
+
+// UNION联合注入相关接口 - MyBatis版本
+export function getArticleVulnMybatis(params) {
+  return request({
+    url: '/sqli/union/mybatis/getArticleVuln',
+    method: 'get',
+    params: params
+  })
+}
+
+export function getArticleSecMybatis(params) {
+  return request({
+    url: '/sqli/union/mybatis/getArticleSec',
+    method: 'get',
+    params: params
+  })
+}
+
+// 布尔盲注相关接口 - JDBC版本
+export function checkUserExistsVulnJdbc(params) {
+  return request({
+    url: '/sqli/boolean/jdbc/checkUserExistsVuln',
+    method: 'get',
+    params: params
+  })
+}
+
+export function checkUserExistsSecJdbc(params) {
+  return request({
+    url: '/sqli/boolean/jdbc/checkUserExistsSec',
+    method: 'get',
+    params: params
+  })
+}
+
+// 布尔盲注相关接口 - MyBatis版本
+export function checkUserExistsVulnMybatis(params) {
+  return request({
+    url: '/sqli/boolean/mybatis/checkUserExistsVuln',
+    method: 'get',
+    params: params
+  })
+}
+
+export function checkUserExistsSecMybatis(params) {
+  return request({
+    url: '/sqli/boolean/mybatis/checkUserExistsSec',
+    method: 'get',
+    params: params
+  })
+}

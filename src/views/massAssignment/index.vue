@@ -314,7 +314,7 @@ public Result updateProfileSec(@RequestBody UpdateAvatarDTO dto,
 </template>
 
 <script>
-import request from '@/utils/request'
+import { updateProfileVuln, updateProfileSec } from '@/api/massAssignment'
 
 export default {
   name: 'MassAssignment',
@@ -362,11 +362,7 @@ export default {
         payload.role = this.vulnForm.role
       }
 
-      request({
-        url: '/massAssignment/updateProfileVuln',
-        method: 'post',
-        data: payload
-      }).then(res => {
+      updateProfileVuln(payload).then(res => {
         if (res.code === 0) {
           // 获取返回的用户数据
           const userData = res.data
@@ -412,11 +408,7 @@ export default {
         payload.role = this.secForm.role
       }
       
-      request({
-        url: '/massAssignment/updateProfileSec',
-        method: 'post',
-        data: payload
-      }).then(res => {
+      updateProfileSec(payload).then(res => {
         if (res.code === 0) {
           // 获取返回的用户数据
           const userData = res.data

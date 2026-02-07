@@ -92,6 +92,12 @@ export const constantRoutes = [
         name: '布尔盲注',
         component: () => import('@/views/sqli/BooleanBlind'),
         meta: { title: '布尔盲注', icon: 'el-icon-view' }
+      },
+      {
+        path: 'unionInjection',
+        name: 'UNION联合注入',
+        component: () => import('@/views/sqli/UnionInjection'),
+        meta: { title: 'UNION联合注入', icon: 'el-icon-files' }
       }
     ]
   },

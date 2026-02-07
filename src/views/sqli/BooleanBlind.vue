@@ -516,7 +516,12 @@ public Result checkUserExistsSec(String username) {
 </template>
 
 <script>
-import request from '@/utils/request';
+import { 
+  checkUserExistsVulnJdbc, 
+  checkUserExistsSecJdbc,
+  checkUserExistsVulnMybatis,
+  checkUserExistsSecMybatis
+} from '@/api/sqli';
 
 export default {
     data() {
@@ -591,11 +596,7 @@ export default {
 
             this.vulnChecking = true;
             try {
-                const res = await request({
-                    url: '/sqli/boolean/jdbc/checkUserExistsVuln',
-                    method: 'get',
-                    params: { username: this.vulnForm.username }
-                });
+                const res = await checkUserExistsVulnJdbc({ username: this.vulnForm.username });
 
                 if (res.code === 0) {
                     this.vulnResult = {
@@ -622,11 +623,7 @@ export default {
 
             this.secChecking = true;
             try {
-                const res = await request({
-                    url: '/sqli/boolean/jdbc/checkUserExistsSec',
-                    method: 'get',
-                    params: { username: this.secForm.username }
-                });
+                const res = await checkUserExistsSecJdbc({ username: this.secForm.username });
 
                 if (res.code === 0) {
                     this.secResult = {
@@ -689,11 +686,7 @@ export default {
 
             this.vulnCheckingMybatis = true;
             try {
-                const res = await request({
-                    url: '/sqli/boolean/mybatis/checkUserExistsVuln',
-                    method: 'get',
-                    params: { username: this.vulnFormMybatis.username }
-                });
+                const res = await checkUserExistsVulnMybatis({ username: this.vulnFormMybatis.username });
 
                 if (res.code === 0) {
                     this.vulnResultMybatis = {
@@ -720,11 +713,7 @@ export default {
 
             this.secCheckingMybatis = true;
             try {
-                const res = await request({
-                    url: '/sqli/boolean/mybatis/checkUserExistsSec',
-                    method: 'get',
-                    params: { username: this.secFormMybatis.username }
-                });
+                const res = await checkUserExistsSecMybatis({ username: this.secFormMybatis.username });
 
                 if (res.code === 0) {
                     this.secResultMybatis = {
