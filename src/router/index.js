@@ -86,6 +86,12 @@ export const constantRoutes = [
         name: '时间盲注',
         component: () => import('@/views/sqli/TimeBased'),
         meta: { title: '时间盲注', icon: 'el-icon-time' }
+      },
+      {
+        path: 'booleanBlind',
+        name: '布尔盲注',
+        component: () => import('@/views/sqli/BooleanBlind'),
+        meta: { title: '布尔盲注', icon: 'el-icon-view' }
       }
     ]
   },
