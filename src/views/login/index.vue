@@ -138,6 +138,7 @@ $cursor: #fff;
     input {
       background: transparent;
       border: 0px;
+      appearance: none;
       -webkit-appearance: none;
       border-radius: 0px;
       padding: 12px 5px 12px 15px;
