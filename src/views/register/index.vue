@@ -1,17 +1,17 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on"
+    <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="login-form" auto-complete="on"
       label-position="left">
 
       <div class="title-container">
-        <h3 class="title">系统登录</h3>
+        <h3 class="title">用户注册</h3>
       </div>
 
       <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
-        <el-input ref="username" v-model="loginForm.username" placeholder="用户名" name="username" type="text"
+        <el-input ref="username" v-model="registerForm.username" placeholder="用户名" name="username" type="text"
           tabindex="1" auto-complete="on" />
       </el-form-item>
 
@@ -19,37 +19,45 @@
         <span class="svg-container">
           <svg-icon icon-class="password" />
         </span>
-        <el-input :key="passwordType" ref="password" v-model="loginForm.password" :type="passwordType"
-          placeholder="密码" name="password" tabindex="2" auto-complete="on" @keyup.enter.native="handleLogin" />
+        <el-input :key="passwordType" ref="password" v-model="registerForm.password" :type="passwordType"
+          placeholder="密码（至少6位）" name="password" tabindex="2" auto-complete="on" />
         <span class="show-pwd" @click="showPwd">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
 
+      <el-form-item prop="confirmPassword">
+        <span class="svg-container">
+          <svg-icon icon-class="password" />
+        </span>
+        <el-input :key="confirmPasswordType" ref="confirmPassword" v-model="registerForm.confirmPassword" 
+          :type="confirmPasswordType" placeholder="确认密码" name="confirmPassword" tabindex="3" 
+          auto-complete="on" @keyup.enter.native="handleRegister" />
+        <span class="show-pwd" @click="showConfirmPwd">
+          <svg-icon :icon-class="confirmPasswordType === 'password' ? 'eye' : 'eye-open'" />
+        </span>
+      </el-form-item>
+
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:10px;"
-        @click.native.prevent="handleLogin">Login</el-button>
+        @click.native.prevent="handleRegister">注册</el-button>
+
+      <div style="text-align: center; margin-bottom: 25px;">
+        <span style="color: #909399; font-size: 14px;">已有账号？</span>
+        <el-button type="text" @click="goToLogin" style="font-size: 14px; padding: 0; margin-left: 5px;">
+          立即登录
+        </el-button>
+      </div>
+
     </el-form>
-
-    <div style="text-align: center; margin-bottom: 25px;">
-      <span style="color: #909399; font-size: 14px;">还没有账号？</span>
-      <el-button type="text" @click="goToRegister" style="font-size: 14px; padding: 0; margin-left: 5px; color: #409EFF; cursor: pointer;">
-        立即注册
-      </el-button>
-    </div>
-
-    <div class="tips" style="text-align: center;">
-      <div style="margin-bottom: 10px; color: red; font-weight: bold; font-style: italic;">测试账号1: admin/123456</div>
-      <div style="margin-bottom: 10px; color: red; font-weight: bold; font-style: italic;">测试账号2: zhangsan/123456</div>
-      <div style="margin-bottom: 10px; color: red; font-weight: bold; font-style: italic;">测试账号3: guest/guest123</div>
-    </div>
   </div>
 </template>
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { register } from '@/api/user'
 
 export default {
-  name: 'Login',
+  name: 'Register',
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
@@ -65,26 +73,29 @@ export default {
         callback()
       }
     }
+    const validateConfirmPassword = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'))
+      } else if (value !== this.registerForm.password) {
+        callback(new Error('两次输入密码不一致'))
+      } else {
+        callback()
+      }
+    }
     return {
-      loginForm: {
-        username: 'admin',
-        password: '123456'
+      registerForm: {
+        username: '',
+        password: '',
+        confirmPassword: ''
       },
-      loginRules: {
+      registerRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        confirmPassword: [{ required: true, trigger: 'blur', validator: validateConfirmPassword }]
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
-    }
-  },
-  watch: {
-    $route: {
-      handler: function (route) {
-        this.redirect = route.query && route.query.redirect
-      },
-      immediate: true
+      confirmPasswordType: 'password'
     }
   },
   methods: {
@@ -98,38 +109,57 @@ export default {
         this.$refs.password.focus()
       })
     },
-    // click事件触发登录操作
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+    showConfirmPwd() {
+      if (this.confirmPasswordType === 'password') {
+        this.confirmPasswordType = ''
+      } else {
+        this.confirmPasswordType = 'password'
+      }
+      this.$nextTick(() => {
+        this.$refs.confirmPassword.focus()
+      })
+    },
+    handleRegister() {
+      this.$refs.registerForm.validate(valid => {
         if (valid) {
-          // 加载样式
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
-          }).catch(() => {
+          const data = {
+            username: this.registerForm.username,
+            password: this.registerForm.password
+          }
+          
+          register(data).then(res => {
+            if (res.code === 0) {
+              this.$message.success('注册成功！即将跳转到登录页...')
+              // 2秒后跳转到登录页
+              setTimeout(() => {
+                this.$router.push('/login')
+              }, 2000)
+            } else {
+              this.$message.error(res.msg || '注册失败')
+              this.loading = false
+            }
+          }).catch(error => {
+            console.error('注册失败:', error)
             this.loading = false
           })
         } else {
-          console.log('error submit!!')
+          console.log('表单验证失败')
           return false
         }
       })
     },
-    // 跳转到注册页面
-    goToRegister() {
-      this.$router.push('/register')
+    goToLogin() {
+      this.$router.push('/login')
     }
   }
 }
 </script>
 
-<style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
-$bg: #283443;
-$light_gray: #fff;
+<style lang="scss" scoped>
+/* 使用与登录页完全相同的样式 */
+$bg:#283443;
+$light_gray:#fff;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -170,12 +200,6 @@ $cursor: #fff;
     color: #454545;
   }
 }
-</style>
-
-<style lang="scss" scoped>
-$bg: #2d3a4b;
-$dark_gray: #889aa4;
-$light_gray: #eee;
 
 .login-container {
   min-height: 100%;
@@ -206,7 +230,7 @@ $light_gray: #eee;
 
   .svg-container {
     padding: 6px 5px 6px 15px;
-    color: $dark_gray;
+    color: $light_gray;
     vertical-align: middle;
     width: 30px;
     display: inline-block;
@@ -229,7 +253,7 @@ $light_gray: #eee;
     right: 10px;
     top: 7px;
     font-size: 16px;
-    color: $dark_gray;
+    color: $light_gray;
     cursor: pointer;
     user-select: none;
   }

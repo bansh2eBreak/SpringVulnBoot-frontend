@@ -37,6 +37,12 @@ export const constantRoutes = [
   },
 
   {
+    path: '/register',
+    component: () => import('@/views/register/index'),
+    hidden: true
+  },
+
+  {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true
@@ -98,6 +104,12 @@ export const constantRoutes = [
         name: 'UNION联合注入',
         component: () => import('@/views/sqli/UnionInjection'),
         meta: { title: 'UNION联合注入', icon: 'el-icon-files' }
+      },
+      {
+        path: 'secondOrder',
+        name: '二次注入',
+        component: () => import('@/views/sqli/SecondOrder'),
+        meta: { title: '二次注入', icon: 'el-icon-refresh-right' }
       }
     ]
   },
