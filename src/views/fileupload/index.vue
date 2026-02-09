@@ -49,30 +49,33 @@
 @RequestMapping("/fileUpload")
 public class FileUploadController {
 
-    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/src/main/resources/static/file/";
+    // 应用统一文件管理目录
+    private static final String APP_FILE_DIR = "/app/file/";
+    
+    // 上传目录（与文件包含漏洞统一使用同一目录）
+    private static final String UPLOAD_DIR = APP_FILE_DIR + "upload/";
 
+    /**
+     * 漏洞版本1：无任何验证的文件上传
+     */
     @PostMapping("/vuln1")
     @ResponseBody
-    public Result handleFileUpload(@RequestParam("file") MultipartFile file) {
+    public Result handleFileUploadVuln1(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return Result.error("请选择要上传的文件");
         }
 
         try {
-            // 确保上传目录存在
-            if (!Files.exists(Paths.get(UPLOAD_DIR))) {
-                Files.createDirectories(Paths.get(UPLOAD_DIR));
-            }
-
-            // 保存文件
+            // ⚠️ 漏洞：直接保存文件，无任何验证
             String filePath = UPLOAD_DIR + file.getOriginalFilename();
             File dest = new File(filePath);
             file.transferTo(dest);
-            // 将下面的file.getOriginalFilename()改为文件完整路径
+            
+            log.warn("⚠️ 文件上传成功（无验证，存在安全风险）: {}", filePath);
             return Result.success("文件上传成功: " + filePath);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("文件上传失败", e);
             return Result.error("文件上传失败: " + e.getMessage());
         }
     }
@@ -86,8 +89,8 @@ public class FileUploadController {
                                 type="success" round size="mini"
                                 @click="fetchDataAndFillTable2">去测试</el-button></el-row>
                         <pre v-highlightjs><code class="java">/**
-* 修复方案：限制上传文件后缀名
-*/
+ * 安全版本：限制上传文件后缀名（白名单）
+ */
 @PostMapping("/sec1")
 @ResponseBody
 public Result handleFileUploadSec1(@RequestParam("file") MultipartFile file) {
@@ -96,27 +99,30 @@ public Result handleFileUploadSec1(@RequestParam("file") MultipartFile file) {
     }
 
     try {
-        // 确保上传目录存在
-        if (!Files.exists(Paths.get(UPLOAD_DIR))) {
-            Files.createDirectories(Paths.get(UPLOAD_DIR));
-        }
-
-        // 限制上传文件类型
+        // ✅ 防御1：验证文件后缀名（白名单）
         String fileName = file.getOriginalFilename();
-        // 如果上传的文件后缀名不属于ALLOWED_EXTENSIONS，则返回错误
-        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+        if (fileName == null || !fileName.contains(".")) {
+            return Result.error("文件名无效");
+        }
+        
+        String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        List&lt;String&gt; ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "gif");
+        
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
-            return Result.error("只允许上传图片文件");
+            log.warn("⚠️ 拒绝上传非白名单后缀的文件: {}", fileName);
+            return Result.error("只允许上传图片文件（jpg、jpeg、png、gif）");
         }
 
         // 保存文件
         String filePath = UPLOAD_DIR + fileName;
         File dest = new File(filePath);
         file.transferTo(dest);
+        
+        log.info("✅ 安全上传成功（后缀白名单验证）: {}", filePath);
         return Result.success("文件上传成功: " + filePath);
 
     } catch (IOException e) {
-        e.printStackTrace();
+        log.error("文件上传失败", e);
         return Result.error("文件上传失败: " + e.getMessage());
     }
 }
@@ -133,8 +139,13 @@ public Result handleFileUploadSec1(@RequestParam("file") MultipartFile file) {
                             </div></el-row>
                         <pre v-highlightjs><code class="java">
 /**
-* 文件类型校验，可绕过。除了通过当前上传进行绕过，也可以通过burpsuite抓包修改文件类型进行绕过！
-*/
+ * 漏洞版本2：仅验证 Content-Type（可绕过）
+ * 
+ * 漏洞说明：
+ * 1. 前端可以修改 Content-Type 绕过（如演示所示）
+ * 2. 使用 Burp Suite 抓包修改 Content-Type 绕过
+ * 3. Content-Type 是客户端可控的，不能作为安全校验依据
+ */
 @PostMapping("/vuln2")
 @ResponseBody
 public Result handleFileUploadVuln2(@RequestParam("file") MultipartFile file) {
@@ -143,14 +154,10 @@ public Result handleFileUploadVuln2(@RequestParam("file") MultipartFile file) {
     }
 
     try {
-        // 确保上传目录存在
-        if (!Files.exists(Paths.get(UPLOAD_DIR))) {
-            Files.createDirectories(Paths.get(UPLOAD_DIR));
-        }
-
-        // 限制上传文件类型
+        // ⚠️ 漏洞：仅验证 Content-Type（容易绕过）
         String contentType = file.getContentType();
-        System.out.println(contentType);
+        log.info("上传文件 Content-Type: {}", contentType);
+        
         if (!"image/jpeg".equals(contentType) && !"image/png".equals(contentType)) {
             return Result.error("只允许上传图片文件");
         }
@@ -159,10 +166,12 @@ public Result handleFileUploadVuln2(@RequestParam("file") MultipartFile file) {
         String filePath = UPLOAD_DIR + file.getOriginalFilename();
         File dest = new File(filePath);
         file.transferTo(dest);
+        
+        log.warn("⚠️ 文件上传成功（仅验证 Content-Type，可绕过）: {}", filePath);
         return Result.success("文件上传成功: " + filePath);
 
     } catch (IOException e) {
-        e.printStackTrace();
+        log.error("文件上传失败", e);
         return Result.error("文件上传失败: " + e.getMessage());
     }
 }
@@ -174,22 +183,26 @@ public Result handleFileUploadVuln2(@RequestParam("file") MultipartFile file) {
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - 其他</el-row>
                         <pre v-highlightjs><code class="java">文件上传漏洞其他加固方案：
 
-1）文件重命名：防止文件名截断攻击，建议使用随机字符串+时间戳方式
+1）文件重命名（推荐）：
+   - 使用 UUID + 时间戳作为文件名，防止文件名截断攻击
+   - 示例：UUID.randomUUID() + "_" + System.currentTimeMillis() + "." + extension
 
-2）文件内容检测：
-   - 检查文件头魔术字节（Magic Number）
-   - 使用文件内容检测库（如Apache Tika）验证文件类型
+2）文件内容检测（推荐）：
+   - 检查文件头魔术字节（Magic Number）验证真实文件类型
+   - 使用 Apache Tika 等库进行深度内容检测
+   - 示例：Tika.detect(inputStream)
    
-3）上传目录防护：
-   - 禁止上传目录具有执行权限
-   - 将上传目录设置在Web根目录之外
-   - 使用单独的域名和服务器存储上传文件，例如使用对象存储服务（如OSS）
+3）上传目录防护（必须）：
+   - 禁止上传目录具有执行权限（chmod 644）
+   - 将上传目录设置在 Web 根目录之外（如本项目：/app/file/upload/）
+   - 使用单独域名和服务器存储上传文件（推荐 OSS/S3）
 
 4）其他建议：
-   - 开启防病毒扫描
-   - 日志记录上传行为
-   - 限制文件大小
-   - 对上传的文件回显相对路径或者不显示路径
+   - 集成防病毒扫描（如 ClamAV）
+   - 详细日志记录上传行为（文件名、大小、IP、时间）
+   - 限制文件大小（防止 DoS 攻击）
+   - 对上传成功的文件仅回显相对路径或文件 ID
+   - 设置文件上传频率限制（防止恶意刷量）
 </code></pre>
                     </div>
                 </el-col>

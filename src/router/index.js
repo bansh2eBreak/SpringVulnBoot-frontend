@@ -517,8 +517,8 @@ export const asyncRoutes = [
       {
         path: 'scientificNotationDoS',
         component: () => import('@/views/otherVuln/scientificNotationDoS/index'),
-        name: '科学记数法DoS',
-        meta: { title: '科学记数法DoS', icon: 'el-icon-warning', roles: ['admin'] }
+        name: '科学计数法DoS',
+        meta: { title: '科学计数法DoS', icon: 'el-icon-warning', roles: ['admin'] }
       },
       {
         path: 'ipspoofing',
