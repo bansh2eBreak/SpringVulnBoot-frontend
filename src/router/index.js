@@ -101,9 +101,9 @@ export const constantRoutes = [
       },
       {
         path: 'unionInjection',
-        name: 'UNION联合注入',
+        name: '联合注入',
         component: () => import('@/views/sqli/UnionInjection'),
-        meta: { title: 'UNION联合注入', icon: 'el-icon-files' }
+        meta: { title: '联合注入', icon: 'el-icon-files' }
       },
       {
         path: 'secondOrder',
@@ -511,8 +511,14 @@ export const asyncRoutes = [
       {
         path: 'redos',
         component: () => import('@/views/otherVuln/redos/index'),
-        name: '拒绝服务漏洞',
-        meta: { title: '拒绝服务漏洞', icon: 'el-icon-close', roles: ['admin'] }
+        name: '正则拒绝服务漏洞',
+        meta: { title: '正则拒绝服务漏洞', icon: 'el-icon-close', roles: ['admin'] }
+      },
+      {
+        path: 'scientificNotationDoS',
+        component: () => import('@/views/otherVuln/scientificNotationDoS/index'),
+        name: '科学记数法DoS',
+        meta: { title: '科学记数法DoS', icon: 'el-icon-warning', roles: ['admin'] }
       },
       {
         path: 'ipspoofing',
