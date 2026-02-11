@@ -19,6 +19,7 @@
 - SQLi注入
   - 基于Jdbc的SQLi注入
   - 基于Mybatis的SQLi注入
+  - Order by注入
   - 报错注入
   - 基于时间盲注
   - 布尔注入

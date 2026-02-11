@@ -82,6 +82,12 @@ export const constantRoutes = [
         meta: { title: 'Mybatis类型', icon: 'el-icon-document' }
       },
       {
+        path: 'orderByInjection',
+        name: 'ORDER BY注入',
+        component: () => import('@/views/sqli/OrderByInjection'),
+        meta: { title: 'ORDER BY注入', icon: 'el-icon-sort' }
+      },
+      {
         path: 'errorInjection',
         name: '报错注入',
         component: () => import('@/views/sqli/ErrorInjection'),

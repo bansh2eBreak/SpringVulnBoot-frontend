@@ -24,7 +24,6 @@
                         <div class="vuln-detail">
                             【必须】SQL语句默认使用预编译并绑定变量
                             使用Mybatis作为持久层框架，应通过#{}语法进行参数绑定，MyBatis 会创建 PreparedStatement 参数占位符，并通过占位符安全地设置参数。
-                            对于无法使用#{}的情况如order by 注入，可以在代码层面通过其他方式来解决，如过滤。
                             <br /><br />
                             【必须】屏蔽异常栈
                             应用程序出现异常时，禁止将数据库版本、数据库结构、操作系统版本、堆栈跟踪、文件名和路径信息、SQL查询字符串等对攻击者有用的信息返回给客户端。建议重定向到一个统一、默认的错误提示页面，进行信息过滤。
@@ -38,10 +37,12 @@
                     </el-tab-pane>
                     <el-tab-pane label="参考文章" name="fourth">
                         <div class="vuln-detail">
-                            <!-- 给超链接配置下划线 -->
-                            <a href="https://mp.weixin.qq.com/s/XFIWgvJRyhZsGGLhTYMjnQ?token=1562987233&lang=zh_CN"
-                                target="_blank" style="text-decoration: underline;">《写点不一样的order by参数注入》</a>：学习order
-                            by参数为啥不能使用Mybatis的预编译模式。<br />
+                            <a href="https://owasp.org/www-community/attacks/SQL_Injection" target="_blank"
+                                style="text-decoration: underline;">《SQL Injection》</a> - OWASP 官方文档<br />
+                            <a href="https://portswigger.net/web-security/sql-injection" target="_blank"
+                                style="text-decoration: underline;">《SQL injection》</a> - PortSwigger 安全指南<br />
+                            <a href="https://mybatis.org/mybatis-3/zh/sqlmap-xml.html" target="_blank"
+                                style="text-decoration: underline;">《MyBatis 映射器》</a> - MyBatis 官方文档
                         </div>
                     </el-tab-pane>
                 </el-tabs>
@@ -125,49 +126,7 @@ List&lt;User&gt; selectUserById(String id);
                 </el-col>
             </el-row>
             <el-row :gutter="20" class="grid-flex">
-                <el-col :span="12">
-                    <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">漏洞代码 -
-                            ${} - order by参数 <div>
-                                <el-button type="success" round size="mini" @click="fetchDataAndFillTable4"
-                                    >正常查询</el-button>
-                                <el-button type="danger" round size="mini" @click="fetchDataAndFillTable5"
-                                    >去测试</el-button>
-                            </div></el-row>
-                        <pre
-                            v-highlightjs><code class="java">// 注意，order by 参数无法使用预编译
-// Controller层
-@GetMapping("/getUserByPage")
-public Result getUserByPage(@RequestParam(defaultValue = "id") String orderBy, @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "5") Integer pageSize) {
-    log.info("分页查询，参数：{} {} {}", page, pageSize, orderBy);
-    return Result.success(userService.pageOrderBy(orderBy, page, pageSize));
-}
-
-// Service层，处理分页逻辑、封装分页结果
-@Override
-public PageBean pageOrderBy(String orderBy, Integer page, Integer pageSize) {
-    //1.获取总记录数
-    int count = userMapper.count();
-
-    //2.获取分页查询结果
-    int start = (page - 1) * pageSize;
-    List&lt;User&gt; userList = userMapper.pageOrderBy(orderBy, start, pageSize);
-
-    //3.分装PageBean对象
-    return new PageBean(count, userList);
-}
-
-// Mapper层
-
-// 查询总记录数
-@Select("select count(*) from user")
-int count();
-
-// 支持按字段排序的分页查询，获取用户列表数据
-@Select("select * from user order by ${orderBy} limit #{start}, #{pageSize}")
-List&lt;User&gt; pageOrderBy(@Param("orderBy") String orderBy, @Param("start") int start, @Param("pageSize") int pageSize);</code></pre>
-                    </div>
-                </el-col>
+                <el-col :span="12"></el-col>
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
                         <el-row type="flex" justify="space-between" align="middle">安全代码 - #{}预编译<div>
@@ -222,7 +181,7 @@ List&lt;User&gt; selectUserSecByUsername(@Param("username") String username);
 
 <script>
 import axios from 'axios';
-import { getUserByPage, getUserById, getUserByIdSec, getUserSecByUsername2 } from '@/api/sqli';
+import { getUserById, getUserByIdSec, getUserSecByUsername2 } from '@/api/sqli';
 
 export default {
     data() {
@@ -238,7 +197,7 @@ export default {
             if (!this.pocUrl) return '';
             
             // 处理不同的参数类型
-            const params = ['id=', 'username=', 'orderBy='];
+            const params = ['id=', 'username='];
             let result = this.pocUrl;
             
             for (const param of params) {
@@ -289,32 +248,6 @@ export default {
                     this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserByIdSec?username=zhangsan' or 'f'='f";
                     this.dialogTableVisible = true; // 显示对话框
                     this.gridData = response.data;
-                    console.log(this.gridData);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        },
-        fetchDataAndFillTable4() {
-            // 从localStorage获取token
-            // const token = localStorage.getItem('token');
-            getUserByPage({ page: 1, pageSize: 5, orderBy: 'username' })
-                .then(response => {
-                    this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=username";
-                    this.dialogTableVisible = true; // 显示对话框
-                    this.gridData = response.data.rows;
-                    console.log(this.gridData);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        },
-        fetchDataAndFillTable5() {
-            getUserByPage({ page: 1, pageSize: 5, orderBy: "(CASE WHEN (select substr((select database()),1,1)='a') THEN username ELSE id END)" })
-                .then(response => {
-                    this.pocUrl = "http://127.0.0.1:8080/sqli/mybatis/getUserByPage?page=1&pageSize=5&orderBy=(CASE+WHEN+(select+substr((select+database()),1,1)='a')+THEN+username+ELSE+id+END)";
-                    this.dialogTableVisible = true; // 显示对话框
-                    this.gridData = response.data.rows;
                     console.log(this.gridData);
                 })
                 .catch(error => {

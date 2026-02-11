@@ -8,14 +8,6 @@ export function getUserByUsername(params) {
   })
 }
 
-export function getUserByPage(params) {
-  return request({
-    url: '/sqli/mybatis/getUserByPage',
-    method: 'get',
-    params: params
-  })
-}
-
 export function getUserByUsernameFilter(params) {
   return request({
     url: '/sqli/jdbc/getUserSecByUsernameFilter',
@@ -180,5 +172,33 @@ export function checkUserExistsSecMybatis(params) {
     url: '/sqli/boolean/mybatis/checkUserExistsSec',
     method: 'get',
     params: params
+  })
+}
+
+// ORDER BY 注入相关接口
+export function orderByVuln(params) {
+  return request({
+    url: '/sqli/orderby/vuln',
+    method: 'get',
+    params: params,
+    timeout: 30000  // ORDER BY + SLEEP 需要更长超时时间（30秒）
+  })
+}
+
+export function orderBySec1(params) {
+  return request({
+    url: '/sqli/orderby/sec1',
+    method: 'get',
+    params: params,
+    timeout: 30000  // 防御测试也可能涉及 SLEEP payload
+  })
+}
+
+export function orderBySec2(params) {
+  return request({
+    url: '/sqli/orderby/sec2',
+    method: 'get',
+    params: params,
+    timeout: 30000  // 防御测试也可能涉及 SLEEP payload
   })
 }
