@@ -527,6 +527,12 @@ export const asyncRoutes = [
         meta: { title: '科学计数法DoS', icon: 'el-icon-warning', roles: ['admin'] }
       },
       {
+        path: 'ldapInjection',
+        component: () => import('@/views/otherVuln/ldapInjection/index'),
+        name: 'LDAP注入',
+        meta: { title: 'LDAP注入', icon: 'el-icon-user', roles: ['admin'] }
+      },
+      {
         path: 'ipspoofing',
         component: () => import('@/views/otherVuln/ipspoofing/index'),
         name: 'IP地址伪造',
