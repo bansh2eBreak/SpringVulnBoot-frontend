@@ -8,89 +8,83 @@
             <div class="vuln-detail">
               科学记数法拒绝服务漏洞是指当服务端使用 BigDecimal 处理用户输入的科学记数法数字时，恶意用户可以传入<b>极端scale</b>的科学记数法（如 <code>0.1e-121312222</code>），导致 BigDecimal 在进行算术运算时需要对齐精度，创建超大内部数组，最终消耗大量 CPU 和内存资源，使服务器响应时间长达数分钟甚至更久，造成拒绝服务。<br/>
               <br/>
-              <b>核心漏洞原理：精度对齐导致的DoS</b><br/>
+              <strong>核心漏洞原理：精度对齐导致的DoS</strong><br/>
               <br/>
-              <b>1. BigDecimal 的内部存储机制</b><br/>
-              - BigDecimal 使用 <code>unscaledValue</code> + <code>scale</code> 来存储数字<br/>
-              - 例如：<code>0.1e-121312222</code> 存储为 unscaledValue=1, scale=121312223（约1.2亿！）<br/>
-              - 这意味着这个数字有<b>1.2亿位小数</b><br/>
+              <strong>1. BigDecimal 的内部存储机制</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• BigDecimal 使用 <code>unscaledValue</code> + <code>scale</code> 来存储数字<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 例如：<code>0.1e-121312222</code> 存储为 unscaledValue=1, scale=121312223（约1.2亿！）<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 这意味着这个数字有<strong>1.2亿位小数</strong><br/>
               <br/>
-              <b>2. 运算时的精度对齐</b><br/>
+              <strong>2. 运算时的精度对齐</strong><br/>
               当两个 BigDecimal 进行算术运算（加减乘除）时，需要对齐两个数字的 scale：<br/>
-              <pre style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">
-BigDecimal num = 0.1e-121312222;  // scale = 121312223
-BigDecimal num1 = new BigDecimal(0.005);  // scale ≈ 3
-BigDecimal result = num1.subtract(num);  
-// ⚠️ 需要对齐到 121312223 位！
-// BigDecimal 内部要创建一个容纳1.2亿位小数的巨大数组
-// 遍历整个数组进行计算，消耗大量CPU和内存</pre>
+              &nbsp;&nbsp;&nbsp;&nbsp;• <code>BigDecimal num = 0.1e-121312222;</code> // scale = 121312223<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• <code>BigDecimal num1 = new BigDecimal(0.005);</code> // scale ≈ 3<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• <code>BigDecimal result = num1.subtract(num);</code> // <span style="color: #f56c6c;">需要对齐到 121312223 位！</span><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• BigDecimal 内部要创建一个容纳1.2亿位小数的巨大数组，遍历整个数组进行计算，消耗大量CPU和内存<br/>
               <br/>
-              <b>3. DoS 攻击效果</b><br/>
-              - 单个请求可能阻塞线程数分钟<br/>
-              - CPU 占用率飙升至 100%<br/>
-              - 多个并发请求可使服务器完全瘫痪<br/>
+              <strong>3. DoS 攻击效果</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 单个请求可能阻塞线程数分钟<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• CPU 占用率飙升至 100%<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 多个并发请求可使服务器完全瘫痪<br/>
             </div>
           </el-tab-pane>
           <el-tab-pane label="漏洞危害" name="second">
             <div class="vuln-detail">
-              <b>1. 服务器响应时间极长</b><br/>
-              - 单个请求可能导致响应时间长达数分钟<br/>
-              - 用户体验极差，看似服务器宕机<br/>
+              <strong>1. 服务器响应时间极长</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 单个请求可能导致响应时间长达数分钟<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 用户体验极差，看似服务器宕机<br/>
               <br/>
-              <b>2. CPU 资源耗尽</b><br/>
-              - BigDecimal 精度对齐需要遍历超大数组<br/>
-              - CPU 占用率持续 100%<br/>
-              - 影响服务器上的所有其他服务<br/>
+              <strong>2. CPU 资源耗尽</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• BigDecimal 精度对齐需要遍历超大数组<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• CPU 占用率持续 100%<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 影响服务器上的所有其他服务<br/>
               <br/>
-              <b>3. 线程池耗尽</b><br/>
-              - 每个攻击请求阻塞一个线程数分钟<br/>
-              - 几个并发请求就能耗尽整个线程池<br/>
-              - 正常用户的请求无法得到处理<br/>
+              <strong>3. 线程池耗尽</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 每个攻击请求阻塞一个线程数分钟<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 几个并发请求就能耗尽整个线程池<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 正常用户的请求无法得到处理<br/>
               <br/>
-              <b>4. 内存溢出风险</b><br/>
-              - 极端情况下可能触发 OutOfMemoryError<br/>
-              - 导致整个 JVM 崩溃<br/>
+              <strong>4. 内存溢出风险</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 极端情况下可能触发 OutOfMemoryError<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 导致整个 JVM 崩溃<br/>
               <br/>
-              <b>5. 攻击成本极低</b><br/>
-              - 攻击者只需发送一个简单的 HTTP 请求<br/>
-              - Payload 只有十几个字符：<code>0.1e-121312222</code><br/>
-              - 难以通过 WAF 拦截（看起来是正常数字）<br/>
+              <strong>5. 攻击成本极低</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 攻击者只需发送一个简单的 HTTP 请求<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• Payload 只有十几个字符：<code>0.1e-121312222</code><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 难以通过 WAF 拦截（看起来是正常数字）<br/>
             </div>
           </el-tab-pane>
           <el-tab-pane label="安全编码" name="third">
             <div class="vuln-detail">
-              <b>【必须】验证 scale 范围</b><br/>
+              <strong>【必须】验证 scale 范围</strong><br/>
               这是最关键的防护措施！限制 BigDecimal 的 scale 在安全范围内（如 ±1000）。<br/>
-              <pre style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">
-int scale = Math.abs(num.scale());
-if (scale > 1000) {
-    return Result.error("数字精度过高，scale=" + scale + " 超过限制");
-}</pre>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 获取scale：<code>int scale = Math.abs(num.scale());</code><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 验证范围：<code>if (scale > 1000) return Result.error("数字精度过高");</code><br/>
               <br/>
-              <b>【建议】设置超时保护</b><br/>
+              <strong>【建议】设置超时保护</strong><br/>
               为计算密集型操作设置超时时间，防止长时间阻塞。<br/>
               <br/>
-              <b>【建议】限制输入长度</b><br/>
+              <strong>【建议】限制输入长度</strong><br/>
               对输入字符串进行长度限制，避免超长输入。<br/>
             </div>
           </el-tab-pane>
           <el-tab-pane label="参考文章" name="fourth">
             <div class="vuln-detail">
-              <b>相关技术文档和参考资源：</b>
+              <strong>相关技术文档和参考资源：</strong>
               <br/><br/>
-              <b>官方文档：</b>
+              <strong>官方文档：</strong>
               <ul>
                 <li><a href="https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html" target="_blank" style="text-decoration: underline;">Java BigDecimal 官方文档</a></li>
                 <li><a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html" target="_blank" style="text-decoration: underline;">Java 数据类型教程</a></li>
               </ul>
               <br/>
-              <b>安全最佳实践：</b>
+              <strong>安全最佳实践：</strong>
               <ul>
                 <li><a href="https://owasp.org/www-community/vulnerabilities/Denial_of_Service" target="_blank" style="text-decoration: underline;">OWASP 拒绝服务攻击</a></li>
                 <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html" target="_blank" style="text-decoration: underline;">OWASP 输入验证检查清单</a></li>
               </ul>
               <br/>
-              <b>漏洞分析文章：</b>
+              <strong>漏洞分析文章：</strong>
               <ul>
                 <li><a href="https://www.javacodegeeks.com/2019/03/bigdecimal-performance-pitfalls.html" target="_blank" style="text-decoration: underline;">BigDecimal 性能陷阱分析</a></li>
                 <li><a href="https://stackoverflow.com/questions/4591206/arithmeticexception-non-terminating-decimal-expansion" target="_blank" style="text-decoration: underline;">BigDecimal 计算异常讨论</a></li>
@@ -458,6 +452,20 @@ export default {
   margin-right: 20px;
   margin-bottom: 20px;
   margin-top: 10px;
+}
+
+.vuln-detail {
+    background-color: #dce9f8;
+    padding: 10px;
+    line-height: 1.8;
+}
+
+.vuln-detail code {
+    background-color: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    color: #e74c3c;
 }
 
 .header-div {

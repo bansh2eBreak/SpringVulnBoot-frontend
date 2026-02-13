@@ -8,96 +8,79 @@
             <div class="vuln-detail">
               LDAP 注入是一种注入攻击，当应用程序将用户输入直接拼接到 LDAP 查询语句中时，攻击者可以通过特殊字符（如 <code>*</code>、<code>(</code>、<code>)</code>、<code>&</code> 等）改变查询逻辑，从而绕过身份认证或泄露敏感信息。<br/>
               <br/>
-              <b>LDAP 过滤器语法：</b><br/>
-              <pre style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">
-基础过滤器：
-  (uid=admin)              # 精确匹配
-  (uid=*admin*)            # 通配符匹配
-
-逻辑运算：
-  (&(uid=admin)(cn=*))     # AND 逻辑
-  (|(uid=admin)(uid=guest)) # OR 逻辑
-  (!(uid=guest))           # NOT 逻辑</pre>
+              <strong>LDAP 过滤器语法：</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 基础过滤器：<code>(uid=admin)</code> 精确匹配，<code>(uid=*admin*)</code> 通配符匹配<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 逻辑运算：<code>(&(uid=admin)(cn=*))</code> AND逻辑，<code>(|(uid=admin)(uid=guest))</code> OR逻辑<br/>
               <br/>
-              <b>核心漏洞原理：LDAP 过滤器注入</b><br/>
+              <strong>核心漏洞原理：LDAP 过滤器注入</strong><br/>
               <br/>
-              <b>1. 正常登录查询：</b><br/>
-              <pre style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">
-// POST Body: {"username":"admin", "password":"admin123"}
-String username = request.getUsername();
-String password = request.getPassword();
-String filter = "(&(uid=" + username + ")(userPassword=" + password + "))";
-// 实际查询：(&(uid=admin)(userPassword=admin123))</pre>
+              <strong>1. 正常登录查询：</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 输入：<code>{"username":"admin", "password":"admin123"}</code><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 拼接代码：<code>String filter = "(&(uid=" + username + ")(userPassword=" + password + "))"</code><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 实际查询：<code>(&(uid=admin)(userPassword=admin123))</code><br/>
               <br/>
-              <b>2. 注入攻击：</b><br/>
-              <pre style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">
-// POST Body: {"username":"admin)(uid=*))(&(uid=*", "password":"anything"}
-String username = request.getUsername(); // admin)(uid=*))(&(uid=*
-String password = request.getPassword(); // anything
-String filter = "(&(uid=" + username + ")(userPassword=" + password + "))";
-// 实际查询：(&(uid=admin)(uid=*))(&(uid=*)(userPassword=anything))
-// 结果：绕过密码验证，直接登录成功！</pre>
+              <strong>2. 注入攻击：</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 输入：<code>{"username":"admin)(uid=*))(&(uid=*", "password":"anything"}</code><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 拼接代码：<code>String filter = "(&(uid=" + username + ")(userPassword=" + password + "))"</code><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 实际查询：<code>(&(uid=admin)(uid=*))(&(uid=*)(userPassword=anything))</code><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• <span style="color: #f56c6c;"><strong>结果：绕过密码验证，直接登录成功！</strong></span><br/>
             </div>
           </el-tab-pane>
           <el-tab-pane label="漏洞危害" name="second">
             <div class="vuln-detail">
-              <b>1. 身份认证绕过</b><br/>
-              - 攻击者无需知道密码即可登录任意账户<br/>
-              - 特别是管理员账户，危害巨大<br/>
+              <strong>1. 身份认证绕过</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 攻击者无需知道密码即可登录任意账户<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 特别是管理员账户，危害巨大<br/>
               <br/>
-              <b>2. 信息泄露</b><br/>
-              - 通过通配符（如 <code>*</code>）枚举所有用户<br/>
-              - 泄露用户名、邮箱、部门等敏感信息<br/>
+              <strong>2. 信息泄露</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 通过通配符（如 <code>*</code>）枚举所有用户<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 泄露用户名、邮箱、部门等敏感信息<br/>
               <br/>
-              <b>3. 权限提升</b><br/>
-              - 登录管理员账户后获取系统最高权限<br/>
-              - 可能导致整个系统被控制<br/>
+              <strong>3. 权限提升</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 登录管理员账户后获取系统最高权限<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 可能导致整个系统被控制<br/>
               <br/>
-              <b>4. 攻击成本低</b><br/>
-              - 只需构造简单的注入 Payload<br/>
-              - 难以通过 WAF 拦截（看起来是正常字符）<br/>
+              <strong>4. 攻击成本低</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 只需构造简单的注入 Payload<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 难以通过 WAF 拦截（看起来是正常字符）<br/>
             </div>
           </el-tab-pane>
           <el-tab-pane label="安全编码" name="third">
             <div class="vuln-detail">
-              <b>【必须】使用参数化查询</b><br/>
+              <strong>【必须】使用参数化查询</strong><br/>
               使用 Spring LDAP 的 Filter API，自动转义特殊字符。<br/>
-              <pre style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">
-AndFilter filter = new AndFilter();
-filter.and(new EqualsFilter("uid", username));
-filter.and(new EqualsFilter("userPassword", password));
-String safeFilter = filter.encode();  // 自动转义</pre>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 示例：<code>AndFilter filter = new AndFilter();</code><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 添加条件：<code>filter.and(new EqualsFilter("uid", username));</code><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 自动转义：<code>String safeFilter = filter.encode();</code><br/>
               <br/>
-              <b>【建议】手动转义特殊字符</b><br/>
+              <strong>【建议】手动转义特殊字符</strong><br/>
               如果无法使用 Filter API，需手动转义 LDAP 特殊字符：<code>\</code>、<code>*</code>、<code>(</code>、<code>)</code>、<code>\0</code><br/>
-              <pre style="background-color: #f5f5f5; padding: 10px; margin: 10px 0;">
-String escapedUsername = escapeLdapSearchFilter(username);
-// * -> \2a, ( -> \28, ) -> \29, \ -> \5c</pre>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 转义规则：<code>* → \2a</code>，<code>( → \28</code>，<code>) → \29</code>，<code>\ → \5c</code><br/>
               <br/>
-              <b>【建议】输入验证和白名单</b><br/>
+              <strong>【建议】输入验证和白名单</strong><br/>
               限制输入字符范围，只允许字母、数字、下划线等安全字符。<br/>
               <br/>
-              <b>【建议】最小权限原则</b><br/>
+              <strong>【建议】最小权限原则</strong><br/>
               限制 LDAP 查询账号的权限，避免查询敏感信息。<br/>
             </div>
           </el-tab-pane>
           <el-tab-pane label="参考文章" name="fourth">
             <div class="vuln-detail">
-              <b>相关技术文档和参考资源：</b>
+              <strong>相关技术文档和参考资源：</strong>
               <br/><br/>
-              <b>官方文档：</b>
+              <strong>官方文档：</strong>
               <ul>
                 <li><a href="https://docs.spring.io/spring-ldap/docs/current/reference/" target="_blank" style="text-decoration: underline;">Spring LDAP 官方文档</a></li>
                 <li><a href="https://ldap.com/ldap-filters/" target="_blank" style="text-decoration: underline;">LDAP 过滤器语法参考</a></li>
               </ul>
               <br/>
-              <b>安全最佳实践：</b>
+              <strong>安全最佳实践：</strong>
               <ul>
                 <li><a href="https://owasp.org/www-community/attacks/LDAP_Injection" target="_blank" style="text-decoration: underline;">OWASP LDAP 注入攻击</a></li>
                 <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html" target="_blank" style="text-decoration: underline;">OWASP LDAP 注入防御清单</a></li>
               </ul>
               <br/>
-              <b>漏洞分析文章：</b>
+              <strong>漏洞分析文章：</strong>
               <ul>
                 <li><a href="https://www.blackhat.com/presentations/bh-europe-08/Alonso-Parada/Whitepaper/bh-eu-08-alonso-parada-WP.pdf" target="_blank" style="text-decoration: underline;">LDAP 注入与盲注技术</a></li>
               </ul>
@@ -523,6 +506,20 @@ export default {
   margin-right: 20px;
   margin-bottom: 20px;
   margin-top: 10px;
+}
+
+.vuln-detail {
+    background-color: #dce9f8;
+    padding: 10px;
+    line-height: 1.8;
+}
+
+.vuln-detail code {
+    background-color: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    color: #e74c3c;
 }
 
 .header-div {

@@ -18,52 +18,62 @@
           </el-tab-pane>
           <el-tab-pane label="漏洞危害" name="second">
             <div class="vuln-detail">
-              1. CPU资源耗尽 - 正则表达式引擎陷入大量回溯计算<br/>
-              2. 服务器拒绝服务 - 无法处理其他正常请求<br/>
-              3. 系统响应缓慢 - 影响整体系统性能<br/>
-              4. 资源竞争 - 可能导致其他服务受影响<br/>
-              5. 隐蔽性强 - 看似正常的正则表达式可能隐藏危险<br/>
+              <strong>1. CPU资源耗尽</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 正则表达式引擎陷入大量回溯计算<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• CPU占用率达到100%<br/>
+              <br/>
+              <strong>2. 服务器拒绝服务</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 线程被阻塞，无法处理其他正常请求<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 整个服务变得不可用<br/>
+              <br/>
+              <strong>3. 系统响应缓慢</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 影响整体系统性能<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 用户体验严重下降<br/>
+              <br/>
+              <strong>4. 资源竞争</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 可能导致其他服务受影响<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 系统整体稳定性受损<br/>
+              <br/>
+              <strong>5. 隐蔽性强</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 看似正常的正则表达式可能隐藏危险<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 代码审计时不易被发现<br/>
             </div>
           </el-tab-pane>
           <el-tab-pane label="安全编码" name="third">
             <div class="vuln-detail">
-              【必须】避免嵌套量词
-              不要使用 (a+)+、(a*)* 等嵌套量词模式，使用简单的量词如 a+、a* 即可。
-              <br />
-              <br />
-              【必须】避免重叠备选项
-              避免使用 (a|aa)*、(a|a+)* 等重叠的备选项模式，确保备选项之间没有重叠。
-              <br />
-              <br />
-              【必须】使用超时机制
-              为正则表达式匹配设置超时时间，防止长时间的回溯计算。
-              <br />
-              <br />
-              【建议】限制输入长度
-              对用户输入进行长度限制，避免过长的恶意输入。
-              <br />
-              <br />
-              【建议】使用原子组
-              如果正则表达式引擎支持，使用原子组避免回溯。
+              <strong>【必须】避免嵌套量词</strong><br/>
+              不要使用 (a+)+、(a*)* 等嵌套量词模式，使用简单的量词如 a+、a* 即可。<br/>
+              <br/>
+              <strong>【必须】避免重叠备选项</strong><br/>
+              避免使用 (a|aa)*、(a|a+)* 等重叠的备选项模式，确保备选项之间没有重叠。<br/>
+              <br/>
+              <strong>【必须】使用超时机制</strong><br/>
+              为正则表达式匹配设置超时时间，防止长时间的回溯计算。<br/>
+              <br/>
+              <strong>【建议】限制输入长度</strong><br/>
+              对用户输入进行长度限制，避免过长的恶意输入。<br/>
+              <br/>
+              <strong>【建议】使用原子组</strong><br/>
+              如果正则表达式引擎支持，使用原子组避免回溯。<br/>
             </div>
           </el-tab-pane>
           <el-tab-pane label="参考文章" name="fourth">
             <div class="vuln-detail">
-              <b>相关技术文档和参考资源：</b>
+              <strong>相关技术文档和参考资源：</strong>
               <br/><br/>
-              <b>官方文档：</b>
+              <strong>官方文档：</strong>
               <ul>
                 <li><a href="https://docs.oracle.com/javase/tutorial/essential/regex/" target="_blank" style="text-decoration: underline;">Java正则表达式官方教程</a></li>
                 <li><a href="https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html" target="_blank" style="text-decoration: underline;">Java Pattern类文档</a></li>
               </ul>
               <br/>
-              <b>安全最佳实践：</b>
+              <strong>安全最佳实践：</strong>
               <ul>
                 <li><a href="https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS" target="_blank" style="text-decoration: underline;">OWASP ReDoS攻击说明</a></li>
                 <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html" target="_blank" style="text-decoration: underline;">OWASP输入验证检查清单</a></li>
               </ul>
               <br/>
-              <b>漏洞分析文章：</b>
+              <strong>漏洞分析文章：</strong>
               <ul>
                 <li><a href="https://www.regular-expressions.info/catastrophic.html" target="_blank" style="text-decoration: underline;">正则表达式灾难性回溯分析</a></li>
                 <li><a href="https://www.rexegg.com/regex-explosive-quantifiers.html" target="_blank" style="text-decoration: underline;">爆炸性量词详解</a></li>
@@ -366,6 +376,20 @@ export default {
     margin-right: 20px;
     margin-bottom: 20px;
     margin-top: 10px;
+}
+
+.vuln-detail {
+    background-color: #dce9f8;
+    padding: 10px;
+    line-height: 1.8;
+}
+
+.vuln-detail code {
+    background-color: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    color: #e74c3c;
 }
 
 .header-div {

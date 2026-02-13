@@ -18,53 +18,62 @@
           </el-tab-pane>
           <el-tab-pane label="漏洞危害" name="second">
             <div class="vuln-detail">
-              1. 绕过IP限制 - 攻击者可以伪造IP绕过黑名单限制<br/>
-              2. 绕过频率限制 - 通过伪造不同IP绕过请求频率限制<br/>
-              3. 绕过地理位置限制 - 伪造特定地区的IP地址<br/>
-              4. 绕过白名单限制 - 伪造白名单中的IP地址<br/>
-              5. 隐藏真实身份 - 攻击者可以隐藏真实的IP地址<br/>
-              6. 绕过安全策略 - 绕过基于IP的安全策略和访问控制<br/>
+              <strong>1. 绕过IP限制</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 攻击者可以伪造IP绕过黑名单限制<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 绕过IP白名单访问受限资源<br/>
+              <br/>
+              <strong>2. 绕过频率限制</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 通过伪造不同IP绕过请求频率限制<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 绕过防刷机制进行恶意请求<br/>
+              <br/>
+              <strong>3. 绕过地理位置限制</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 伪造特定地区的IP地址<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 访问有地域限制的内容或服务<br/>
+              <br/>
+              <strong>4. 绕过白名单限制</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 伪造白名单中的IP地址<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 获取特权访问权限<br/>
+              <br/>
+              <strong>5. 隐藏真实身份</strong><br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 攻击者可以隐藏真实的IP地址<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;• 绕过基于IP的安全策略和访问控制<br/>
             </div>
           </el-tab-pane>
           <el-tab-pane label="安全编码" name="third">
             <div class="vuln-detail">
-              【必须】不信任HTTP头
-              不要直接信任X-Forwarded-For、X-Real-IP等HTTP头，这些头可以被客户端伪造。
-              <br />
-              <br />
-              【必须】使用直接连接IP
-              优先使用request.getRemoteAddr()获取直接连接的IP地址，这是最可靠的IP来源。
-              <br />
-              <br />
-              【必须】验证代理服务器
-              如果使用代理服务器，需要验证代理服务器的可信度，并正确配置IP传递。
-              <br />
-              <br />
-              【建议】IP地址验证
-              对获取到的IP地址进行格式验证，确保IP地址的有效性和合理性。
-              <br />
-              <br />
-              【建议】多重验证
-              结合多种方式验证用户身份，不仅仅依赖IP地址进行安全判断。
+              <strong>【必须】不信任HTTP头</strong><br/>
+              不要直接信任X-Forwarded-For、X-Real-IP等HTTP头，这些头可以被客户端伪造。<br/>
+              <br/>
+              <strong>【必须】使用直接连接IP</strong><br/>
+              优先使用request.getRemoteAddr()获取直接连接的IP地址，这是最可靠的IP来源。<br/>
+              <br/>
+              <strong>【必须】验证代理服务器</strong><br/>
+              如果使用代理服务器，需要验证代理服务器的可信度，并正确配置IP传递。<br/>
+              <br/>
+              <strong>【建议】IP地址验证</strong><br/>
+              对获取到的IP地址进行格式验证，确保IP地址的有效性和合理性。<br/>
+              <br/>
+              <strong>【建议】多重验证</strong><br/>
+              结合多种方式验证用户身份，不仅仅依赖IP地址进行安全判断。<br/>
             </div>
           </el-tab-pane>
           <el-tab-pane label="参考文章" name="fourth">
             <div class="vuln-detail">
-              <b>相关技术文档和参考资源：</b>
+              <strong>相关技术文档和参考资源：</strong>
               <br/><br/>
-              <b>官方文档：</b>
+              <strong>官方文档：</strong>
               <ul>
                 <li><a href="https://docs.oracle.com/javase/tutorial/networking/sockets/" target="_blank" style="text-decoration: underline;">Java网络编程官方教程</a></li>
                 <li><a href="https://docs.oracle.com/javase/8/docs/api/java/net/InetAddress.html" target="_blank" style="text-decoration: underline;">Java InetAddress类文档</a></li>
               </ul>
               <br/>
-              <b>安全最佳实践：</b>
+              <strong>安全最佳实践：</strong>
               <ul>
                 <li><a href="https://owasp.org/www-community/attacks/IP_Spoofing" target="_blank" style="text-decoration: underline;">OWASP IP伪造攻击说明</a></li>
                 <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html" target="_blank" style="text-decoration: underline;">OWASP输入验证检查清单</a></li>
               </ul>
               <br/>
-              <b>漏洞分析文章：</b>
+              <strong>漏洞分析文章：</strong>
               <ul>
                 <li><a href="https://en.wikipedia.org/wiki/IP_address_spoofing" target="_blank" style="text-decoration: underline;">Wikipedia - IP地址伪造</a></li>
                 <li><a href="https://www.imperva.com/learn/application-security/ip-spoofing/" target="_blank" style="text-decoration: underline;">Imperva - IP伪造详解</a></li>
@@ -462,6 +471,20 @@ export default {
     margin-right: 20px;
     margin-bottom: 20px;
     margin-top: 10px;
+}
+
+.vuln-detail {
+    background-color: #dce9f8;
+    padding: 10px;
+    line-height: 1.8;
+}
+
+.vuln-detail code {
+    background-color: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    color: #e74c3c;
 }
 
 .header-div {
