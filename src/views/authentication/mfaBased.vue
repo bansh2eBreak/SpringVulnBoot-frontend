@@ -273,8 +273,10 @@ export default {
                     throw new Error('JWT格式错误');
                 }
 
-                // 3. Base64解码
-                const decodedPayload = JSON.parse(atob(payload));
+                // 3. Base64URL → 标准 Base64（JWT 用 Base64URL 编码，需替换 -/_ 并补齐填充）
+                let base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+                while (base64.length % 4 !== 0) base64 += '='
+                const decodedPayload = JSON.parse(atob(base64));
                 if (!decodedPayload.id) {
                     throw new Error('JWT中未找到用户ID');
                 }

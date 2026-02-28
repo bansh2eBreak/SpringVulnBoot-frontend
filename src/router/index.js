@@ -172,6 +172,29 @@ export const constantRoutes = [
         meta: { title: '批量赋值漏洞', icon: 'el-icon-edit-outline' }
       }
     ]
+  },
+
+  // GraphQL 安全漏洞（guest 和 admin 均可访问）
+  {
+    path: '/graphql',
+    component: Layout,
+    redirect: '/graphql/introspection',
+    name: 'GraphQL漏洞',
+    meta: { title: 'GraphQL漏洞', icon: 'el-icon-connection' },
+    children: [
+      {
+        path: 'introspection',
+        component: () => import('@/views/graphql/index'),
+        name: 'GraphQL字段泄露',
+        meta: { title: 'GraphQL字段泄露', icon: 'el-icon-search' }
+      },
+      {
+        path: 'idor',
+        component: () => import('@/views/graphql/idor'),
+        name: 'GraphQL越权查询',
+        meta: { title: 'GraphQL越权查询', icon: 'el-icon-user' }
+      }
+    ]
   }
 ]
 
