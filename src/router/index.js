@@ -193,6 +193,12 @@ export const constantRoutes = [
         component: () => import('@/views/graphql/idor'),
         name: 'GraphQL越权查询',
         meta: { title: 'GraphQL越权查询', icon: 'el-icon-user' }
+      },
+      {
+        path: 'sqli',
+        component: () => import('@/views/graphql/sqli'),
+        name: 'GraphQL SQL注入',
+        meta: { title: 'GraphQL SQL注入', icon: 'el-icon-warning-outline' }
       }
     ]
   }

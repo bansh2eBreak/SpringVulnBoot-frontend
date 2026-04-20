@@ -129,3 +129,45 @@ export function secureMyProfile(targetUserId) {
   return executeGraphQL({ query, variables: { id: String(targetUserId) } })
 }
 
+/**
+ * SQL注入-漏洞版：keyword 直接拼接到 SQL（后端使用 ${} 拼接）
+ * @param {string} keyword - 搜索关键词（可注入）
+ */
+export function searchUsers(keyword) {
+  const query = `
+    query {
+      searchUsers(keyword: "${keyword}") {
+        id
+        username
+        email
+        role
+        salary
+        ssn
+        internalNotes
+      }
+    }
+  `
+  return executeGraphQL({ query })
+}
+
+/**
+ * SQL注入-安全版：参数化查询，防止注入（后端使用 #{} 参数化）
+ * @param {string} keyword - 搜索关键词
+ */
+export function secureSearchUsers(keyword) {
+  const query = `
+    query SearchUsers($keyword: String!) {
+      secureSearchUsers(keyword: $keyword) {
+        id
+        username
+        email
+        role
+        salary
+        ssn
+        internalNotes
+      }
+    }
+  `
+  return executeGraphQL({ query, variables: { keyword } })
+}
+
