@@ -3,9 +3,14 @@ import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 
+// VUE_APP_BASE_API 为空时，自动取浏览器当前访问的 hostname + 后端端口 8080
+// 如需固定地址（如 Burp Suite 抓包），在 .env.development 中设置 VUE_APP_BASE_API
+const baseURL = process.env.VUE_APP_BASE_API ||
+  `${window.location.protocol}//${window.location.hostname}:8080/`
+
 // create an axios instance
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // VUE_APP_BASE_API = 'http://127.0.0.1:8080/'
+  baseURL,
   withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })
