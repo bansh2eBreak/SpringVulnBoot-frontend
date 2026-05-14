@@ -10,5 +10,7 @@ RUN npm run build:prod
 FROM nginx:stable-alpine as production-stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
+# CORS 漏洞演示 - 攻击者模拟站点（端口 81，独立 Origin）
+COPY attacker.html /usr/share/nginx/attacker/attacker.html
+EXPOSE 80 81
 CMD ["nginx", "-g", "daemon off;"]

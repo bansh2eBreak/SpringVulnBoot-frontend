@@ -528,6 +528,12 @@ export const asyncRoutes = [
         component: () => import('@/views/configVuln/swagger/index.vue'),
         name: 'Swagger未授权',
         meta: { title: 'Swagger未授权', icon: 'el-icon-document', roles: ['admin'] }
+      },
+      {
+        path: 'cors',
+        component: () => import('@/views/configVuln/cors/index'),
+        name: 'CORS配置漏洞',
+        meta: { title: 'CORS配置漏洞', icon: 'el-icon-connection', roles: ['admin'] }
       }
     ]
   },
