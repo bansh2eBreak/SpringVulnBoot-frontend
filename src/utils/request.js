@@ -5,8 +5,13 @@ import { getToken } from '@/utils/auth'
 
 // VUE_APP_BASE_API 为空时，自动取浏览器当前访问的 hostname + 后端端口 8080
 // 如需固定地址（如 Burp Suite 抓包），在 .env.development 中设置 VUE_APP_BASE_API
-const baseURL = process.env.VUE_APP_BASE_API ||
-  `${window.location.protocol}//${window.location.hostname}:8080/`
+// 导出供裸 fetch 场景（如 fileInclusion、xxe）复用，保证 baseURL 计算逻辑统一
+export function getBaseUrl() {
+  return (process.env.VUE_APP_BASE_API ||
+    `${window.location.protocol}//${window.location.hostname}:8080/`).replace(/\/$/, '')
+}
+
+const baseURL = getBaseUrl()
 
 // create an axios instance
 const service = axios.create({

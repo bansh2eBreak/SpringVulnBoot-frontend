@@ -145,10 +145,11 @@ public Result xxeSsrfSecure(@RequestBody String xmlContent) {
 
 <script>
 import { xxeSsrfVulnerable, xxeSsrfSecure } from '@/api/xml'
+import { getBaseUrl } from '@/utils/request'
 
 export default {
   data() {
-    const base = (process.env.VUE_APP_BASE_API || '').replace(/\/$/, '') || 'http://127.0.0.1:8080'
+    const base = getBaseUrl()
     return {
       activeName: 'first',
       baseUrl: base,

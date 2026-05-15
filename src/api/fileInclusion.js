@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import request, { getBaseUrl } from '@/utils/request'
 
 /**
  * 上传文件
@@ -19,11 +19,10 @@ export function uploadScript(formData) {
  * 注意：这个接口返回HTML，不是JSON
  */
 export function groovyIncludeVuln(params) {
-  // 去除可能的双斜杠问题
-  const baseUrl = process.env.VUE_APP_BASE_API.replace(/\/$/, '')
+  const baseUrl = getBaseUrl()
   const url = `/fileInclusion/groovy/vuln?file=${encodeURIComponent(params.file)}`
   const cmdParam = params.cmd ? `&cmd=${encodeURIComponent(params.cmd)}` : ''
-  
+
   return fetch(baseUrl + url + cmdParam, {
     method: 'GET',
     credentials: 'include'
@@ -35,11 +34,10 @@ export function groovyIncludeVuln(params) {
  * 注意：这个接口返回HTML，不是JSON
  */
 export function groovyIncludeSecure(params) {
-  // 去除可能的双斜杠问题
-  const baseUrl = process.env.VUE_APP_BASE_API.replace(/\/$/, '')
+  const baseUrl = getBaseUrl()
   const url = `/fileInclusion/groovy/sec?file=${encodeURIComponent(params.file)}`
   const cmdParam = params.cmd ? `&cmd=${encodeURIComponent(params.cmd)}` : ''
-  
+
   return fetch(baseUrl + url + cmdParam, {
     method: 'GET',
     credentials: 'include'
@@ -50,8 +48,7 @@ export function groovyIncludeSecure(params) {
  * 下载示例文件
  */
 export function downloadExample(type) {
-  // 去除可能的双斜杠问题
-  const baseUrl = process.env.VUE_APP_BASE_API.replace(/\/$/, '')
+  const baseUrl = getBaseUrl()
   const url = `${baseUrl}/fileInclusion/downloadExample?type=${type}`
   
   // 创建隐藏的a标签下载
