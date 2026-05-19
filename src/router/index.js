@@ -358,6 +358,27 @@ export const asyncRoutes = [
     ]
   },
 
+  // ========== 模板注入漏洞（独立一级菜单，便于后续扩展 Freemarker/Velocity SSTI） ==========
+  {
+    path: '/ssti',
+    component: Layout,
+    redirect: '/ssti/thymeleaf',
+    name: 'ssti',
+    meta: {
+      title: '模板注入漏洞',
+      icon: 'el-icon-document-copy',
+      roles: ['admin']
+    },
+    children: [
+      {
+        path: 'thymeleaf',
+        component: () => import('@/views/ssti/index'),
+        name: 'SSTI模板注入漏洞',
+        meta: { title: 'SSTI模板注入漏洞', icon: 'el-icon-edit-outline', roles: ['admin'] }
+      }
+    ]
+  },
+
   {
     path: '/fileupload',
     component: Layout,
@@ -581,6 +602,7 @@ export const asyncRoutes = [
       }
     ]
   },
+
 
   // 外部链接（所有用户都可以访问）
   {
