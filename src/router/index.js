@@ -604,19 +604,6 @@ export const asyncRoutes = [
   },
 
 
-  // 外部链接（所有用户都可以访问）
-  {
-    path: '/external-link',
-    component: Layout,
-    meta: { roles: ['guest', 'admin'] },
-    children: [
-      {
-        path: 'https://github.com/bansh2eBreak/SpringVulnBoot-backend',
-        meta: { title: 'External Link', icon: 'link', roles: ['guest', 'admin'] }
-      }
-    ]
-  },
-  
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

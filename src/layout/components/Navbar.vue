@@ -18,9 +18,6 @@
               Home
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="">
-            <el-dropdown-item>Github</el-dropdown-item>
-          </a>
           <el-dropdown-item @click.native="showUpdatePasswordDialog">
             <span style="display:block;">ResetPass</span>
           </el-dropdown-item>

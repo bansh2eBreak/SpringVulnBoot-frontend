@@ -148,24 +148,6 @@
       </div>
     </div>
 
-    <!-- GitHub关注部分 -->
-    <div class="section github-section">
-      <h2 class="section-title">支持我们</h2>
-      <div class="content-box">
-        <p>如果您觉得这个项目对您有帮助，欢迎：</p>
-        <ul class="support-list">
-          <li><i class="el-icon-star-on"></i> 给项目点个Star</li>
-          <li><i class="el-icon-view"></i> 关注项目更新</li>
-          <li><i class="el-icon-chat-dot-round"></i> 提出宝贵建议</li>
-          <li><i class="el-icon-share"></i> 分享给更多朋友</li>
-        </ul>
-        <div class="github-link">
-          <a href="https://github.com/bansh2eBreak/SpringVulnBoot-backend" target="_blank" class="github-button">
-            <i class="el-icon-star-on"></i> Star on GitHub
-          </a>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -220,46 +202,6 @@ export default {
 .architecture-item h3 i {
   margin-right: 8px;
   color: #409EFF;
-}
-
-.support-list {
-  list-style: none;
-  padding: 0;
-  margin: 20px 0;
-}
-
-.support-list li {
-  margin: 10px 0;
-  display: flex;
-  align-items: center;
-}
-
-.support-list li i {
-  color: #409EFF;
-  margin-right: 8px;
-}
-
-.github-link {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.github-button {
-  display: inline-block;
-  padding: 10px 20px;
-  background: #409EFF;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-}
-
-.github-button:hover {
-  background: #66b1ff;
-}
-
-.github-button i {
-  margin-right: 5px;
 }
 
 .file-structure {
