@@ -347,13 +347,21 @@ export const asyncRoutes = [
   {
     path: '/pathtraversal',
     component: Layout,
-    meta: { roles: ['admin'] },
+    redirect: '/pathtraversal/index',
+    name: 'pathtraversal',
+    meta: { title: '路径穿越漏洞', icon: 'el-icon-s-management', roles: ['admin'] },
     children: [
       {
-        path: '',
-        name: 'pathtraversal',
+        path: 'index',
+        name: 'PathTraversalIndex',
         component: () => import('@/views/pathtraversal/index'),
-        meta: { title: '路径穿越漏洞', icon: 'el-icon-s-management', roles: ['admin'] }
+        meta: { title: '路径穿越漏洞', icon: 'el-icon-folder-opened', roles: ['admin'] }
+      },
+      {
+        path: 'zipslip',
+        name: 'ZipSlip',
+        component: () => import('@/views/pathtraversal/zipslip'),
+        meta: { title: 'ZIP Slip漏洞', icon: 'el-icon-files', roles: ['admin'] }
       }
     ]
   },
