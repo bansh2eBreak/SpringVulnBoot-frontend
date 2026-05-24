@@ -607,6 +607,12 @@ export const asyncRoutes = [
         component: () => import('@/views/otherVuln/spel/index'),
         name: 'SpEL表达式注入',
         meta: { title: 'SpEL表达式注入', icon: 'el-icon-s-operation', roles: ['admin'] }
+      },
+      {
+        path: 'crlf',
+        component: () => import('@/views/otherVuln/crlf/index'),
+        name: 'CRLF注入',
+        meta: { title: 'CRLF注入', icon: 'el-icon-edit', roles: ['admin'] }
       }
     ]
   },
