@@ -613,6 +613,12 @@ export const asyncRoutes = [
         component: () => import('@/views/otherVuln/crlf/index'),
         name: 'CRLF注入',
         meta: { title: 'CRLF注入', icon: 'el-icon-edit', roles: ['admin'] }
+      },
+      {
+        path: 'clickjacking',
+        component: () => import('@/views/otherVuln/clickjacking/index'),
+        name: '点击劫持漏洞',
+        meta: { title: '点击劫持漏洞', icon: 'el-icon-mouse', roles: ['admin'] }
       }
     ]
   },

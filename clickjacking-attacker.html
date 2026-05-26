@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎁 恭喜中奖 - 限时领取 iPhone 16 Pro</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 50%, #f39c12 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    .banner {
+      background: #c0392b;
+      color: #fff;
+      padding: 12px 20px;
+      font-size: 13px;
+      line-height: 1.6;
+      border-bottom: 3px solid #922b21;
+      text-align: center;
+    }
+    .banner strong { font-size: 14px; }
+    .banner code { background: rgba(0,0,0,.35); padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+
+    .container { max-width: 700px; margin: 0 auto; padding: 30px 20px; }
+
+    .control-panel {
+      background: rgba(255,255,255,.95);
+      color: #303133;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    }
+    .control-panel h3 {
+      font-size: 14px;
+      color: #e94560;
+      margin-bottom: 12px;
+      letter-spacing: .5px;
+    }
+    .ctrl-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .ctrl-row label { color: #606266; min-width: 90px; }
+    select, button {
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: 1px solid #dcdfe6;
+      font-size: 13px;
+      cursor: pointer;
+      background: #fff;
+      color: #303133;
+    }
+    button.toggle-active {
+      background: #f39c12;
+      color: #fff;
+      border-color: #f39c12;
+    }
+
+    .lure-card {
+      position: relative;
+      background: #fff;
+      color: #303133;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      overflow: hidden;
+    }
+    .lure-card h1 {
+      color: #e94560;
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .lure-card .sub {
+      text-align: center;
+      color: #909399;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .prize-area {
+      background: linear-gradient(135deg, #fef9e7, #fcf3cf);
+      border: 2px dashed #f39c12;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .prize-area .prize-icon { font-size: 60px; }
+    .prize-area .prize-name { font-size: 20px; font-weight: bold; color: #d35400; margin-top: 8px; }
+    .prize-area .prize-desc { font-size: 13px; color: #7d6608; margin-top: 6px; }
+
+    /* 诱饵区域容器（用于定位 iframe 覆盖） */
+    .click-zone {
+      position: relative;
+      width: 100%;
+      height: 60px;
+      margin-top: 12px;
+      transition: height .3s ease;
+    }
+    .click-zone.expanded { height: 420px; }
+
+    /* 诱饵按钮（用户看到的） */
+    .lure-btn {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 60px;
+      background: linear-gradient(135deg, #e94560, #c0392b);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(233,69,96,.4);
+      letter-spacing: 1px;
+    }
+
+    /* iframe 覆盖在诱饵按钮上方
+       受害者页面的"确认修改密码"按钮通过 position:fixed 锁在 (0,0)，宽 100%、高 60px
+       所以 iframe 简单覆盖在诱饵按钮上方即可精准对齐按钮 */
+    .victim-iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 60px;
+      border: none;
+      z-index: 10;
+      transition: opacity .3s ease, height .3s ease;
+    }
+    .victim-iframe.transparent { opacity: 0; }
+    .victim-iframe.semi { opacity: 0.5; }
+    .victim-iframe.visible { opacity: 1; height: 420px; }
+
+    .countdown {
+      text-align: center;
+      font-size: 14px;
+      color: #909399;
+      margin-top: 16px;
+    }
+    .countdown strong { color: #e94560; font-size: 20px; }
+
+    .hint {
+      margin-top: 16px;
+      padding: 12px;
+      background: #f4f4f5;
+      border-left: 3px solid #f39c12;
+      font-size: 12px;
+      color: #606266;
+      line-height: 1.7;
+      border-radius: 4px;
+    }
+    .hint strong { color: #e94560; }
+  </style>
+</head>
+<body>
+
+<!-- 安全提示横幅 -->
+<div class="banner">
+  <strong>⚠️ 这是模拟攻击者控制的钓鱼网站（仅用于 ClickJacking 漏洞演示）</strong><br>
+  当前页面 Origin：<code id="currentOrigin"></code>
+  &nbsp;|&nbsp;
+  iframe 加载目标：<code id="iframeUrlDisplay"></code>
+</div>
+
+<div class="container">
+
+  <!-- 控制面板（教学用） -->
+  <div class="control-panel">
+    <h3>🛠️ 演示控制面板（攻击者视角，真实攻击中用户看不到）</h3>
+    <div class="ctrl-row">
+      <label>受害者页面：</label>
+      <select id="victimSelect" onchange="onVictimChange()">
+        <option value="vuln">漏洞版（无 X-Frame-Options 防护）</option>
+        <option value="sec">安全版（X-Frame-Options: DENY）</option>
+      </select>
+    </div>
+    <div class="ctrl-row">
+      <label>iframe 模式：</label>
+      <button id="btnTransparent" class="toggle-active" onclick="setIframeMode('transparent')">透明（真实攻击）</button>
+      <button id="btnSemi" onclick="setIframeMode('semi')">半透明（教学）</button>
+      <button id="btnVisible" onclick="setIframeMode('visible')">完全可见（调试）</button>
+    </div>
+    <div class="ctrl-row" style="margin-top: 4px; color: #909399; font-size: 12px;">
+      💡 建议先用"半透明"模式直观看到 iframe 错位覆盖，再切换"透明"模式模拟真实攻击
+    </div>
+  </div>
+
+  <!-- 诱饵卡片 -->
+  <div class="lure-card">
+    <h1>🎉 恭喜您！</h1>
+    <p class="sub">您是我们今天第 <strong style="color:#e94560;">88888</strong> 位幸运访客</p>
+
+    <div class="prize-area">
+      <div class="prize-icon">📱</div>
+      <div class="prize-name">iPhone 16 Pro Max 256GB</div>
+      <div class="prize-desc">原价 ¥9,999 — 限时免费领取，仅剩最后 1 份！</div>
+    </div>
+
+    <!-- 点击区域：诱饵按钮 + iframe 覆盖 -->
+    <div class="click-zone" id="clickZone">
+      <button class="lure-btn">🎁 立即领取大奖</button>
+      <iframe id="victimFrame" class="victim-iframe transparent"
+              src="http://127.0.0.1/clickjacking-victim-vuln.html"></iframe>
+    </div>
+
+    <div class="countdown">
+      限时倒计时：<strong id="countdown">59</strong> 秒，错过再等一年！
+    </div>
+
+    <div class="hint">
+      <strong>📌 漏洞原理：</strong>
+      上方"立即领取"按钮的位置实际上覆盖了一个透明 iframe，iframe 内加载的是您靶场账户的"修改密码"页面。
+      由于您已登录靶场（同 origin 的 localStorage 中存有 JWT），iframe 内的页面可以直接拿到您的 JWT 并发起修改密码请求。
+      <br>当您点击"领取"时，实际点击穿透到 iframe 内的"确认修改"按钮上，密码被改为 <code>hacked_by_clickjacking</code>。
+    </div>
+
+    <div class="hint" style="background:#fff3e0; border-left-color:#e67e22; margin-top:10px;">
+      <strong>⚠️ 关于 iframe 加载的目标页面（重要澄清）：</strong>
+      <br>iframe 中加载的 <code>http://127.0.0.1/clickjacking-victim-vuln.html</code> 部署在<strong>靶场前端服务器（端口 80）</strong>，
+      它<strong>不是攻击者放上去的</strong>，而是<strong>模拟业务系统本身的"修改密码"合法页面</strong>。
+      <br><br>
+      在真实场景中（例如银行被点击劫持）：
+      <br>• 攻击者只控制自己的钓鱼站（如 attacker.com）
+      <br>• 攻击者写一行 <code>&lt;iframe src="<strong>http://bank.com/transfer</strong>"&gt;</code>
+      <br>• 浏览器自动去 <strong>bank.com</strong>（业务方）拉取合法转账页
+      <br>• 漏洞本质：<strong>bank.com 的合法页面没有设置 X-Frame-Options</strong>，允许被任意网站 iframe 嵌入
+      <br><br>
+      本靶场用一个简化的静态 HTML（<code>clickjacking-victim-vuln.html</code>）等价模拟"靶场真实的修改密码业务页"，
+      没有任何攻击者代码，全部是合法业务逻辑（读 JWT → 调 <code>/changePassword</code>）。
+      之所以不直接 iframe 靶场 Vue 项目里的修改密码页，是因为 Vue 是 SPA，
+      所有路由都返回同一个 <code>index.html</code>，Nginx 难以针对单个 SPA 子路由设置不同的 <code>X-Frame-Options</code> 来做漏洞/安全版对比。
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // 显示 origin 和 iframe URL
+  document.getElementById('currentOrigin').textContent = window.location.origin;
+
+  var iframe = document.getElementById('victimFrame');
+
+  function updateIframeUrl() {
+    document.getElementById('iframeUrlDisplay').textContent = iframe.src;
+  }
+  updateIframeUrl();
+
+  // 切换受害者页面
+  function onVictimChange() {
+    var v = document.getElementById('victimSelect').value;
+    var base = window.location.protocol + '//' + window.location.hostname;
+    iframe.src = base + '/clickjacking-victim-' + v + '.html';
+    updateIframeUrl();
+  }
+
+  // 切换 iframe 显示模式
+  function setIframeMode(mode) {
+    iframe.classList.remove('transparent', 'semi', 'visible');
+    iframe.classList.add(mode);
+
+    // 完全可见模式：扩展容器高度，让用户能看到 iframe 内的完整表单
+    var zone = document.getElementById('clickZone');
+    if (mode === 'visible') {
+      zone.classList.add('expanded');
+    } else {
+      zone.classList.remove('expanded');
+    }
+
+    ['btnTransparent', 'btnSemi', 'btnVisible'].forEach(function(id) {
+      document.getElementById(id).classList.remove('toggle-active');
+    });
+    document.getElementById('btn' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('toggle-active');
+  }
+
+  // 倒计时动画（视觉效果）
+  var sec = 59;
+  setInterval(function() {
+    sec = sec > 0 ? sec - 1 : 59;
+    document.getElementById('countdown').textContent = sec;
+  }, 1000);
+</script>
+
+</body>
+</html>

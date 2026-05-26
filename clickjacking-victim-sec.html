@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>账户安全 - 修改密码（安全版）</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f5f7fa;
+      padding: 30px;
+      color: #303133;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 28px;
+      max-width: 480px;
+      margin: 0 auto;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    }
+    h2 { font-size: 18px; margin-bottom: 16px; color: #303133; }
+    .field { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; color: #606266; margin-bottom: 6px; }
+    input {
+      width: 100%; padding: 8px 12px; font-size: 14px;
+      border: 1px solid #dcdfe6; border-radius: 4px; color: #606266;
+    }
+    input:read-only { background: #f5f7fa; cursor: not-allowed; }
+    .btn-primary {
+      width: 100%; padding: 10px;
+      background: #67c23a; color: #fff;
+      border: none; border-radius: 4px;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+    }
+    .btn-primary:hover { background: #85ce61; }
+
+    /* 与漏洞版相同的 fixed 按钮（演示一致性），但本页 Nginx 配置了 X-Frame-Options: DENY
+       iframe 根本无法加载本页，所以按钮也不会显示 */
+    .clickjacking-trigger {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 60px;
+      background: #67c23a;
+      color: #fff;
+      border: none;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      z-index: 9999;
+      letter-spacing: 1px;
+    }
+    .clickjacking-trigger:hover { background: #85ce61; }
+    .result {
+      margin-top: 14px; padding: 10px 14px;
+      border-radius: 4px; font-size: 13px;
+      display: none;
+    }
+    .result.success { background: #f0f9eb; color: #67c23a; border: 1px solid #c2e7b0; display: block; }
+    .result.error { background: #fef0f0; color: #f56c6c; border: 1px solid #fbc4c4; display: block; }
+  </style>
+</head>
+<body style="padding-top: 80px;">
+
+<!-- 与漏洞版同样有 fixed 按钮，但本页响应头 X-Frame-Options: DENY，根本无法被 iframe -->
+<button class="clickjacking-trigger" onclick="doChangePassword()">确认修改密码</button>
+
+<div class="card">
+  <h2>修改密码（安全版）</h2>
+  <div class="field">
+    <label>当前账号</label>
+    <input type="text" id="username" value="加载中..." readonly>
+  </div>
+  <div class="field">
+    <label>新密码</label>
+    <input type="text" id="newPassword" value="hacked_by_clickjacking">
+  </div>
+  <button class="btn-primary" id="submitBtn" onclick="doChangePassword()">确认修改</button>
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+  var jwt = localStorage.getItem('Authorization');
+
+  function parseJwt(token) {
+    try {
+      var base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      return JSON.parse(decodeURIComponent(atob(base64).split('').map(function(c){
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join('')));
+    } catch(e) { return null; }
+  }
+
+  if (jwt) {
+    var payload = parseJwt(jwt);
+    if (payload && payload.username) {
+      document.getElementById('username').value = payload.username;
+    } else {
+      document.getElementById('username').value = '(未登录)';
+    }
+  } else {
+    document.getElementById('username').value = '(未登录靶场)';
+  }
+
+  var backendUrl = window.location.protocol + '//' + window.location.hostname + ':8080';
+
+  async function doChangePassword() {
+    var newPassword = document.getElementById('newPassword').value;
+    var resultBox = document.getElementById('result');
+
+    if (!jwt) {
+      resultBox.className = 'result error';
+      resultBox.textContent = '❌ 未检测到 JWT，请先登录靶场后再测试';
+      return;
+    }
+
+    try {
+      var resp = await fetch(backendUrl + '/changePassword', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': jwt
+        },
+        body: JSON.stringify({ newPassword: newPassword })
+      });
+      var json = await resp.json();
+      if (json.code === 1 || json.code === 0) {
+        resultBox.className = 'result success';
+        resultBox.innerHTML = '✅ ' + (json.msg || '密码修改成功') + '<br>新密码：<code>' + newPassword + '</code>';
+      } else {
+        resultBox.className = 'result error';
+        resultBox.textContent = '❌ ' + (json.msg || '修改失败');
+      }
+    } catch (e) {
+      resultBox.className = 'result error';
+      resultBox.textContent = '❌ 请求异常：' + e.message;
+    }
+  }
+</script>
+
+</body>
+</html>
