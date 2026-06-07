@@ -619,6 +619,12 @@ export const asyncRoutes = [
         component: () => import('@/views/otherVuln/clickjacking/index'),
         name: '点击劫持漏洞',
         meta: { title: '点击劫持漏洞', icon: 'el-icon-mouse', roles: ['admin'] }
+      },
+      {
+        path: 'hostHeaderInjection',
+        component: () => import('@/views/otherVuln/hostHeaderInjection/index'),
+        name: 'HostHeader注入漏洞',
+        meta: { title: 'HostHeader注入漏洞', icon: 'el-icon-message', roles: ['admin'] }
       }
     ]
   },
