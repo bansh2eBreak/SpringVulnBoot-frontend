@@ -629,6 +629,26 @@ export const asyncRoutes = [
     ]
   },
 
+  {
+    path: '/passwordSecurity',
+    component: Layout,
+    redirect: '/passwordSecurity/predictableSeed',
+    name: 'passwordSecurity',
+    meta: {
+      title: '密码安全',
+      icon: 'el-icon-lock',
+      roles: ['admin']
+    },
+    children: [
+      {
+        path: 'predictableSeed',
+        component: () => import('@/views/passwordSecurity/predictableSeed/index'),
+        name: '种子可预测漏洞',
+        meta: { title: '种子可预测漏洞', icon: 'el-icon-key', roles: ['admin'] }
+      }
+    ]
+  },
+
 
   // 外部链接（所有用户都可以访问）
   {
