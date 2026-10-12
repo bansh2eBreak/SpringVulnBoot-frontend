@@ -6,7 +6,7 @@ import request from '@/utils/request'
  */
 export function forgotPasswordVuln(username) {
   return request({
-    url: '/passwordSecurity/predictableSeed/forgot-password/vuln',
+    url: '/cryptoSecurity/predictableSeed/forgot-password/vuln',
     method: 'post',
     data: { username }
   })
@@ -17,7 +17,7 @@ export function forgotPasswordVuln(username) {
  */
 export function forgotPasswordSec(username) {
   return request({
-    url: '/passwordSecurity/predictableSeed/forgot-password/sec',
+    url: '/cryptoSecurity/predictableSeed/forgot-password/sec',
     method: 'post',
     data: { username }
   })
@@ -28,7 +28,7 @@ export function forgotPasswordSec(username) {
  */
 export function resetPassword(token, newPassword) {
   return request({
-    url: '/passwordSecurity/predictableSeed/reset',
+    url: '/cryptoSecurity/predictableSeed/reset',
     method: 'post',
     data: { token, newPassword }
   })

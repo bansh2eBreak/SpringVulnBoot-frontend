@@ -630,19 +630,19 @@ export const asyncRoutes = [
   },
 
   {
-    path: '/passwordSecurity',
+    path: '/cryptoSecurity',
     component: Layout,
-    redirect: '/passwordSecurity/predictableSeed',
-    name: 'passwordSecurity',
+    redirect: '/cryptoSecurity/predictableSeed',
+    name: 'cryptoSecurity',
     meta: {
-      title: '密码安全',
+      title: '加密安全',
       icon: 'el-icon-lock',
       roles: ['admin']
     },
     children: [
       {
         path: 'predictableSeed',
-        component: () => import('@/views/passwordSecurity/predictableSeed/index'),
+        component: () => import('@/views/cryptoSecurity/predictableSeed/index'),
         name: '种子可预测漏洞',
         meta: { title: '种子可预测漏洞', icon: 'el-icon-key', roles: ['admin'] }
       }
