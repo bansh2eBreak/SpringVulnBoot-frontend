@@ -645,6 +645,12 @@ export const asyncRoutes = [
         component: () => import('@/views/cryptoSecurity/predictableSeed/index'),
         name: '种子可预测漏洞',
         meta: { title: '种子可预测漏洞', icon: 'el-icon-key', roles: ['admin'] }
+      },
+      {
+        path: 'frontendSign',
+        component: () => import('@/views/cryptoSecurity/frontendSign/index'),
+        name: '前端加签被逆向',
+        meta: { title: '前端加签被逆向', icon: 'el-icon-edit-outline', roles: ['admin'] }
       }
     ]
   },
