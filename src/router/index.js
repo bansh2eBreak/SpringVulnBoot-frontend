@@ -341,6 +341,12 @@ export const asyncRoutes = [
         name: 'JWT 算法混淆漏洞',
         meta: { title: 'JWT 算法混淆漏洞', icon: 'el-icon-lock', roles: ['admin'] }
       },
+      {
+        path: 'jku',
+        component: () => import('@/views/jwt/Jku'),
+        name: 'JWT jku 远程公钥',
+        meta: { title: 'JWT jku 远程公钥', icon: 'el-icon-link', roles: ['admin'] }
+      },
     ]
   },
 
