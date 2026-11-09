@@ -574,6 +574,54 @@ export const asyncRoutes = [
   },
 
   {
+    path: '/cryptoSecurity',
+    component: Layout,
+    redirect: '/cryptoSecurity/predictableSeed',
+    name: 'cryptoSecurity',
+    meta: {
+      title: '加密安全',
+      icon: 'el-icon-lock',
+      roles: ['admin']
+    },
+    children: [
+      {
+        path: 'predictableSeed',
+        component: () => import('@/views/cryptoSecurity/predictableSeed/index'),
+        name: '种子可预测漏洞',
+        meta: { title: '种子可预测漏洞', icon: 'el-icon-key', roles: ['admin'] }
+      },
+      {
+        path: 'frontendSign',
+        component: () => import('@/views/cryptoSecurity/frontendSign/index'),
+        name: '前端加签被逆向',
+        meta: { title: '前端加签被逆向', icon: 'el-icon-edit-outline', roles: ['admin'] }
+      }
+    ]
+  },
+
+  {
+    path: '/businessLogic',
+    component: Layout,
+    redirect: '/businessLogic/couponRace',
+    name: 'businessLogic',
+    meta: { title: '业务逻辑漏洞', icon: 'el-icon-goods', roles: ['admin'] },
+    children: [
+      {
+        path: 'couponRace',
+        name: 'Coupon Race',
+        component: () => import('@/views/businessLogic/CouponRace'),
+        meta: { title: '优惠券并发超用', icon: 'el-icon-tickets', roles: ['admin'] }
+      },
+      {
+        path: 'negativeOrder',
+        name: 'Negative Order',
+        component: () => import('@/views/businessLogic/NegativeOrder'),
+        meta: { title: '负数下单', icon: 'el-icon-shopping-cart-2', roles: ['admin'] }
+      }
+    ]
+  },
+
+  {
     path: '/otherVuln',
     component: Layout,
     redirect: '/otherVuln/redos',
@@ -634,33 +682,6 @@ export const asyncRoutes = [
       }
     ]
   },
-
-  {
-    path: '/cryptoSecurity',
-    component: Layout,
-    redirect: '/cryptoSecurity/predictableSeed',
-    name: 'cryptoSecurity',
-    meta: {
-      title: '加密安全',
-      icon: 'el-icon-lock',
-      roles: ['admin']
-    },
-    children: [
-      {
-        path: 'predictableSeed',
-        component: () => import('@/views/cryptoSecurity/predictableSeed/index'),
-        name: '种子可预测漏洞',
-        meta: { title: '种子可预测漏洞', icon: 'el-icon-key', roles: ['admin'] }
-      },
-      {
-        path: 'frontendSign',
-        component: () => import('@/views/cryptoSecurity/frontendSign/index'),
-        name: '前端加签被逆向',
-        meta: { title: '前端加签被逆向', icon: 'el-icon-edit-outline', roles: ['admin'] }
-      }
-    ]
-  },
-
 
   // 外部链接（所有用户都可以访问）
   {
