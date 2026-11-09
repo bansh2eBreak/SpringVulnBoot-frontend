@@ -617,6 +617,12 @@ export const asyncRoutes = [
         name: 'Negative Order',
         component: () => import('@/views/businessLogic/NegativeOrder'),
         meta: { title: '负数下单', icon: 'el-icon-shopping-cart-2', roles: ['admin'] }
+      },
+      {
+        path: 'paymentReplay',
+        name: 'Payment Replay',
+        component: () => import('@/views/businessLogic/PaymentReplay'),
+        meta: { title: '支付回调重复处理', icon: 'el-icon-money', roles: ['admin'] }
       }
     ]
   },
