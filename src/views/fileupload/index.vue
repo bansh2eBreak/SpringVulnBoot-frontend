@@ -6,29 +6,35 @@
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="漏洞描述" name="first">
                         <div class="vuln-detail">
-                            文件上传漏洞，是指攻击者通过上传恶意文件来获得对服务器的控制权的漏洞。<br>攻击者通常会利用Web应用程序的文件上传功能，将一个包含恶意代码的文件上传到服务器上。如果服务器没有正确地检查和限制上传的文件类型、大小、后缀名等信息，攻击者就可以上传一个包含恶意代码的文件，如php、jsp、asp等可执行脚本文件，然后通过访问上传的文件来执行恶意代码，从而获得对服务器的控制权。
+                            文件上传漏洞是指服务端未正确限制上传文件的类型、内容、大小或文件名，导致攻击者可以将不符合业务要求的文件写入服务器。<br><br>
+                            本课展示三类常见根因：<strong>无校验上传</strong>会接受任意内容；<strong>仅校验 Content-Type</strong>会信任客户端伪造的图片声明；<strong>直接拼接原始文件名</strong>会导致路径穿越和文件覆盖。<br><br>
+                            本靶场的上传目录不是 Web 可执行目录，因此上传 jsp、php 等文件本身不会被自动执行；但若该目录被 Web 服务映射并允许执行，或上传文件被后续文件包含、模板加载等功能处理，就可能进一步形成远程代码执行攻击链。
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="漏洞危害" name="second">
                         <div class="vuln-detail">
-                            任意文件上传漏洞允许攻击者上传恶意文件到服务器，可能导致服务器被完全控制，数据泄露或被篡改，以及网站被挂马传播恶意软件。攻击者可以利用此漏洞执行任意代码，窃取敏感信息，甚至将服务器作为跳板进行其他网络攻击。
+                            • <strong>恶意文件落盘</strong>：非业务允许的文件被写入服务器，污染文件存储空间；<br>
+                            • <strong>路径穿越与覆盖</strong>：攻击者利用 <code>../</code> 跳出上传目录，覆盖图片、附件、配置或其他已有文件；<br>
+                            • <strong>远程代码执行链</strong>：若上传目录可执行，或上传文件会被文件包含、模板加载等功能处理，可能进一步形成 RCE；<br>
+                            • <strong>资源与数据风险</strong>：大文件、畸形文件或同名覆盖可造成存储资源消耗、数据破坏和业务异常。
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="安全编码" name="third">
                         <div class="vuln-detail">
-                            【必须】文件类型限制 <br />
-                            必须在服务器端采用白名单方式对上传或下载的文件类型、大小进行严格的限制。仅允许业务所需文件类型上传，避免上传.jsp、.jspx、.html、.exe等危险文件。
-                            <br /><br />
-                            【建议】其他<br />
-                            对上传的文件回显相对路径或者不显示路径。<br />
-                            设置目录权限限制，禁止上传目录的执行权限。<br />
-                            建议使用OSS静态存储服务器来存储用户上传的文件。
+                            <span style="color: red;">【注意】仅后缀白名单不是完整防护</span><br />
+                            <code>sec1</code> 仅限制扩展名，文本文件改名为 <code>.jpg</code> 仍可通过，且原始文件名仍可能带来覆盖风险。<br /><br />
+                            <span style="color: red;">【必须】服务端验证真实图片内容</span><br />
+                            <code>sec2</code> 限制 PNG/JPEG、文件大小和图片尺寸，检查魔术字节并使用 <code>ImageIO</code> 实际解析图片；客户端提供的文件名和 Content-Type 均不作为可信依据。<br /><br />
+                            <span style="color: red;">【必须】安全保存与下载</span><br />
+                            使用服务端生成的随机文件名，规范化并校验保存路径，将上传目录设为不可执行目录；下载时由服务端确定响应类型，设置 <code>attachment</code> 和 <code>nosniff</code>，且不返回物理绝对路径。
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="参考文章" name="fourth">
                         <div class="vuln-detail">
                             <a href="https://www.javasec.org/java-vuls/FileUpload.html" target="_blank"
                                 style="text-decoration: underline;">《任意文件上传漏洞》</a><br />
+                            <a href="https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html" target="_blank"
+                                style="text-decoration: underline;">《OWASP File Upload Cheat Sheet》</a><br />
                         </div>
                     </el-tab-pane>
                 </el-tabs>
@@ -85,11 +91,12 @@ public class FileUploadController {
                 </el-col>
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 文件扩展名校验 <el-button
+                        <el-row type="flex" justify="space-between" align="middle">基础防护代码 - 文件扩展名校验（仍可绕过）<el-button
                                 type="success" round size="mini"
                                 @click="fetchDataAndFillTable2">去测试</el-button></el-row>
                         <pre v-highlightjs><code class="java">/**
- * 安全版本：限制上传文件后缀名（白名单）
+ * 基础防护：仅后缀白名单校验
+ * 仍无法验证真实图片内容，也不能作为最终安全方案。
  */
 @PostMapping("/sec1")
 @ResponseBody
@@ -142,9 +149,9 @@ public Result handleFileUploadSec1(@RequestParam("file") MultipartFile file) {
  * 漏洞版本2：仅验证 Content-Type（可绕过）
  * 
  * 漏洞说明：
- * 1. 前端可以修改 Content-Type 绕过（如演示所示）
- * 2. 使用 Burp Suite 抓包修改 Content-Type 绕过
- * 3. Content-Type 是客户端可控的，不能作为安全校验依据
+ * 1. multipart 文件分段的 Content-Type 由客户端声明
+ * 2. 前端或 Burp Suite 可把普通文件声明为 image/png
+ * 3. Content-Type 不能证明文件内容是真实图片，不能作为唯一安全校验
  */
 @PostMapping("/vuln2")
 @ResponseBody
@@ -180,29 +187,42 @@ public Result handleFileUploadVuln2(@RequestParam("file") MultipartFile file) {
                 </el-col>
                 <el-col :span="12">
                     <div class="grid-content bg-purple">
-                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 其他</el-row>
-                        <pre v-highlightjs><code class="java">文件上传漏洞其他加固方案：
+                        <el-row type="flex" justify="space-between" align="middle">安全代码 - 完整安全图片上传 <el-button
+                                type="success" round size="mini"
+                                @click="fetchDataAndFillTable5">去测试</el-button></el-row>
+                        <pre v-highlightjs><code class="java">@PostMapping("/sec2")
+public Result uploadSecureImage(@RequestParam MultipartFile file) {
+    // ✅ 限制业务大小，验证 PNG/JPEG 魔术字节
+    String format = detectImageFormat(file.getBytes());
+    validateImageDimensions(file.getBytes());
+    BufferedImage image = ImageIO.read(file.getInputStream());
 
-1）文件重命名（推荐）：
-   - 使用 UUID + 时间戳作为文件名，防止文件名截断攻击
-   - 示例：UUID.randomUUID() + "_" + System.currentTimeMillis() + "." + extension
-
-2）文件内容检测（推荐）：
-   - 检查文件头魔术字节（Magic Number）验证真实文件类型
-   - 使用 Apache Tika 等库进行深度内容检测
-   - 示例：Tika.detect(inputStream)
-   
-3）上传目录防护（必须）：
-   - 禁止上传目录具有执行权限（chmod 644）
-   - 将上传目录设置在 Web 根目录之外（如本项目：/app/file/upload/）
-   - 使用单独域名和服务器存储上传文件（推荐 OSS/S3）
-
-4）其他建议：
-   - 集成防病毒扫描（如 ClamAV）
-   - 详细日志记录上传行为（文件名、大小、IP、时间）
-   - 限制文件大小（防止 DoS 攻击）
-   - 对上传成功的文件仅回显相对路径或文件 ID
-   - 设置文件上传频率限制（防止恶意刷量）
+    // ✅ 重新编码，并使用服务端生成的随机文件名
+    Path target = uploadRoot.resolve(randomFileName(format)).normalize();
+    ImageIO.write(image, format, target.toFile());
+    return Result.success("真实图片校验通过");
+}</code></pre>
+                    </div>
+                </el-col>
+            </el-row>
+            <el-row :gutter="20" class="grid-flex">
+                <el-col :span="12">
+                    <div class="grid-content bg-purple">
+                        <el-row type="flex" justify="space-between" align="middle">漏洞代码 - 原始文件名路径穿越与覆盖 <el-button
+                                type="danger" round size="mini"
+                                @click="fetchDataAndFillTable4">去测试</el-button></el-row>
+                        <pre v-highlightjs><code class="java">/**
+ * 漏洞版本3：直接拼接原始文件名
+ * 例如文件名为 ../upload-guard.txt 时，
+ * 可跳出 upload 目录并覆盖父目录中的文件。
+ */
+@PostMapping("/vuln3")
+public Result handleFileUploadVuln3(@RequestParam("file") MultipartFile file) {
+    // ❌ 原始文件名完全由客户端控制
+    String filePath = UPLOAD_DIR + file.getOriginalFilename();
+    file.transferTo(new File(filePath));
+    return Result.success("文件上传成功");
+}
 </code></pre>
                     </div>
                 </el-col>
@@ -225,6 +245,9 @@ public Result handleFileUploadVuln2(@RequestParam("file") MultipartFile file) {
 
         <!-- 打开嵌套表格的对话框2 -->
         <el-dialog title="上传文件" :visible.sync="dialogFormVisible2" class="center-dialog">
+            <div style="text-align: left; color: #e6a23c; font-style: italic; margin-bottom: 20px;">
+                说明：该场景只校验文件扩展名。可选择任意文本文件并改名为 <code>.jpg</code> 测试：基础防护会接受，完整安全图片上传会拒绝。
+            </div>
             <div>
                 <input type="file" @change="onFileChange" />
                 <button @click="uploadFile2">上传</button>
@@ -240,7 +263,7 @@ public Result handleFileUploadVuln2(@RequestParam("file") MultipartFile file) {
         <!-- 打开嵌套表格的对话框3 -->
         <el-dialog title="上传文件" :visible.sync="dialogFormVisible3" class="center-dialog">
             <div style="text-align: left; color: red; font-style: italic; margin-bottom: 20px;">
-                说明：强制修改文件类型为图片类型：image/png，从而绕过后端接口的文件限制！
+                说明：本次上传会将文件分段声明为 image/png；文件实际内容不会改变，因此可绕过仅校验 Content-Type 的后端接口。
             </div>
             <div style="margin-bottom: 20px;">
                 <input type="file" @change="onFileChange" />
@@ -253,24 +276,58 @@ public Result handleFileUploadVuln2(@RequestParam("file") MultipartFile file) {
             </div>
         </el-dialog>
 
-        <!-- 打开嵌套表格的对话框4 -->
-        <el-dialog title="上传文件" :visible.sync="dialogFormVisible4" class="center-dialog">
-            <div>
+        <!-- 原始文件名路径穿越与覆盖测试 -->
+        <el-dialog title="原始文件名路径穿越与覆盖测试" :visible.sync="dialogFormVisible4" class="center-dialog">
+            <div style="text-align: left; color: red; font-style: italic; margin-bottom: 20px;">
+                说明：将提交给服务端的文件名设置为 <code>../upload-guard.txt</code>，可跳出上传目录并覆盖父目录中的测试文件。
+            </div>
+            <div class="target-file">
+                <div>当前 /app/file/upload-guard.txt 内容：</div>
+                <pre>{{ pathTraversalTargetContent }}</pre>
+            </div>
+            <div style="margin-bottom: 12px;">
                 <input type="file" @change="onFileChange" />
-                <button @click="uploadFile4">上传</button>
+            </div>
+            <div style="margin-bottom: 12px;">
+                <span>提交给服务端的文件名：</span>
+                <el-input v-model.trim="customFilename" size="small" style="width: 240px;" />
             </div>
             <div>
-                <!-- 文本展示区，字体红色 -->
-                <br />
-                <p v-if="message" style="color: red;">{{ message }}</p>
+                <el-button type="danger" @click="uploadFile4">上传并覆盖</el-button>
+                <el-button @click="resetPathTraversal">重置测试数据</el-button>
             </div>
+            <p v-if="pathTraversalMessage" style="color: red;">{{ pathTraversalMessage }}</p>
+        </el-dialog>
+
+        <el-dialog title="完整安全图片上传测试" :visible.sync="dialogFormVisible5" class="center-dialog">
+            <div style="text-align: left; color: #606266; margin-bottom: 20px;">
+                仅接受不超过 2MB、尺寸不超过 4096 × 4096 的真实 PNG 或 JPEG 图片。文件名和客户端声明的 Content-Type 不作为可信依据。
+            </div>
+            <div style="margin-bottom: 12px;">
+                <input type="file" @change="onSecureFileChange" />
+            </div>
+            <div>
+                <el-button type="success" @click="uploadFile5">安全上传</el-button>
+            </div>
+            <p v-if="secureImageMessage" style="color: red;">{{ secureImageMessage }}</p>
+            <p v-if="secureImageDownloadUrl">
+                <a :href="secureImageDownloadUrl" target="_blank">下载服务端重新编码后的图片</a>
+            </p>
         </el-dialog>
     </div>
 </template>
 
 <script>
-import axios from 'axios';
-import { fileuploadVuln1, fileuploadVuln2, fileuploadSec1, fileuploadSec2 } from '@/api/fileupload';
+import { getBaseUrl } from '@/utils/request';
+import {
+    fileuploadVuln1,
+    fileuploadVuln2,
+    fileuploadVuln3,
+    fileuploadSec1,
+    fileuploadSec2,
+    getPathTraversalTarget,
+    resetPathTraversalTarget
+} from '@/api/fileupload';
 
 export default {
     data() {
@@ -279,8 +336,16 @@ export default {
             dialogFormVisible1: false,
             dialogFormVisible2: false,
             dialogFormVisible3: false,
+            dialogFormVisible4: false,
+            dialogFormVisible5: false,
             selectedFile: null,
+            secureImageFile: null,
             message: '',
+            customFilename: '../upload-guard.txt',
+            pathTraversalTargetContent: '',
+            pathTraversalMessage: '',
+            secureImageMessage: '',
+            secureImageDownloadUrl: '',
         };
     },
     methods: {
@@ -299,8 +364,24 @@ export default {
             this.dialogFormVisible3 = true; // 显示对话框
             this.message = ''; // 清空消息
         },
+        async fetchDataAndFillTable4() {
+            this.dialogFormVisible4 = true;
+            this.selectedFile = null;
+            this.customFilename = '../upload-guard.txt';
+            this.pathTraversalMessage = '';
+            await this.loadPathTraversalTarget();
+        },
+        fetchDataAndFillTable5() {
+            this.dialogFormVisible5 = true;
+            this.secureImageFile = null;
+            this.secureImageMessage = '';
+            this.secureImageDownloadUrl = '';
+        },
         onFileChange(event) {
             this.selectedFile = event.target.files[0];
+        },
+        onSecureFileChange(event) {
+            this.secureImageFile = event.target.files[0];
         },
         async uploadFile1() {
             if (!this.selectedFile) {
@@ -357,7 +438,6 @@ export default {
                 type: 'image/png'
             });
             formData.append('file', modifiedFile);
-            // console.log(formData.get('file').type);  
 
             try {
                 const response = await fileuploadVuln2(formData);
@@ -368,6 +448,60 @@ export default {
                 }
             } catch (error) {
                 this.message = '文件上传时发生错误';
+            }
+        },
+        async loadPathTraversalTarget() {
+            try {
+                const response = await getPathTraversalTarget();
+                this.pathTraversalTargetContent = response.data;
+            } catch (error) {
+                this.pathTraversalTargetContent = '读取测试文件失败';
+            }
+        },
+        async uploadFile4() {
+            if (!this.selectedFile) {
+                this.pathTraversalMessage = '请选择要上传的文件';
+                return;
+            }
+            if (!this.customFilename) {
+                this.pathTraversalMessage = '请输入提交给服务端的文件名';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', this.selectedFile, this.customFilename);
+            try {
+                const response = await fileuploadVuln3(formData);
+                this.pathTraversalMessage = response.data;
+                await this.loadPathTraversalTarget();
+            } catch (error) {
+                this.pathTraversalMessage = '文件上传时发生错误';
+            }
+        },
+        async resetPathTraversal() {
+            try {
+                const response = await resetPathTraversalTarget();
+                this.pathTraversalMessage = response.data;
+                await this.loadPathTraversalTarget();
+            } catch (error) {
+                this.pathTraversalMessage = '重置测试文件失败';
+            }
+        },
+        async uploadFile5() {
+            if (!this.secureImageFile) {
+                this.secureImageMessage = '请选择要上传的图片';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', this.secureImageFile);
+            try {
+                const response = await fileuploadSec2(formData);
+                this.secureImageMessage = response.data.message;
+                this.secureImageDownloadUrl = getBaseUrl() + response.data.downloadUrl;
+            } catch (error) {
+                this.secureImageMessage = '图片未通过安全校验';
+                this.secureImageDownloadUrl = '';
             }
         }
     }
@@ -484,5 +618,17 @@ pre code {
 
 .center-dialog-table {
     text-align: center;
+}
+
+.target-file {
+    background: #f5f7fa;
+    margin-bottom: 15px;
+    padding: 10px;
+    text-align: left;
+}
+
+.target-file pre {
+    margin-bottom: 0;
+    white-space: pre-wrap;
 }
 </style>
